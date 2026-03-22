@@ -1,0 +1,445 @@
+/* ===== Reset & Base ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --color-basic:      #ffffff;
+  --color-basic-border: #e0e0e0;
+  --color-focus:      #fff9c4;
+  --color-focus-border: #f9a825;
+  --color-more:       #ffe0cc;
+  --color-more-border: #e64a19;
+  --color-primary:    #3f51b5;
+  --color-primary-dark: #283593;
+  --color-bg:         #f4f5f7;
+  --radius:           8px;
+  --shadow:           0 2px 6px rgba(0,0,0,0.12);
+}
+
+body {
+  font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+  background: var(--color-bg);
+  color: #222;
+  min-height: 100vh;
+}
+
+/* ===== Nav ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--color-primary);
+  color: #fff;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 52px;
+  box-shadow: var(--shadow);
+}
+
+body { padding-top: 52px; }
+nav .logo { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.5px; margin-right: auto; }
+nav a {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  font-size: 0.92rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+nav a:hover, nav a.active { background: rgba(255,255,255,0.18); color: #fff; }
+
+/* ===== Page Header ===== */
+.page-header {
+  padding: 28px 24px 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.page-header h1 { font-size: 1.4rem; color: var(--color-primary-dark); }
+
+/* ===== Mode Legend ===== */
+.legend {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 0 24px 16px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+}
+.legend-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid;
+}
+.legend-dot.basic  { background: var(--color-basic);  border-color: var(--color-basic-border); }
+.legend-dot.focus  { background: var(--color-focus);  border-color: var(--color-focus-border); }
+.legend-dot.more   { background: var(--color-more);   border-color: var(--color-more-border); }
+
+/* ===== Chapter Section ===== */
+.chapter-section { padding: 0 24px 32px; }
+.chapter-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  margin-bottom: 10px;
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--color-primary);
+  display: inline-block;
+}
+
+/* ===== Word Grid ===== */
+.word-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+/* ===== Word Card ===== */
+.word-card {
+  position: relative;
+  background: var(--color-basic);
+  border: 1.5px solid var(--color-basic-border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  user-select: none;
+}
+.word-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.word-card.active { z-index: 200; }
+.word-card.mode-focus { background: var(--color-focus); border-color: var(--color-focus-border); }
+.word-card.mode-more  { background: var(--color-more);  border-color: var(--color-more-border); }
+
+.word-card .eng  { font-size: 0.96rem; font-weight: 600; color: #1a237e; word-break: break-word; }
+.word-card .kor  { font-size: 0.86rem; color: #555; margin-top: 3px; word-break: keep-all; }
+
+/* ===== Mode Popup ===== */
+.mode-popup {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 100;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.16);
+  min-width: 130px;
+  overflow: hidden;
+}
+.mode-popup.open { display: block; }
+.mode-popup button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-align: left;
+  transition: background 0.15s;
+}
+.mode-popup button:hover { background: #f0f0f0; }
+.mode-popup .dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-basic { background: #bdbdbd; }
+.dot-focus { background: var(--color-focus-border); }
+.dot-more  { background: var(--color-more-border); }
+
+/* ===== Quiz Page ===== */
+.quiz-controls {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 24px;
+  margin: 0 24px 24px;
+}
+.quiz-controls h2 { font-size: 1rem; margin-bottom: 14px; color: var(--color-primary-dark); }
+
+.chapter-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.chapter-checks label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.chapter-checks label:hover { background: #f0f4ff; }
+.chapter-checks input[type=checkbox] { accent-color: var(--color-primary); width: 15px; height: 15px; }
+
+.select-btns { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+.select-btns button {
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1.5px solid var(--color-primary);
+  background: #fff;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.select-btns button:hover { background: var(--color-primary); color: #fff; }
+
+.mode-radios { display: flex; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+.mode-radios label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.mode-radios input[type=radio],
+.mode-radios input[type=checkbox] { accent-color: var(--color-primary); width: 16px; height: 16px; }
+
+.mode-swatch {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid;
+  vertical-align: middle;
+}
+.swatch-all   { background: #eee;               border-color: #aaa; }
+.swatch-basic { background: var(--color-basic); border-color: var(--color-basic-border); }
+.swatch-focus { background: var(--color-focus); border-color: var(--color-focus-border); }
+.swatch-more  { background: var(--color-more);  border-color: var(--color-more-border); }
+
+.count-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+.count-row input[type=number] {
+  width: 80px;
+  padding: 6px 10px;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  text-align: center;
+  accent-color: var(--color-primary);
+}
+.count-row input[type=number]:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.action-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ── 공통 버튼 베이스 ── */
+.btn-primary, .btn-secondary {
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+}
+.btn-primary:hover { background: var(--color-primary-dark); box-shadow: 0 2px 8px rgba(63,81,181,0.35); }
+.btn-secondary {
+  background: #fff;
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
+}
+.btn-secondary:hover { background: #eef0fc; box-shadow: 0 2px 8px rgba(63,81,181,0.18); }
+
+/* ===== Quiz Table ===== */
+#quiz-result { padding: 0 24px 40px; }
+.result-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-toggle-meaning {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-left: auto;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.btn-toggle-meaning:hover { background: var(--color-primary-dark); box-shadow: 0 2px 8px rgba(63,81,181,0.35); }
+
+.quiz-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.quiz-table th {
+  background: var(--color-primary);
+  color: #fff;
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 0.88rem;
+  border-right: 1px solid rgba(255,255,255,0.2);
+}
+.quiz-table th:last-child { border-right: none; }
+
+.quiz-table td {
+  padding: 0;
+  font-size: 0.88rem;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  border-right: 1px solid rgba(0,0,0,0.07);
+  vertical-align: middle;
+  height: 32px;
+}
+.quiz-table td:last-child { border-right: none; }
+.quiz-table tbody tr:last-child td { border-bottom: none; }
+.quiz-table tbody tr:nth-child(even) { background: #fafafa; }
+
+/* 2단 구분선 */
+.quiz-table th.col-divider,
+.quiz-table td.col-divider {
+  width: 12px;
+  min-width: 12px;
+  padding: 0;
+  background: #e8eaf6;
+  border-right: none;
+}
+
+/* td 내부 패딩은 각 셀 클래스에서 처리 — .quiz-table td보다 specificity를 높임 */
+.quiz-table td.num-cell  {
+  color: #aaa;
+  font-size: 0.78rem;
+  width: 40px;
+  text-align: center;
+  padding: 0 8px;
+}
+.quiz-table td.word-cell {
+  font-weight: 600;
+  color: #1a237e;
+  width: 200px;
+  padding: 0 16px;
+}
+.quiz-table td.meaning-cell { padding: 0 16px; white-space: nowrap; overflow: hidden; }
+
+/* 입력칸: td 전체를 채우는 input */
+.quiz-table td.input-cell { width: 260px; padding: 0; }
+.input-cell input {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 32px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: #222;
+  transition: background 0.15s;
+}
+.input-cell input:focus {
+  outline: none;
+  background: #eef0fc;
+}
+.input-cell input::placeholder { color: #ccc; }
+
+/* 한글 뜻 숨김/보기 */
+.quiz-table td.meaning-cell {
+  color: transparent;
+  user-select: none;
+  transition: color 0.2s;
+}
+.quiz-table td.meaning-cell.visible { color: #444; user-select: auto; }
+
+/* ===== Filter 전체 토글 ===== */
+.filter-all-label {
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+.filter-divider {
+  display: inline-block;
+  width: 1px;
+  height: 20px;
+  background: #bbb;
+  margin: 0 8px;
+  vertical-align: middle;
+}
+
+/* 인쇄 시 배경색·테두리 유지 */
+* { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+
+/* ===== Print ===== */
+@media print {
+  nav, .quiz-controls, .result-meta, .page-header { display: none !important; }
+  body { background: #fff; padding-top: 0 !important; margin-top: 0 !important; }
+  #quiz-result { padding: 0; }
+
+  /* 셀 높이 고정, 넘치는 텍스트 숨김 */
+  .quiz-table th,
+  .quiz-table td { height: 32px !important; max-height: 32px !important; overflow: hidden !important; }
+  .quiz-table td.meaning-cell { white-space: nowrap; overflow: hidden; max-width: 160px; }
+  .quiz-table td.word-cell { white-space: nowrap; overflow: hidden; max-width: 140px; }
+
+  /* 테이블 선 */
+  .quiz-table { box-shadow: none; border-collapse: collapse; }
+  .quiz-table th,
+  .quiz-table td { border: 0.5px solid #ccc !important; }
+  .quiz-table th { background: #f2f2f2 !important; color: #333 !important; padding: 0 8px !important; }
+  .quiz-table th.col-divider,
+  .quiz-table td.col-divider { border-left: 1px solid #bbb !important; border-right: 1px solid #bbb !important; background: none !important; }
+
+  /* 문제 인쇄: 한글 뜻 열 숨김, 입력칸은 빈 칸으로 */
+  body.print-question .quiz-table th:nth-child(4),
+  body.print-question .quiz-table th:nth-child(9),
+  body.print-question .quiz-table td.meaning-cell { display: none !important; }
+  body.print-question .input-cell input { visibility: hidden; }
+
+  /* 정답 인쇄: 입력 열 숨김, 한글 뜻 표시 */
+  body.print-answer .quiz-table th:nth-child(3),
+  body.print-answer .quiz-table th:nth-child(8),
+  body.print-answer .quiz-table td.input-cell { display: none !important; }
+  body.print-answer .quiz-table td.meaning-cell { color: #222 !important; }
+}

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>영단어 목록</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <span class="logo">📚 영단어 공부</span>
+  <a href="index.html" class="active">전체 단어</a>
+  <a href="quiz.html">퀴즈표</a>
+</nav>
+
+<div class="page-header">
+  <h1>전체 단어 목록</h1>
+</div>
+
+<div class="legend">
+  <span class="legend-item"><span class="legend-dot basic"></span>기본</span>
+  <span class="legend-item"><span class="legend-dot focus"></span>집중</span>
+  <span class="legend-item"><span class="legend-dot more"></span>더 집중</span>
+  <span style="margin-left:auto; font-size:0.8rem; color:#888;">단어를 클릭하면 모드를 선택할 수 있어요</span>
+</div>
+
+<div id="chapters-container"></div>
+
+<script src="data.js"></script>
+<script>
+  // ── Storage helpers ──
+  const STORAGE_KEY = 'word_modes';
+  function loadModes() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+    catch { return {}; }
+  }
+  function saveModes(modes) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(modes));
+  }
+
+  let modes = loadModes();
+  let openPopup = null;  // currently open popup element
+  let openCard = null;   // currently active card
+
+  // ── Build DOM ──
+  const container = document.getElementById('chapters-container');
+
+  CHAPTERS.forEach(chapter => {
+    const section = document.createElement('div');
+    section.className = 'chapter-section';
+
+    const title = document.createElement('div');
+    title.className = 'chapter-title';
+    title.textContent = `${chapter.id}. ${chapter.name}`;
+    section.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'word-grid';
+
+    chapter.words.forEach((item, idx) => {
+      const key = `${chapter.id}-${idx}`;
+      const card = document.createElement('div');
+      card.className = 'word-card';
+      applyMode(card, modes[key] || 'basic');
+
+      card.innerHTML = `
+        <div class="eng">${item.word}</div>
+        <div class="kor">${item.meaning}</div>
+        <div class="mode-popup">
+          <button data-mode="basic"><span class="dot dot-basic"></span>기본</button>
+          <button data-mode="focus"><span class="dot dot-focus"></span>집중</button>
+          <button data-mode="more"><span class="dot dot-more"></span>더 집중</button>
+        </div>
+      `;
+
+      const popup = card.querySelector('.mode-popup');
+
+      card.addEventListener('click', e => {
+        e.stopPropagation();
+        if (popup.classList.contains('open')) {
+          popup.classList.remove('open');
+          card.classList.remove('active');
+          openPopup = null;
+          openCard = null;
+          return;
+        }
+        if (openPopup) openPopup.classList.remove('open');
+        if (openCard)  openCard.classList.remove('active');
+        popup.classList.add('open');
+        card.classList.add('active');
+        openPopup = popup;
+        openCard = card;
+      });
+
+      popup.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const mode = btn.dataset.mode;
+          modes[key] = mode;
+          saveModes(modes);
+          applyMode(card, mode);
+          popup.classList.remove('open');
+          card.classList.remove('active');
+          openPopup = null;
+          openCard = null;
+        });
+      });
+
+      grid.appendChild(card);
+    });
+
+    section.appendChild(grid);
+    container.appendChild(section);
+  });
+
+  // ── Close popup on outside click ──
+  document.addEventListener('click', () => {
+    if (openPopup) {
+      openPopup.classList.remove('open');
+      openPopup = null;
+    }
+    if (openCard) {
+      openCard.classList.remove('active');
+      openCard = null;
+    }
+  });
+
+  function applyMode(card, mode) {
+    card.classList.remove('mode-focus', 'mode-more');
+    if (mode === 'focus') card.classList.add('mode-focus');
+    if (mode === 'more')  card.classList.add('mode-more');
+  }
+</script>
+</body>
+</html>

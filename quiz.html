@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>퀴즈표</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <span class="logo">📚 영단어 공부</span>
+  <a href="index.html">전체 단어</a>
+  <a href="quiz.html" class="active">퀴즈표</a>
+</nav>
+
+<div class="page-header">
+  <h1>랜덤 퀴즈표</h1>
+</div>
+
+<div class="quiz-controls">
+  <!-- 단원 선택 -->
+  <h2>단원 선택</h2>
+  <div class="select-btns">
+    <button onclick="setAll(true)">전체 선택</button>
+    <button onclick="setAll(false)">전체 해제</button>
+  </div>
+  <div class="chapter-checks" id="chapter-checks"></div>
+
+  <!-- 단어 유형 필터 -->
+  <h2 style="margin-top:4px;">단어 유형</h2>
+  <div class="mode-radios">
+    <label class="filter-all-label">
+      <input type="checkbox" id="filter-all" checked onchange="toggleAllFilters(this.checked)">
+      전체
+    </label>
+    <span class="filter-divider"></span>
+    <label>
+      <input type="checkbox" id="filter-basic" value="basic" checked onchange="syncAllFilterCheckbox()">
+      <span class="mode-swatch swatch-basic"></span>기본
+    </label>
+    <label>
+      <input type="checkbox" id="filter-focus" value="focus" checked onchange="syncAllFilterCheckbox()">
+      <span class="mode-swatch swatch-focus"></span>집중
+    </label>
+    <label>
+      <input type="checkbox" id="filter-more" value="more" checked onchange="syncAllFilterCheckbox()">
+      <span class="mode-swatch swatch-more"></span>더 집중
+    </label>
+  </div>
+
+  <!-- 퀴즈 갯수 -->
+  <h2 style="margin-top:4px;">퀴즈 갯수</h2>
+  <div class="count-row">
+    <input type="number" id="quiz-count" value="60" min="1" max="900">
+    <span>개</span>
+    <small style="color:#888; margin-left:8px;">(선택된 단어 수보다 적으면 그 수만큼 출제)</small>
+  </div>
+
+  <div class="action-row" style="margin-top:18px;">
+    <button class="btn-primary" onclick="generateQuiz()">퀴즈표 생성</button>
+    <button class="btn-secondary" onclick="printQuiz('question')">🖨 문제 인쇄</button>
+    <button class="btn-secondary" onclick="printQuiz('answer')">🖨 정답 인쇄</button>
+  </div>
+</div>
+
+<div id="quiz-result"></div>
+
+<script src="data.js"></script>
+<script>
+  const STORAGE_KEY = 'word_modes';
+
+  function loadWordModes() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+    catch { return {}; }
+  }
+
+  function getWordMode(chapterId, wordIdx, wordModes) {
+    return wordModes[`${chapterId}-${wordIdx}`] || 'basic';
+  }
+
+  // ── Build chapter checkboxes ──
+  const checksContainer = document.getElementById('chapter-checks');
+  CHAPTERS.forEach(ch => {
+    const label = document.createElement('label');
+    label.innerHTML = `
+      <input type="checkbox" value="${ch.id}">
+      ${ch.id}. ${ch.name}
+    `;
+    checksContainer.appendChild(label);
+  });
+
+  function setAll(checked) {
+    checksContainer.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = checked);
+  }
+
+  // ── Fisher-Yates shuffle ──
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  let meaningVisible = false;
+
+  function toggleMeaning() {
+    meaningVisible = !meaningVisible;
+    const btn = document.getElementById('toggle-meaning-btn');
+    document.querySelectorAll('.meaning-cell').forEach(td => {
+      td.classList.toggle('visible', meaningVisible);
+    });
+    btn.textContent = meaningVisible ? '뜻 숨기기' : '뜻 보기';
+  }
+
+  function generateQuiz() {
+    const selected = [...checksContainer.querySelectorAll('input[type=checkbox]:checked')]
+      .map(cb => cb.value);
+
+    if (selected.length === 0) {
+      alert('단원을 하나 이상 선택해 주세요.');
+      return;
+    }
+
+    const filters = ['basic', 'focus', 'more'].filter(v => document.getElementById(`filter-${v}`).checked);
+    if (filters.length === 0) {
+      alert('단어 유형을 하나 이상 선택해 주세요.');
+      return;
+    }
+    const maxCount = parseInt(document.getElementById('quiz-count').value, 10) || 60;
+    const wordModes = loadWordModes();
+
+    // 선택 챕터 + 유형 필터로 단어 수집
+    const words = [];
+    CHAPTERS.forEach(ch => {
+      if (!selected.includes(ch.id)) return;
+      ch.words.forEach((item, idx) => {
+        const mode = getWordMode(ch.id, idx, wordModes);
+        if (filters.includes(mode)) {
+          words.push(item);
+        }
+      });
+    });
+
+    if (words.length === 0) {
+      alert('선택한 조건에 해당하는 단어가 없습니다.\n단어 목록 페이지에서 먼저 단어에 모드를 지정해 주세요.');
+      return;
+    }
+
+    const shuffled = shuffle(words).slice(0, maxCount);
+    const filterLabels = { basic: '기본', focus: '집중', more: '더 집중' };
+    const filterLabel = filters.map(f => filterLabels[f]).join(', ');
+    const chapterNames = selected.map(id => {
+      const ch = CHAPTERS.find(c => c.id === id);
+      return `${ch.id}.${ch.name}`;
+    }).join(', ');
+
+    meaningVisible = false;
+
+    const cell = (item, i) => `
+      <td class="num-cell">${i + 1}</td>
+      <td class="word-cell">${item.word}</td>
+      <td class="input-cell"><input type="text" placeholder="뜻을 입력해 보세요" autocomplete="off" spellcheck="false"></td>
+      <td class="meaning-cell">${item.meaning}</td>
+    `;
+    const emptyCell = () => `
+      <td class="num-cell"></td>
+      <td class="word-cell"></td>
+      <td class="input-cell"></td>
+      <td class="meaning-cell"></td>
+    `;
+
+    const rows = [];
+    for (let i = 0; i < shuffled.length; i += 2) {
+      const left  = cell(shuffled[i], i);
+      const right = shuffled[i + 1] ? cell(shuffled[i + 1], i + 1) : emptyCell();
+      rows.push(`<tr>${left}<td class="col-divider"></td>${right}</tr>`);
+    }
+
+    document.getElementById('quiz-result').innerHTML = `
+      <div class="result-meta">
+        단원: ${chapterNames} &nbsp;|&nbsp; 유형: ${filterLabel} &nbsp;|&nbsp; ${shuffled.length}개
+        <button id="toggle-meaning-btn" class="btn-toggle-meaning" onclick="toggleMeaning()">뜻 보기</button>
+      </div>
+      <table class="quiz-table">
+        <thead>
+          <tr>
+            <th style="width:40px;">#</th>
+            <th>영단어</th>
+            <th>입력</th>
+            <th>한글 뜻</th>
+            <th class="col-divider"></th>
+            <th style="width:40px;">#</th>
+            <th>영단어</th>
+            <th>입력</th>
+            <th>한글 뜻</th>
+          </tr>
+        </thead>
+        <tbody>${rows.join('')}</tbody>
+      </table>
+    `;
+
+    document.getElementById('quiz-result').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function toggleAllFilters(checked) {
+    ['basic', 'focus', 'more'].forEach(v => {
+      document.getElementById(`filter-${v}`).checked = checked;
+    });
+  }
+
+  function syncAllFilterCheckbox() {
+    const all = ['basic', 'focus', 'more'].every(v => document.getElementById(`filter-${v}`).checked);
+    document.getElementById('filter-all').checked = all;
+  }
+
+  function printQuiz(type) {
+    if (!document.getElementById('quiz-result').innerHTML.trim()) {
+      alert('먼저 퀴즈표를 생성해 주세요.');
+      return;
+    }
+    document.body.classList.add(`print-${type}`);
+    window.addEventListener('afterprint', () => {
+      document.body.classList.remove(`print-${type}`);
+    }, { once: true });
+    window.print();
+  }
+</script>
+</body>
+</html>
