@@ -87,7 +87,7 @@
   const STORAGE_KEY      = 'word_modes';
   const STORAGE_MODE_KEY = 'storage_mode';
 
-  function getStorageMode() { return localStorage.getItem(STORAGE_MODE_KEY) || 'local'; }
+  function getStorageMode() { return localStorage.getItem(STORAGE_MODE_KEY) || 'web'; }
 
   async function loadWordModes() {
     if (getStorageMode() === 'web') {
@@ -208,9 +208,16 @@
     }).join(', ');
 
     meaningVisible = false;
+    lastShuffled = shuffled;
 
     const isMobile = window.innerWidth < 768;
+    renderQuizTable(shuffled, isMobile, chapterNames, filterLabel);
+    document.getElementById('quiz-result').scrollIntoView({ behavior: 'smooth' });
+  }
 
+  let lastShuffled = null;
+
+  function buildTableHTML(shuffled, isMobile) {
     const cell = (item, i) => `
       <td class="num-cell">${i + 1}</td>
       <td class="word-cell">${item.word}</td>
@@ -223,7 +230,6 @@
       <td class="input-cell"></td>
       <td class="meaning-cell"></td>
     `;
-
     let rows, thead;
     if (isMobile) {
       rows = shuffled.map((item, i) => `<tr>${cell(item, i)}</tr>`);
@@ -252,19 +258,18 @@
         <th>한글 뜻</th>
       </tr>`;
     }
+    return `<thead>${thead}</thead><tbody>${rows.join('')}</tbody>`;
+  }
 
+  function renderQuizTable(shuffled, isMobile, chapterNames, filterLabel) {
     document.getElementById('quiz-result').innerHTML = `
       <div class="result-meta">
         단원: ${chapterNames} &nbsp;|&nbsp; 유형: ${filterLabel} &nbsp;|&nbsp; ${shuffled.length}개
         <button id="toggle-meaning-btn" class="btn-toggle-meaning" onclick="toggleMeaning()">뜻 보기</button>
       </div>
-      <table class="quiz-table">
-        <thead>${thead}</thead>
-        <tbody>${rows.join('')}</tbody>
-      </table>
+      <table class="quiz-table screen-table">${buildTableHTML(shuffled, isMobile)}</table>
+      <table class="quiz-table print-table">${buildTableHTML(shuffled, false)}</table>
     `;
-
-    document.getElementById('quiz-result').scrollIntoView({ behavior: 'smooth' });
   }
 
   function toggleAllFilters(checked) {
@@ -279,7 +284,7 @@
   }
 
   function printQuiz(type) {
-    if (!document.getElementById('quiz-result').innerHTML.trim()) {
+    if (!lastShuffled) {
       alert('먼저 퀴즈표를 생성해 주세요.');
       return;
     }

@@ -472,8 +472,8 @@ nav a:hover, nav a.active { background: rgba(255,255,255,0.18); color: #fff; }
   .quiz-table td.input-cell { width: 32%; }
   .quiz-table td.meaning-cell { width: auto; overflow: hidden; white-space: normal; }
 
-  .btn-secondary { display: none; }
 }
+
 
 /* ===== Storage Mode Button (nav) ===== */
 .nav-storage-btn {
@@ -551,9 +551,24 @@ nav a:hover, nav a.active { background: rgba(255,255,255,0.18); color: #fff; }
 /* 인쇄 시 배경색·테두리 유지 */
 * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 
+/* 인쇄용 2단 테이블: 화면 밖에 미리 렌더링 */
+.print-table {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  width: 100%;
+  visibility: hidden;
+}
+
 /* ===== Print ===== */
 @media print {
   nav, .quiz-controls, .result-meta, .page-header { display: none !important; }
+  .screen-table { display: none !important; }
+  .print-table {
+    position: static !important;
+    left: auto !important;
+    visibility: visible !important;
+  }
   body { background: #fff; padding-top: 0 !important; margin-top: 0 !important; }
   #quiz-result { padding: 0; }
 
