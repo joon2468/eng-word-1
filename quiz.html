@@ -206,16 +206,21 @@
       const ch = CHAPTERS.find(c => c.id === id);
       return `${ch.id}.${ch.name}`;
     }).join(', ');
+    const chapterIds = selected.join(', ');
 
     meaningVisible = false;
     lastShuffled = shuffled;
+    lastChapterIds = chapterIds;
+    lastFilterLabel = filterLabel;
 
     const isMobile = window.innerWidth < 768;
-    renderQuizTable(shuffled, isMobile, chapterNames, filterLabel);
+    renderQuizTable(shuffled, isMobile, chapterNames, chapterIds, filterLabel);
     document.getElementById('quiz-result').scrollIntoView({ behavior: 'smooth' });
   }
 
   let lastShuffled = null;
+  let lastChapterIds = '';
+  let lastFilterLabel = '';
 
   function buildTableHTML(shuffled, isMobile) {
     const cell = (item, i) => `
@@ -261,14 +266,71 @@
     return `<thead>${thead}</thead><tbody>${rows.join('')}</tbody>`;
   }
 
-  function renderQuizTable(shuffled, isMobile, chapterNames, filterLabel) {
+  function buildQuestionPrintHTML(shuffled) {
+    const cell = (item, i) => `
+      <td class="num-cell">${i + 1}</td>
+      <td class="word-cell">${item.word}</td>
+      <td class="input-cell"></td>
+    `;
+    const emptyCell = () => `
+      <td class="num-cell"></td>
+      <td class="word-cell"></td>
+      <td class="input-cell"></td>
+    `;
+    const rows = [];
+    for (let i = 0; i < shuffled.length; i += 2) {
+      const left  = cell(shuffled[i], i);
+      const right = shuffled[i + 1] ? cell(shuffled[i + 1], i + 1) : emptyCell();
+      rows.push(`<tr>${left}<td class="col-divider"></td>${right}</tr>`);
+    }
+    const thead = `<tr>
+      <th style="width:40px;">#</th>
+      <th>영단어</th>
+      <th>쓰기</th>
+      <th class="col-divider"></th>
+      <th style="width:40px;">#</th>
+      <th>영단어</th>
+      <th>쓰기</th>
+    </tr>`;
+    return `<thead>${thead}</thead><tbody>${rows.join('')}</tbody>`;
+  }
+
+  function buildAnswerPrintHTML(shuffled) {
+    const cell = (item, i) => `
+      <td class="num-cell">${i + 1}</td>
+      <td class="word-cell">${item.word}</td>
+      <td class="meaning-cell">${item.meaning}</td>
+    `;
+    const emptyCell = () => `
+      <td class="num-cell"></td>
+      <td class="word-cell"></td>
+      <td class="meaning-cell"></td>
+    `;
+    const rows = [];
+    for (let i = 0; i < shuffled.length; i += 2) {
+      const left  = cell(shuffled[i], i);
+      const right = shuffled[i + 1] ? cell(shuffled[i + 1], i + 1) : emptyCell();
+      rows.push(`<tr>${left}<td class="col-divider"></td>${right}</tr>`);
+    }
+    const thead = `<tr>
+      <th style="width:40px;">#</th>
+      <th>영단어</th>
+      <th>한글 뜻</th>
+      <th class="col-divider"></th>
+      <th style="width:40px;">#</th>
+      <th>영단어</th>
+      <th>한글 뜻</th>
+    </tr>`;
+    return `<thead>${thead}</thead><tbody>${rows.join('')}</tbody>`;
+  }
+
+  function renderQuizTable(shuffled, isMobile, chapterNames, chapterIds, filterLabel) {
     document.getElementById('quiz-result').innerHTML = `
       <div class="result-meta">
         단원: ${chapterNames} &nbsp;|&nbsp; 유형: ${filterLabel} &nbsp;|&nbsp; ${shuffled.length}개
         <button id="toggle-meaning-btn" class="btn-toggle-meaning" onclick="toggleMeaning()">뜻 보기</button>
       </div>
       <table class="quiz-table screen-table">${buildTableHTML(shuffled, isMobile)}</table>
-      <table class="quiz-table print-table">${buildTableHTML(shuffled, false)}</table>
     `;
   }
 
@@ -283,18 +345,58 @@
     document.getElementById('filter-all').checked = all;
   }
 
+  function buildPrintHTML(type) {
+    const isMobile = window.innerWidth < 768;
+    const tableHTML = type === 'question'
+      ? buildQuestionPrintHTML(lastShuffled)
+      : buildAnswerPrintHTML(lastShuffled);
+    const info = `단원: ${lastChapterIds} &nbsp;|&nbsp; 유형: ${lastFilterLabel} &nbsp;|&nbsp; ${lastShuffled.length}개`;
+    const mobileClass = isMobile ? ' print-mobile' : '';
+    return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="print-page">
+  <div class="print-chapter-info">${info}</div>
+  <table class="quiz-table${mobileClass}">${tableHTML}</table>
+</body>
+</html>`;
+  }
+
   function printQuiz(type) {
     if (!lastShuffled) {
       alert('먼저 퀴즈표를 생성해 주세요.');
       return;
     }
-    document.body.classList.add(`print-${type}`);
-    window.addEventListener('afterprint', () => {
-      document.body.classList.remove(`print-${type}`);
-    }, { once: true });
-    window.print();
+    const html = buildPrintHTML(type);
+    if (window.innerWidth < 768) {
+      // 모바일: 새 창 방식
+      const win = window.open('', '_blank');
+      win.document.write(html);
+      win.document.close();
+      win.onload = function() {
+        win.print();
+        win.addEventListener('afterprint', function() { win.close(); });
+      };
+    } else {
+      // PC: iframe 방식
+      const frame = document.getElementById('print-frame');
+      frame.onload = function() {
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+      };
+      const doc = frame.contentDocument || frame.contentWindow.document;
+      doc.open();
+      doc.write(html);
+      doc.close();
+    }
   }
 </script>
+
+<iframe id="print-frame" style="display:none;"></iframe>
 
 <!-- Storage Modal -->
 <div class="gh-modal-overlay" id="gh-modal" onclick="if(event.target===this)closeStorageModal()">

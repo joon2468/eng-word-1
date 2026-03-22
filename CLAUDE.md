@@ -40,11 +40,29 @@ style.css     공통 스타일 (모든 페이지 공유)
 ---
 
 ## 인쇄 규칙 (quiz.html)
-- 문제 인쇄 (`print-question`): 한글 뜻 열 숨김, 입력칸 빈 칸 유지
-- 정답 인쇄 (`print-answer`): 입력 열 숨김, 한글 뜻 표시
-- `document.body.classList` + `afterprint` 이벤트로 인쇄 모드 클래스 관리
-- 인쇄 시 숨길 요소: `nav`, `.quiz-controls`, `.result-meta`, `.page-header`
-- 인쇄 시 th/td 높이: `32px` 고정, th padding `0 8px`
+
+### 인쇄 방식
+- **PC**: `<iframe id="print-frame">` 에 내용을 write 후 `iframe.contentWindow.print()` 호출
+- **모바일**: `window.open('', '_blank')` 새 창에 내용을 write 후 `win.print()` 호출, `afterprint` 이벤트로 자동 닫기
+- 분기 기준: `window.innerWidth < 768`
+- ⚠️ 모바일에서 `@media print` + body 클래스 방식은 동작 불안정 (프린터 선택 시 클래스 소실) — 절대 사용 금지
+- ⚠️ 모바일에서 iframe 방식은 페이지 전체가 인쇄되는 오류 발생 — 사용 금지
+
+### 인쇄 전용 페이지 구조
+- 인쇄 창은 별도 HTML 문서로 구성: `<body class="print-page">`
+- style.css를 link로 불러오고, `body.print-page` 기반 스타일로 인쇄 레이아웃 적용
+- 인쇄 테이블은 문제용(`buildQuestionPrintHTML`)과 정답용(`buildAnswerPrintHTML`) 별도 함수로 생성
+  - 문제용: `#`, `영단어`, `쓰기(빈 td)` — input 요소 없음, placeholder 없음
+  - 정답용: `#`, `영단어`, `한글 뜻`
+  - 두 테이블 모두 항상 2단 구성 (col-divider 포함)
+- 인쇄 창 상단에 `.print-chapter-info` 표시 (단원 번호만, 단원명 제외 — 한 줄 유지)
+- 모바일 인쇄 시 테이블에 `print-mobile` 클래스 추가 → 셀 높이만 축소 (`26px`)
+
+### 인쇄 시 th/td 높이
+- 기본: `32px` 고정, th padding `0 8px`
+- 모바일(`print-mobile`): `26px`
+
+### 기타
 - 모바일에서 인쇄 버튼(`.btn-secondary`) 숨김
 
 ---
