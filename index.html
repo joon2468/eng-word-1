@@ -16,13 +16,32 @@
 
 <div class="page-header">
   <h1>전체 단어 목록</h1>
+  <select id="chapter-jump" onchange="jumpToChapter(this.value)">
+    <option value="">── 챕터 이동 ──</option>
+  </select>
 </div>
 
 <div class="legend">
-  <span class="legend-item"><span class="legend-dot basic"></span>기본</span>
-  <span class="legend-item"><span class="legend-dot focus"></span>집중</span>
-  <span class="legend-item"><span class="legend-dot more"></span>더 집중</span>
-  <span style="margin-left:auto; font-size:0.8rem; color:#888;">단어를 클릭하면 모드를 선택할 수 있어요</span>
+  <div class="mode-radios">
+    <label class="filter-all-label">
+      <input type="checkbox" id="idx-filter-all" checked onchange="toggleAllFilters(this.checked)">
+      전체
+    </label>
+    <span class="filter-divider"></span>
+    <label>
+      <input type="checkbox" id="idx-filter-basic" value="basic" checked onchange="syncAllFilterCheckbox(); filterCards()">
+      <span class="mode-swatch swatch-basic"></span>기본
+    </label>
+    <label>
+      <input type="checkbox" id="idx-filter-focus" value="focus" checked onchange="syncAllFilterCheckbox(); filterCards()">
+      <span class="mode-swatch swatch-focus"></span>집중
+    </label>
+    <label>
+      <input type="checkbox" id="idx-filter-more" value="more" checked onchange="syncAllFilterCheckbox(); filterCards()">
+      <span class="mode-swatch swatch-more"></span>더 집중
+    </label>
+  </div>
+  <span style="font-size:0.8rem; color:#888;">단어를 클릭하면 모드를 선택할 수 있어요</span>
 </div>
 
 <div id="chapters-container"></div>
@@ -46,90 +65,125 @@
   // ── Build DOM ──
   const container = document.getElementById('chapters-container');
 
+  const jumpSelect = document.getElementById('chapter-jump');
   CHAPTERS.forEach(chapter => {
-    const section = document.createElement('div');
-    section.className = 'chapter-section';
-
-    const title = document.createElement('div');
-    title.className = 'chapter-title';
-    title.textContent = `${chapter.id}. ${chapter.name}`;
-    section.appendChild(title);
-
-    const grid = document.createElement('div');
-    grid.className = 'word-grid';
-
-    chapter.words.forEach((item, idx) => {
-      const key = `${chapter.id}-${idx}`;
-      const card = document.createElement('div');
-      card.className = 'word-card';
-      applyMode(card, modes[key] || 'basic');
-
-      card.innerHTML = `
-        <div class="eng">${item.word}</div>
-        <div class="kor">${item.meaning}</div>
-        <div class="mode-popup">
-          <button data-mode="basic"><span class="dot dot-basic"></span>기본</button>
-          <button data-mode="focus"><span class="dot dot-focus"></span>집중</button>
-          <button data-mode="more"><span class="dot dot-more"></span>더 집중</button>
-        </div>
-      `;
-
-      const popup = card.querySelector('.mode-popup');
-
-      card.addEventListener('click', e => {
-        e.stopPropagation();
-        if (popup.classList.contains('open')) {
-          popup.classList.remove('open');
-          card.classList.remove('active');
-          openPopup = null;
-          openCard = null;
-          return;
-        }
-        if (openPopup) openPopup.classList.remove('open');
-        if (openCard)  openCard.classList.remove('active');
-        popup.classList.add('open');
-        card.classList.add('active');
-        openPopup = popup;
-        openCard = card;
-      });
-
-      popup.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.stopPropagation();
-          const mode = btn.dataset.mode;
-          modes[key] = mode;
-          saveModes(modes);
-          applyMode(card, mode);
-          popup.classList.remove('open');
-          card.classList.remove('active');
-          openPopup = null;
-          openCard = null;
-        });
-      });
-
-      grid.appendChild(card);
-    });
-
-    section.appendChild(grid);
-    container.appendChild(section);
+    const opt = document.createElement('option');
+    opt.value = chapter.id;
+    opt.textContent = `${chapter.id}. ${chapter.name}`;
+    jumpSelect.appendChild(opt);
   });
+
+  function jumpToChapter(id) {
+    if (!id) return;
+    const el = document.getElementById('chapter-' + id);
+    if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 58);
+    jumpSelect.value = '';
+  }
+
+  // ── Build DOM (HTML string → single innerHTML) ──
+  const modeClass = mode => mode === 'focus' ? ' mode-focus' : mode === 'more' ? ' mode-more' : '';
+
+  container.innerHTML = CHAPTERS.map(chapter => `
+    <div class="chapter-section" id="chapter-${chapter.id}">
+      <div class="chapter-title-row">
+        <div class="chapter-title">${chapter.id}. ${chapter.name}</div>
+        <button class="btn-top" data-top="1">↑ 맨 위</button>
+      </div>
+      <div class="word-grid">
+        ${chapter.words.map((item, idx) => {
+          const key = `${chapter.id}-${idx}`;
+          const mode = modes[key] || 'basic';
+          return `<div class="word-card${modeClass(mode)}" data-key="${key}">
+            <div class="eng">${item.word}</div>
+            <div class="kor">${item.meaning}</div>
+            <div class="mode-popup">
+              <button data-mode="basic"><span class="dot dot-basic"></span>기본</button>
+              <button data-mode="focus"><span class="dot dot-focus"></span>집중</button>
+              <button data-mode="more"><span class="dot dot-more"></span>더 집중</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  // ── Event delegation (단일 리스너) ──
+  container.addEventListener('click', e => {
+    // 맨 위 버튼
+    if (e.target.closest('[data-top]')) {
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    // 모드 선택 버튼
+    const modeBtn = e.target.closest('[data-mode]');
+    if (modeBtn) {
+      e.stopPropagation();
+      const card = modeBtn.closest('.word-card');
+      const mode = modeBtn.dataset.mode;
+      modes[card.dataset.key] = mode;
+      saveModes(modes);
+      applyMode(card, mode);
+      closePopup();
+      return;
+    }
+
+    // 카드 클릭 → 팝업 토글
+    const card = e.target.closest('.word-card');
+    if (card) {
+      e.stopPropagation();
+      const popup = card.querySelector('.mode-popup');
+      if (popup === openPopup) { closePopup(); return; }
+      closePopup();
+      popup.classList.add('open');
+      card.classList.add('active');
+      openPopup = popup;
+      openCard = card;
+    }
+  });
+
+  function closePopup() {
+    if (openPopup) { openPopup.classList.remove('open'); openPopup = null; }
+    if (openCard)  { openCard.classList.remove('active'); openCard = null; }
+  }
 
   // ── Close popup on outside click ──
-  document.addEventListener('click', () => {
-    if (openPopup) {
-      openPopup.classList.remove('open');
-      openPopup = null;
-    }
-    if (openCard) {
-      openCard.classList.remove('active');
-      openCard = null;
-    }
-  });
+  document.addEventListener('click', closePopup);
 
   function applyMode(card, mode) {
     card.classList.remove('mode-focus', 'mode-more');
     if (mode === 'focus') card.classList.add('mode-focus');
     if (mode === 'more')  card.classList.add('mode-more');
+    filterCards();
+  }
+
+  function getCardMode(card) {
+    if (card.classList.contains('mode-more'))  return 'more';
+    if (card.classList.contains('mode-focus')) return 'focus';
+    return 'basic';
+  }
+
+  function filterCards() {
+    const active = ['basic', 'focus', 'more'].filter(v =>
+      document.getElementById(`idx-filter-${v}`).checked
+    );
+    document.querySelectorAll('.word-card').forEach(card => {
+      card.style.display = active.includes(getCardMode(card)) ? '' : 'none';
+    });
+  }
+
+  function toggleAllFilters(checked) {
+    ['basic', 'focus', 'more'].forEach(v => {
+      document.getElementById(`idx-filter-${v}`).checked = checked;
+    });
+    filterCards();
+  }
+
+  function syncAllFilterCheckbox() {
+    const all = ['basic', 'focus', 'more'].every(v =>
+      document.getElementById(`idx-filter-${v}`).checked
+    );
+    document.getElementById('idx-filter-all').checked = all;
   }
 </script>
 </body>

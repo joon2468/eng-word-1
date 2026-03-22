@@ -61,13 +61,37 @@ nav a:hover, nav a.active { background: rgba(255,255,255,0.18); color: #fff; }
 }
 .page-header h1 { font-size: 1.4rem; color: var(--color-primary-dark); }
 
+#chapter-jump {
+  appearance: none;
+  -webkit-appearance: none;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233f51b5' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+  border: 1.5px solid var(--color-primary);
+  border-radius: 8px;
+  padding: 6px 36px 6px 14px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(63,81,181,0.10);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+#chapter-jump:focus {
+  outline: none;
+  border-color: var(--color-primary-dark);
+  box-shadow: 0 0 0 3px rgba(63,81,181,0.15);
+}
+#chapter-jump:hover { border-color: var(--color-primary-dark); }
+
 /* ===== Mode Legend ===== */
 .legend {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 12px;
   flex-wrap: wrap;
   padding: 0 24px 16px;
 }
+.legend .mode-radios { margin-bottom: 0; }
 .legend-item {
   display: flex;
   align-items: center;
@@ -85,14 +109,37 @@ nav a:hover, nav a.active { background: rgba(255,255,255,0.18); color: #fff; }
 
 /* ===== Chapter Section ===== */
 .chapter-section { padding: 0 24px 32px; }
+.chapter-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
 .chapter-title {
   font-size: 1rem;
   font-weight: 700;
   color: var(--color-primary-dark);
-  margin-bottom: 10px;
   padding-bottom: 4px;
   border-bottom: 2px solid var(--color-primary);
-  display: inline-block;
+}
+.btn-top {
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #888;
+  background: #e8e8e8;
+  border: none;
+  border-radius: 20px;
+  padding: 3px 10px 3px 8px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  line-height: 1.6;
+}
+.btn-top:hover {
+  background: #eef0fc;
+  color: var(--color-primary);
+  box-shadow: 0 1px 4px rgba(63,81,181,0.15);
 }
 
 /* ===== Word Grid ===== */
@@ -362,7 +409,7 @@ nav a:hover, nav a.active { background: rgba(255,255,255,0.18); color: #fff; }
   width: 200px;
   padding: 0 16px;
 }
-.quiz-table td.meaning-cell { padding: 0 16px; white-space: nowrap; overflow: hidden; }
+.quiz-table td.meaning-cell { padding: 0 16px; }
 
 /* 입력칸: td 전체를 채우는 input */
 .quiz-table td.input-cell { width: 260px; padding: 0; }
@@ -421,7 +468,9 @@ nav a:hover, nav a.active { background: rgba(255,255,255,0.18); color: #fff; }
   .quiz-table td.num-cell   { width: 28px; }
   .quiz-table td.word-cell  { width: 32%; }
   .quiz-table td.input-cell { width: 32%; }
-  .quiz-table td.meaning-cell { width: auto; overflow: hidden; }
+  .quiz-table td.meaning-cell { width: auto; overflow: hidden; white-space: normal; }
+
+  .btn-secondary { display: none; }
 }
 
 /* 인쇄 시 배경색·테두리 유지 */
