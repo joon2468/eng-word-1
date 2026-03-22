@@ -159,6 +159,8 @@
 
     meaningVisible = false;
 
+    const isMobile = window.innerWidth < 768;
+
     const cell = (item, i) => `
       <td class="num-cell">${i + 1}</td>
       <td class="word-cell">${item.word}</td>
@@ -172,11 +174,33 @@
       <td class="meaning-cell"></td>
     `;
 
-    const rows = [];
-    for (let i = 0; i < shuffled.length; i += 2) {
-      const left  = cell(shuffled[i], i);
-      const right = shuffled[i + 1] ? cell(shuffled[i + 1], i + 1) : emptyCell();
-      rows.push(`<tr>${left}<td class="col-divider"></td>${right}</tr>`);
+    let rows, thead;
+    if (isMobile) {
+      rows = shuffled.map((item, i) => `<tr>${cell(item, i)}</tr>`);
+      thead = `<tr>
+        <th style="width:32px;">#</th>
+        <th>영단어</th>
+        <th>입력</th>
+        <th>한글 뜻</th>
+      </tr>`;
+    } else {
+      rows = [];
+      for (let i = 0; i < shuffled.length; i += 2) {
+        const left  = cell(shuffled[i], i);
+        const right = shuffled[i + 1] ? cell(shuffled[i + 1], i + 1) : emptyCell();
+        rows.push(`<tr>${left}<td class="col-divider"></td>${right}</tr>`);
+      }
+      thead = `<tr>
+        <th style="width:40px;">#</th>
+        <th>영단어</th>
+        <th>입력</th>
+        <th>한글 뜻</th>
+        <th class="col-divider"></th>
+        <th style="width:40px;">#</th>
+        <th>영단어</th>
+        <th>입력</th>
+        <th>한글 뜻</th>
+      </tr>`;
     }
 
     document.getElementById('quiz-result').innerHTML = `
@@ -185,19 +209,7 @@
         <button id="toggle-meaning-btn" class="btn-toggle-meaning" onclick="toggleMeaning()">뜻 보기</button>
       </div>
       <table class="quiz-table">
-        <thead>
-          <tr>
-            <th style="width:40px;">#</th>
-            <th>영단어</th>
-            <th>입력</th>
-            <th>한글 뜻</th>
-            <th class="col-divider"></th>
-            <th style="width:40px;">#</th>
-            <th>영단어</th>
-            <th>입력</th>
-            <th>한글 뜻</th>
-          </tr>
-        </thead>
+        <thead>${thead}</thead>
         <tbody>${rows.join('')}</tbody>
       </table>
     `;

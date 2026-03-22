@@ -408,6 +408,19 @@ nav a:hover, nav a.active { background: rgba(255,255,255,0.18); color: #fff; }
   vertical-align: middle;
 }
 
+/* ===== Mobile ===== */
+@media (max-width: 767px) {
+  .quiz-controls { padding: 14px 16px; margin: 0 12px 16px; }
+  .quiz-controls h2 { margin-bottom: 10px; }
+  .chapter-checks { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .page-header { padding: 20px 16px 10px; }
+  .chapter-section { padding: 0 12px 24px; }
+  #quiz-result { padding: 0 12px 32px; }
+
+  .quiz-table td.input-cell { width: auto; }
+  .quiz-table td.word-cell  { width: auto; }
+}
+
 /* 인쇄 시 배경색·테두리 유지 */
 * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 
