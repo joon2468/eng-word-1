@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>퀴즈표</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -12,6 +14,7 @@
   <span class="logo">📚 영단어 공부</span>
   <a href="index.html">전체 단어</a>
   <a href="quiz.html" class="active">퀴즈표</a>
+  <button class="nav-storage-btn" id="storage-btn" onclick="openStorageModal()">💾 로컬</button>
 </nav>
 
 <div class="page-header">
@@ -68,9 +71,31 @@
 
 <script src="data.js"></script>
 <script>
-  const STORAGE_KEY = 'word_modes';
+  // ── Firebase ──
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBLliEhUZHFzw4r3Xk6piiYjk9UFauJvE",
+    authDomain: "eng-word-1.firebaseapp.com",
+    projectId: "eng-word-1",
+    storageBucket: "eng-word-1.firebasestorage.app",
+    messagingSenderId: "342379526397",
+    appId: "1:342379526397:web:946215d945f6f3da0ea694"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-  function loadWordModes() {
+  // ── Storage ──
+  const STORAGE_KEY      = 'word_modes';
+  const STORAGE_MODE_KEY = 'storage_mode';
+
+  function getStorageMode() { return localStorage.getItem(STORAGE_MODE_KEY) || 'local'; }
+
+  async function loadWordModes() {
+    if (getStorageMode() === 'web') {
+      try {
+        const snap = await db.collection('wordData').doc('modes').get();
+        return snap.exists ? (snap.data().data || {}) : {};
+      } catch { /* fallthrough */ }
+    }
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
     catch { return {}; }
   }
@@ -78,6 +103,31 @@
   function getWordMode(chapterId, wordIdx, wordModes) {
     return wordModes[`${chapterId}-${wordIdx}`] || 'basic';
   }
+
+  // ── Storage modal ──
+  function updateStorageBtn() {
+    document.getElementById('storage-btn').textContent =
+      getStorageMode() === 'web' ? '☁️ 웹' : '💾 로컬';
+  }
+  function openStorageModal() {
+    const mode = getStorageMode();
+    document.getElementById('btn-mode-local').classList.toggle('active', mode === 'local');
+    document.getElementById('btn-mode-web').classList.toggle('active', mode === 'web');
+    document.getElementById('gh-modal').classList.add('open');
+  }
+  function selectMode(mode) {
+    document.getElementById('btn-mode-local').classList.toggle('active', mode === 'local');
+    document.getElementById('btn-mode-web').classList.toggle('active', mode === 'web');
+  }
+  function closeStorageModal() { document.getElementById('gh-modal').classList.remove('open'); }
+  function applyStorageMode() {
+    const isWeb = document.getElementById('btn-mode-web').classList.contains('active');
+    localStorage.setItem(STORAGE_MODE_KEY, isWeb ? 'web' : 'local');
+    closeStorageModal();
+    updateStorageBtn();
+  }
+
+  updateStorageBtn();
 
   // ── Build chapter checkboxes ──
   const checksContainer = document.getElementById('chapter-checks');
@@ -115,7 +165,7 @@
     btn.textContent = meaningVisible ? '뜻 숨기기' : '뜻 보기';
   }
 
-  function generateQuiz() {
+  async function generateQuiz() {
     const selected = [...checksContainer.querySelectorAll('input[type=checkbox]:checked')]
       .map(cb => cb.value);
 
@@ -130,7 +180,7 @@
       return;
     }
     const maxCount = parseInt(document.getElementById('quiz-count').value, 10) || 60;
-    const wordModes = loadWordModes();
+    const wordModes = await loadWordModes();
 
     // 선택 챕터 + 유형 필터로 단어 수집
     const words = [];
@@ -240,5 +290,20 @@
     window.print();
   }
 </script>
+
+<!-- Storage Modal -->
+<div class="gh-modal-overlay" id="gh-modal" onclick="if(event.target===this)closeStorageModal()">
+  <div class="gh-panel">
+    <h3>저장 방식</h3>
+    <div class="gh-mode-btns">
+      <button id="btn-mode-local" onclick="selectMode('local')">💾 로컬</button>
+      <button id="btn-mode-web"   onclick="selectMode('web')">☁️ 웹</button>
+    </div>
+    <div class="gh-panel-actions">
+      <button class="btn-secondary" onclick="closeStorageModal()">취소</button>
+      <button class="btn-primary" onclick="applyStorageMode()">적용</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

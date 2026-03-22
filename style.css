@@ -473,6 +473,79 @@ nav a:hover, nav a.active { background: rgba(255,255,255,0.18); color: #fff; }
   .btn-secondary { display: none; }
 }
 
+/* ===== Storage Mode Button (nav) ===== */
+.nav-storage-btn {
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 14px;
+  padding: 3px 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.nav-storage-btn:hover { background: rgba(255,255,255,0.28); }
+
+/* ===== Storage Modal ===== */
+.gh-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 3000;
+  align-items: center;
+  justify-content: center;
+}
+.gh-modal-overlay.open { display: flex; }
+.gh-panel {
+  background: #fff;
+  border-radius: 14px;
+  padding: 24px;
+  width: 320px;
+  max-width: 92vw;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+.gh-panel h3 { margin: 0 0 16px; font-size: 1rem; color: var(--color-primary-dark); }
+.gh-mode-btns { display: flex; gap: 8px; margin-bottom: 16px; }
+.gh-mode-btns button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  background: #f5f5f5;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.gh-mode-btns button.active {
+  border-color: var(--color-primary);
+  background: #eef0fc;
+  color: var(--color-primary-dark);
+}
+.gh-config { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.gh-config label { font-size: 0.82rem; color: #555; }
+.gh-config input {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  box-sizing: border-box;
+}
+.gh-config input:focus { outline: none; border-color: var(--color-primary); }
+.gh-panel-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.gh-status { font-size: 0.78rem; color: #888; margin-top: 10px; min-height: 1.2em; }
+.gh-status.error { color: #e53935; }
+.gh-status.ok { color: #43a047; }
+
 /* 인쇄 시 배경색·테두리 유지 */
 * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 
