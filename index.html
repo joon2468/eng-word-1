@@ -100,6 +100,21 @@
     else saveToLocal(data);
   }
 
+  // ── Meanings storage ──
+  const debouncedSaveMeaningsToFirestore = debounce(async data => {
+    try { await db.collection('wordData').doc('meanings').set({ data }); } catch(e) { console.error('meanings save error:', e); }
+  }, 1000);
+
+  async function loadMeanings() {
+    try {
+      const snap = await db.collection('wordData').doc('meanings').get();
+      return snap.exists ? (snap.data().data || {}) : {};
+    } catch { return {}; }
+  }
+  function saveMeanings(data) {
+    debouncedSaveMeaningsToFirestore(data);
+  }
+
   // ── Storage modal ──
   function updateStorageBtn() {
     document.getElementById('storage-btn').textContent =
@@ -121,14 +136,16 @@
     localStorage.setItem(STORAGE_MODE_KEY, isWeb ? 'web' : 'local');
     closeStorageModal();
     updateStorageBtn();
-    modes = await loadModes();
+    [modes, meanings] = await Promise.all([loadModes(), loadMeanings()]);
     renderDOM();
   }
 
   // ── State ──
   let modes = {};
+  let meanings = {};
   let openPopup = null;
   let openCard  = null;
+  let meaningVisible = true;
 
   // ── Build chapter-jump select ──
   const container  = document.getElementById('chapters-container');
@@ -156,18 +173,22 @@
         <div class="chapter-title-row">
           <div class="chapter-title">${chapter.id}. ${chapter.name}</div>
           <button class="btn-top" data-top="1">↑ 맨 위</button>
+          <button class="btn-top" data-toggle-meaning="1">${meaningVisible ? '뜻 숨기기' : '뜻 보기'}</button>
         </div>
         <div class="word-grid">
           ${chapter.words.map((item, idx) => {
             const key  = `${chapter.id}-${idx}`;
             const mode = modes[key] || 'basic';
-            return `<div class="word-card${modeClass(mode)}" data-key="${key}">
+            const meaning = meanings[key] || item.meaning;
+            return `<div class="word-card${modeClass(mode)}" data-key="${key}" data-default-meaning="${item.meaning}">
               <div class="eng">${item.word}</div>
-              <div class="kor">${item.meaning}</div>
+              <div class="kor" style="visibility:${meaningVisible ? '' : 'hidden'}">${meaning}</div>
               <div class="mode-popup">
                 <button data-mode="basic"><span class="dot dot-basic"></span>기본</button>
                 <button data-mode="focus"><span class="dot dot-focus"></span>집중</button>
                 <button data-mode="more"><span class="dot dot-more"></span>더 집중</button>
+                <div class="popup-divider"></div>
+                <button data-edit-meaning="1">✏️ 뜻 수정</button>
               </div>
             </div>`;
           }).join('')}
@@ -180,6 +201,54 @@
   // ── Event delegation ──
   container.addEventListener('click', e => {
     if (e.target.closest('[data-top]')) { window.scrollTo(0, 0); return; }
+    if (e.target.closest('[data-toggle-meaning]')) {
+      meaningVisible = !meaningVisible;
+      document.querySelectorAll('.word-card .kor').forEach(el => {
+        el.style.visibility = meaningVisible ? '' : 'hidden';
+      });
+      document.querySelectorAll('[data-toggle-meaning]').forEach(btn => {
+        btn.textContent = meaningVisible ? '뜻 숨기기' : '뜻 보기';
+      });
+      return;
+    }
+    if (e.target.closest('[data-edit-meaning]')) {
+      e.stopPropagation();
+      const card = e.target.closest('.word-card');
+      closePopup();
+      const korEl = card.querySelector('.kor');
+      const currentText = korEl.textContent;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = currentText;
+      input.className = 'kor-edit-input';
+      korEl.replaceWith(input);
+      input.focus();
+      input.select();
+      const commit = () => {
+        const newVal = input.value.trim();
+        const key = card.dataset.key;
+        const div = document.createElement('div');
+        div.className = 'kor';
+        if (newVal && newVal !== card.dataset.defaultMeaning) {
+          meanings[key] = newVal;
+          div.textContent = newVal;
+        } else {
+          delete meanings[key];
+          div.textContent = card.dataset.defaultMeaning;
+        }
+        div.style.visibility = meaningVisible ? '' : 'hidden';
+        input.replaceWith(div);
+        saveMeanings(meanings);
+        div.classList.add('saved');
+        setTimeout(() => div.classList.remove('saved'), 1000);
+      };
+      input.addEventListener('blur', commit);
+      input.addEventListener('keydown', e2 => {
+        if (e2.key === 'Enter') input.blur();
+        if (e2.key === 'Escape') { input.value = currentText; input.blur(); }
+      });
+      return;
+    }
     const modeBtn = e.target.closest('[data-mode]');
     if (modeBtn) {
       e.stopPropagation();
@@ -193,6 +262,7 @@
     }
     const card = e.target.closest('.word-card');
     if (card) {
+      if (document.querySelector('.kor-edit-input')) return;
       e.stopPropagation();
       const popup = card.querySelector('.mode-popup');
       if (popup === openPopup) { closePopup(); return; }
@@ -246,7 +316,7 @@
 
   // ── Init ──
   async function init() {
-    modes = await loadModes();
+    [modes, meanings] = await Promise.all([loadModes(), loadMeanings()]);
     renderDOM();
     updateStorageBtn();
   }

@@ -166,7 +166,9 @@ nav a:hover, nav a.active { background: rgba(255,255,255,0.18); color: #fff; }
 .word-card.mode-more  { background: var(--color-more);  border-color: var(--color-more-border); }
 
 .word-card .eng  { font-size: 0.96rem; font-weight: 600; color: #1a237e; word-break: break-word; }
-.word-card .kor  { font-size: 0.86rem; color: #555; margin-top: 3px; word-break: keep-all; }
+.word-card .kor  { font-size: 0.86rem; color: #555; margin-top: 3px; word-break: keep-all; transition: color 0.3s; }
+.word-card .kor.saved { color: #2e7d32; }
+.kor-edit-input  { font-size: 0.86rem; color: #555; margin-top: 3px; width: 100%; border: none; border-bottom: 1px solid #90a4ae; outline: none; background: transparent; padding: 0; }
 
 /* ===== Mode Popup ===== */
 .mode-popup {
@@ -197,6 +199,7 @@ nav a:hover, nav a.active { background: rgba(255,255,255,0.18); color: #fff; }
   transition: background 0.15s;
 }
 .mode-popup button:hover { background: #f0f0f0; }
+.popup-divider { height: 1px; background: #eee; margin: 4px 0; }
 .mode-popup .dot {
   width: 10px; height: 10px;
   border-radius: 50%;
