@@ -104,6 +104,14 @@
     return wordModes[`${chapterId}-${wordIdx}`] || 'basic';
   }
 
+  // ── Meanings storage ──
+  async function loadMeanings() {
+    try {
+      const snap = await db.collection('wordData').doc('meanings').get();
+      return snap.exists ? (snap.data().data || {}) : {};
+    } catch { return {}; }
+  }
+
   // ── Storage modal ──
   function updateStorageBtn() {
     document.getElementById('storage-btn').textContent =
@@ -180,7 +188,7 @@
       return;
     }
     const maxCount = parseInt(document.getElementById('quiz-count').value, 10) || 60;
-    const wordModes = await loadWordModes();
+    const [wordModes, meanings] = await Promise.all([loadWordModes(), loadMeanings()]);
 
     // 선택 챕터 + 유형 필터로 단어 수집
     const words = [];
@@ -189,7 +197,8 @@
       ch.words.forEach((item, idx) => {
         const mode = getWordMode(ch.id, idx, wordModes);
         if (filters.includes(mode)) {
-          words.push(item);
+          const meaning = meanings[`${ch.id}-${idx}`] || item.meaning;
+          words.push(meaning === item.meaning ? item : { ...item, meaning });
         }
       });
     });
