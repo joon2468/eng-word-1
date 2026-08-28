@@ -143,6 +143,16 @@
   .backbtn:active{transform:translateY(1px)}
   .backbtn .ar{font-family:var(--eng);font-weight:700;font-size:15px;line-height:1}
   .navbot{display:flex;justify-content:center;margin:26px 0 4px}
+
+  /* ---------- voice picker ---------- */
+  .voicepick{display:flex;align-items:center;gap:7px}
+  .voicepick .vlab{font-family:var(--eng);font-weight:600;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted)}
+  .voicepick select{font-family:var(--kor);font-weight:600;font-size:13px;color:var(--teal);
+    background:#fff;border:1px solid var(--teal-line);border-radius:11px;padding:8px 10px;
+    max-width:190px;cursor:pointer}
+  .voicepick select:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+  .voicepick[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -161,6 +171,10 @@
       <button class="tg" id="tgEng" aria-pressed="false"><span class="dot"></span>영어 가리기</button>
       <button class="tg" id="tgKor" aria-pressed="false"><span class="dot"></span>뜻 가리기</button>
       <button class="tg" id="tgQuiz" aria-pressed="false"><span class="dot"></span>퀴즈 모드</button>
+    </div>
+    <div class="voicepick" id="voicePick" hidden>
+      <span class="vlab">발음</span>
+      <select id="voiceSel" aria-label="발음 목소리 선택"></select>
     </div>
     <div class="ghost">
       <span class="score" id="score" hidden>정답 0</span>
@@ -741,18 +755,85 @@
 
   /* ---------- pronunciation (Web Speech API) ---------- */
   var synth=window.speechSynthesis||null, enVoice=null;
-  function pickVoice(){
-    if(!synth)return; var vs=synth.getVoices();
-    enVoice = vs.filter(function(v){return /^en(-|_|$)/i.test(v.lang);})
-               .sort(function(a,b){return (/US/i.test(b.lang)?1:0)-(/US/i.test(a.lang)?1:0);})[0] || null;
+  var vPick=document.getElementById('voicePick'), vSel=document.getElementById('voiceSel');
+  var VKEY='voca-headword-voice';               /* Day 30개 페이지가 함께 쓰는 설정 */
+
+  /* macOS 효과음·구형 음성: 크롬이 정식 en-US로 노출하지만 학습용으로 부적합 —
+     자동 선택에서만 제외하고, 목록에는 그대로 남겨 직접 고를 수 있게 둔다 */
+  var BAD_V=/\b(albert|zarvox|trinoids|deranged|jester|superstar|whisper|wobble|bubbles|bells|boing|bahh|cellos|organ|good news|bad news|junior|kathy|princess|ralph|fred|bruce|agnes|victoria|vicki|grandma|grandpa|rocko|shelley|sandy|eddy|flo|reed|hysterical)\b/i;
+  /* 위에 있을수록 먼저 선택 */
+  var PREFER_V=[
+    /^google us english$/i,
+    /microsoft.*(aria|ava|emma|michelle|andrew|brian).*(natural|online)/i,
+    /^(ava|zoe|allison|susan|nicky|tom|evan)\s*\((premium|enhanced)\)$/i,
+    /^(samantha|allison|ava|zoe|susan)\b/i,
+    /^alex$/i,
+    /^google uk english/i,
+    /^microsoft (zira|david|mark)\b/i
+  ];
+
+  function enVoiceList(){
+    if(!synth) return [];
+    return synth.getVoices().filter(function(v){ return /^en(-|_|$)/i.test(v.lang); });
   }
-  if(synth){ pickVoice(); if(typeof synth.onvoiceschanged!=='undefined') synth.onvoiceschanged=pickVoice; }
+  function voiceRank(v){
+    for(var i=0;i<PREFER_V.length;i++){ if(PREFER_V[i].test(v.name)) return i; }
+    if(BAD_V.test(v.name)) return 900;
+    return /^en[-_]US/i.test(v.lang) ? 500 : 600;
+  }
+  function autoVoice(vs){
+    var best=null,bestRank=1e9;
+    vs.forEach(function(v){ var r=voiceRank(v); if(r<bestRank){ bestRank=r; best=v; } });
+    return best;
+  }
+  function savedVoice(){ try{ return localStorage.getItem(VKEY)||''; }catch(e){ return ''; } }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+
+  function pickVoice(){
+    if(!synth) return;
+    var vs=enVoiceList();
+    if(!vs.length){ enVoice=null; if(vPick) vPick.hidden=true; return; }
+
+    var want=savedVoice(), chosen=null;
+    if(want){
+      for(var i=0;i<vs.length;i++){ if(String(vs[i].voiceURI||'')===want||vs[i].name===want){ chosen=vs[i]; break; } }
+    }
+    enVoice = chosen || autoVoice(vs);
+
+    if(vSel){
+      var html='<option value="">자동 (추천)</option>';
+      vs.slice().sort(function(a,b){ return voiceRank(a)-voiceRank(b); }).forEach(function(v){
+        var vid=String(v.voiceURI||v.name), sel=(v===chosen) ? ' selected' : '';
+        html+='<option value="'+esc(vid)+'"'+sel+'>'+esc(v.name)
+            + (BAD_V.test(v.name)?' ⚠︎':'') + '</option>';
+      });
+      vSel.innerHTML=html;
+      if(vPick) vPick.hidden=false;
+    }
+  }
+
+  if(synth){
+    pickVoice();
+    if(typeof synth.onvoiceschanged!=='undefined') synth.onvoiceschanged=pickVoice;
+    if(vSel) vSel.addEventListener('change',function(){
+      try{ localStorage.setItem(VKEY,vSel.value); }catch(e){}
+      pickVoice();
+      /* 고른 목소리를 바로 들려준다 */
+      try{
+        synth.cancel();
+        var u=new SpeechSynthesisUtterance('beautiful');
+        u.rate=.92; if(enVoice){ u.voice=enVoice; u.lang=enVoice.lang; } else { u.lang='en-US'; }
+        synth.speak(u);
+      }catch(e){}
+    });
+  }
   function speak(cell){
     if(!synth){ return; }
     var word=cell.getAttribute('data-word')|| (cell.querySelector('.txt')||{}).textContent || '';
     word=word.trim(); if(!word) return;
     try{ synth.cancel();
-      var u=new SpeechSynthesisUtterance(word); u.lang='en-US'; u.rate=.92; if(enVoice)u.voice=enVoice;
+      var u=new SpeechSynthesisUtterance(word); u.rate=.92;
+      if(enVoice){ u.voice=enVoice; u.lang=enVoice.lang; } else { u.lang='en-US'; }
       cell.classList.add('speaking');
       u.onend=u.onerror=function(){cell.classList.remove('speaking');};
       synth.speak(u);
