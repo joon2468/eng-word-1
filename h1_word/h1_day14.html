@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>표제어 암기 · Day 14</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css">
+<style>
+  :root{
+    --desk:#E9E5DB; --paper:#FCFBF8; --ink:#22201C; --muted:#8C8677;
+    --teal:#22635C; --teal-soft:#E4EEEC; --teal-line:#BFD8D4;
+    --cover:#D8384A; --cover-2:#C42F41; --ok:#2E7D57;
+    --line:#E8E3D8;
+    --eng:'Space Grotesk', ui-monospace, system-ui, sans-serif;
+    --kor:'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    --shadow:0 1px 0 rgba(0,0,0,.02), 0 8px 24px -18px rgba(34,32,28,.35);
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:var(--desk);
+    background-image:radial-gradient(circle at 1px 1px, rgba(34,32,28,.05) 1px, transparent 0);
+    background-size:22px 22px; color:var(--ink); font-family:var(--kor);
+    -webkit-font-smoothing:antialiased; line-height:1.5; padding:32px 16px 80px;}
+  .wrap{max-width:860px;margin:0 auto}
+
+  header{margin:8px 4px 20px}
+  .eyebrow{font-family:var(--eng);font-weight:600;letter-spacing:.28em;text-transform:uppercase;font-size:11px;color:var(--teal)}
+  h1{font-family:var(--eng);font-weight:700;font-size:clamp(40px,9vw,68px);letter-spacing:-.02em;margin:.12em 0 .05em;line-height:.95}
+  h1 .no{color:var(--cover)}
+  .sub{color:var(--muted);font-size:14px}
+  .sub b{color:var(--ink);font-weight:600}
+
+  .bar{position:sticky;top:12px;z-index:20;margin:18px 0 16px;background:var(--paper);
+    border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:12px;
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .toggles{display:flex;gap:8px;flex-wrap:wrap}
+  .tg{font-family:var(--kor);font-weight:600;font-size:14px;cursor:pointer;border:1px solid var(--teal-line);
+    background:#fff;color:var(--teal);padding:9px 14px;border-radius:11px;display:inline-flex;align-items:center;gap:8px;
+    transition:transform .06s ease, background .15s ease, color .15s ease, border-color .15s ease}
+  .tg .dot{width:9px;height:9px;border-radius:50%;background:var(--teal-line)}
+  .tg[aria-pressed="true"]{background:var(--cover);border-color:var(--cover-2);color:#fff}
+  .tg[aria-pressed="true"] .dot{background:#fff}
+  .tg#tgQuiz[aria-pressed="true"]{background:var(--teal);border-color:var(--teal)}
+  .tg:active{transform:translateY(1px)}
+  .tg[hidden]{display:none}
+  .ghost{margin-left:auto;display:flex;align-items:center;gap:14px}
+  .reset{background:none;border:none;color:var(--muted);font-family:var(--kor);font-weight:600;font-size:13px;
+    cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:6px}
+  .reset:hover{color:var(--ink)}
+  .score{font-family:var(--eng);font-weight:600;font-size:13px;color:var(--ok)}
+  .score[hidden]{display:none}
+  .prog{display:flex;align-items:center;gap:9px}
+  .track{width:84px;height:7px;border-radius:99px;background:var(--teal-soft);overflow:hidden}
+  .fill{height:100%;width:0;background:var(--teal);transition:width .25s ease}
+  .count{font-family:var(--eng);font-weight:600;font-size:13px;color:var(--teal);min-width:46px;text-align:right}
+
+  .hint{font-size:12.5px;color:var(--muted);margin:0 6px 12px}
+  .hint b{color:var(--teal)}
+
+  .head,.row{display:grid;grid-template-columns:30px 40px 1fr 1.35fr;gap:12px;align-items:center}
+  .head{padding:0 14px 8px;font-family:var(--eng);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+
+  ul.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+  .row{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:11px 14px;box-shadow:var(--shadow)}
+  .row.done{background:#F6F8F5;border-color:#DDE8DA}
+  .row.done .idx{color:#9BB79A}
+  .row.done .cell.eng .txt{color:#93A891;text-decoration:line-through;text-decoration-color:#C3D6C0}
+
+  .idx{font-family:var(--eng);font-weight:600;font-size:15px;color:var(--teal);text-align:right}
+
+  .chk{width:22px;height:22px;border-radius:50%;border:2px solid var(--teal-line);background:#fff;cursor:pointer;
+    position:relative;padding:0;transition:.15s}
+  .chk:hover{border-color:var(--teal)}
+  .chk[aria-pressed="true"]{background:var(--teal);border-color:var(--teal)}
+  .chk[aria-pressed="true"]::after{content:"";position:absolute;left:6px;top:2.5px;width:5px;height:10px;
+    border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(42deg)}
+
+  .cell{position:relative;min-height:34px;display:flex;align-items:center;border-radius:8px;outline:none}
+  .cell .txt{font-size:16px}
+  .cell.eng .txt{font-family:var(--eng);font-weight:600;letter-spacing:-.01em}
+  .cell.kor .txt{font-family:var(--kor)}
+  .cell:focus-visible{box-shadow:0 0 0 3px var(--teal-soft)}
+  .cell.eng{cursor:pointer}
+  .spk{margin-left:9px;color:var(--teal-line);display:inline-flex;align-items:center;vertical-align:middle;flex:0 0 auto}
+  .cell.eng:hover .spk{color:var(--teal)}
+  .row.done .spk{color:#C3D6C0}
+  @media (prefers-reduced-motion: no-preference){
+    .spk{transition:color .15s ease, transform .15s ease}
+    .cell.eng.speaking .spk{color:var(--cover);transform:scale(1.18)}
+  }
+
+  .cover{position:absolute;inset:-4px -6px;display:none;align-items:center;justify-content:flex-start;padding-left:10px;
+    border-radius:8px;cursor:pointer;
+    background:repeating-linear-gradient(45deg, rgba(255,255,255,.10) 0 7px, transparent 7px 14px),
+      linear-gradient(180deg, var(--cover), var(--cover-2));
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.18), 0 2px 8px -4px rgba(196,47,65,.6)}
+  .cover .ci{font-family:var(--kor);font-weight:700;font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.9)}
+  .hide-eng .cell.eng:not(.peek) .cover{display:flex}
+  .hide-kor .cell.kor:not(.peek) .cover{display:flex}
+  @media (prefers-reduced-motion: no-preference){
+    .cover{transition:opacity .12s ease}
+    .cell.peek .cover{opacity:0}
+  }
+
+  /* quiz mode */
+  .ans{display:none;width:100%;font-family:var(--kor);font-size:16px;padding:7px 11px;border:1.5px solid var(--teal-line);
+    border-radius:9px;background:#fff;color:var(--ink);outline:none}
+  .ans:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+  .res{display:none;font-family:var(--eng);font-weight:700;font-size:16px;margin-right:8px;line-height:1}
+  .you{display:none;font-size:12px;color:var(--muted);margin-left:8px;font-family:var(--kor)}
+  .quiz .cell.kor .cover{display:none !important}
+  .quiz .cell.kor .txt{display:none}
+  .quiz .cell.kor .ans{display:block}
+  .quiz .cell.kor.graded .ans{display:none}
+  .quiz .cell.kor.graded .txt{display:inline}
+  .quiz .cell.kor.graded .res{display:inline-flex}
+  .quiz .cell.kor.graded.correct .txt{color:var(--ok)}
+  .quiz .cell.kor.graded.correct .res{color:var(--ok)}
+  .quiz .cell.kor.graded.wrong .txt{color:var(--cover)}
+  .quiz .cell.kor.graded.wrong .res{color:var(--cover)}
+  .quiz .cell.kor.graded.wrong .you{display:inline}
+
+  footer{margin:26px 6px 0;font-size:12px;color:var(--muted);line-height:1.6}
+  footer b{color:var(--ink)}
+
+  @media (max-width:600px){
+    .head{grid-template-columns:26px 30px 1fr;gap:8px}
+    .head .h-kor{display:none}
+    .row{grid-template-columns:26px 30px 1fr;gap:8px;row-gap:9px}
+    .cell.kor{grid-column:2 / -1}
+    .ghost{width:100%;justify-content:space-between;margin-left:0;gap:10px}
+  }
+
+  /* ---------- index navigation ---------- */
+  .navtop{display:flex;align-items:center;gap:10px;margin:0 4px 6px}
+  .backbtn{font-family:var(--kor);font-weight:600;font-size:13.5px;text-decoration:none;cursor:pointer;
+    display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:11px;
+    border:1px solid var(--teal-line);background:var(--paper);color:var(--teal);box-shadow:var(--shadow);
+    transition:background .15s ease,color .15s ease,border-color .15s ease,transform .06s ease}
+  .backbtn:hover{background:var(--teal);border-color:var(--teal);color:#fff}
+  .backbtn:active{transform:translateY(1px)}
+  .backbtn .ar{font-family:var(--eng);font-weight:700;font-size:15px;line-height:1}
+  .navbot{display:flex;justify-content:center;margin:26px 0 4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="navtop">
+    <a class="backbtn" href="index.html"><span class="ar">←</span> 목차로 돌아가기</a>
+  </nav>
+  <header>
+    <div class="eyebrow">표제어 암기 · 수능 영단어</div>
+    <h1>Day <span class="no">14</span></h1>
+    <div class="sub"><b>521–560</b>번 · 총 <b>40</b>단어</div>
+  </header>
+
+  <div class="bar">
+    <div class="toggles">
+      <button class="tg" id="tgEng" aria-pressed="false"><span class="dot"></span>영어 가리기</button>
+      <button class="tg" id="tgKor" aria-pressed="false"><span class="dot"></span>뜻 가리기</button>
+      <button class="tg" id="tgQuiz" aria-pressed="false"><span class="dot"></span>퀴즈 모드</button>
+    </div>
+    <div class="ghost">
+      <span class="score" id="score" hidden>정답 0</span>
+      <button class="reset" id="reset">모두 보이기</button>
+      <div class="prog" title="학습 완료">
+        <div class="track"><div class="fill" id="fill"></div></div>
+        <span class="count" id="count">0 / 40</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="hint" id="hint">영어 단어를 <b>누르면 발음</b>이 나와요. 뜻은 <b>가려진 상태</b>로 시작하고, 가려진 칸을 <b>탭</b>하면 잠깐 열려요.</p>
+
+  <div class="head">
+    <span></span><span class="h-idx">#</span><span class="h-eng">Word</span><span class="h-kor">뜻</span>
+  </div>
+
+  <ul class="list" id="list">
+<li class="row" data-n="521">
+  <button class="chk" aria-pressed="false" aria-label="521번 학습 완료 표시" data-chk></button>
+  <span class="idx">521</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="occupation">
+    <span class="txt">occupation</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="직업, 점유">
+    <span class="res" aria-hidden="true"></span><span class="txt">직업, 점유</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="521번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="522">
+  <button class="chk" aria-pressed="false" aria-label="522번 학습 완료 표시" data-chk></button>
+  <span class="idx">522</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="supervise">
+    <span class="txt">supervise</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="감독하다, 관리하다, 통제하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">감독하다, 관리하다, 통제하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="522번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="523">
+  <button class="chk" aria-pressed="false" aria-label="523번 학습 완료 표시" data-chk></button>
+  <span class="idx">523</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="specialize">
+    <span class="txt">specialize</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="전문적으로 하다, 전공하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">전문적으로 하다, 전공하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="523번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="524">
+  <button class="chk" aria-pressed="false" aria-label="524번 학습 완료 표시" data-chk></button>
+  <span class="idx">524</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="bond">
+    <span class="txt">bond</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="유대, 결속, 채권">
+    <span class="res" aria-hidden="true"></span><span class="txt">유대, 결속, 채권</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="524번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="525">
+  <button class="chk" aria-pressed="false" aria-label="525번 학습 완료 표시" data-chk></button>
+  <span class="idx">525</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="certificate">
+    <span class="txt">certificate</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="증명서, 자격증">
+    <span class="res" aria-hidden="true"></span><span class="txt">증명서, 자격증</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="525번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="526">
+  <button class="chk" aria-pressed="false" aria-label="526번 학습 완료 표시" data-chk></button>
+  <span class="idx">526</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="chief">
+    <span class="txt">chief</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="단체의 장, 우두머리; 주요한, 최고의">
+    <span class="res" aria-hidden="true"></span><span class="txt">단체의 장, 우두머리; 주요한, 최고의</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="526번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="527">
+  <button class="chk" aria-pressed="false" aria-label="527번 학습 완료 표시" data-chk></button>
+  <span class="idx">527</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="collaborate">
+    <span class="txt">collaborate</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="협력하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">협력하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="527번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="528">
+  <button class="chk" aria-pressed="false" aria-label="528번 학습 완료 표시" data-chk></button>
+  <span class="idx">528</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="deprive">
+    <span class="txt">deprive</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="박탈하다, 빼앗다">
+    <span class="res" aria-hidden="true"></span><span class="txt">박탈하다, 빼앗다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="528번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="529">
+  <button class="chk" aria-pressed="false" aria-label="529번 학습 완료 표시" data-chk></button>
+  <span class="idx">529</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="colleague">
+    <span class="txt">colleague</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="직장 동료">
+    <span class="res" aria-hidden="true"></span><span class="txt">직장 동료</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="529번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="530">
+  <button class="chk" aria-pressed="false" aria-label="530번 학습 완료 표시" data-chk></button>
+  <span class="idx">530</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="shift">
+    <span class="txt">shift</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="바꾸다, 이동하다; 변화, 이동, 교대">
+    <span class="res" aria-hidden="true"></span><span class="txt">바꾸다, 이동하다; 변화, 이동, 교대</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="530번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="531">
+  <button class="chk" aria-pressed="false" aria-label="531번 학습 완료 표시" data-chk></button>
+  <span class="idx">531</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="outcome">
+    <span class="txt">outcome</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="결과, 성과">
+    <span class="res" aria-hidden="true"></span><span class="txt">결과, 성과</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="531번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="532">
+  <button class="chk" aria-pressed="false" aria-label="532번 학습 완료 표시" data-chk></button>
+  <span class="idx">532</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="exceed">
+    <span class="txt">exceed</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="넘어서다, 초과하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">넘어서다, 초과하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="532번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="533">
+  <button class="chk" aria-pressed="false" aria-label="533번 학습 완료 표시" data-chk></button>
+  <span class="idx">533</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="procedure">
+    <span class="txt">procedure</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="절차, 수순">
+    <span class="res" aria-hidden="true"></span><span class="txt">절차, 수순</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="533번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="534">
+  <button class="chk" aria-pressed="false" aria-label="534번 학습 완료 표시" data-chk></button>
+  <span class="idx">534</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="attendant">
+    <span class="txt">attendant</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="종업원, 수행원">
+    <span class="res" aria-hidden="true"></span><span class="txt">종업원, 수행원</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="534번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="535">
+  <button class="chk" aria-pressed="false" aria-label="535번 학습 완료 표시" data-chk></button>
+  <span class="idx">535</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="negotiation">
+    <span class="txt">negotiation</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="협상">
+    <span class="res" aria-hidden="true"></span><span class="txt">협상</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="535번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="536">
+  <button class="chk" aria-pressed="false" aria-label="536번 학습 완료 표시" data-chk></button>
+  <span class="idx">536</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="incentive">
+    <span class="txt">incentive</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="동기, 유인, 장려책">
+    <span class="res" aria-hidden="true"></span><span class="txt">동기, 유인, 장려책</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="536번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="537">
+  <button class="chk" aria-pressed="false" aria-label="537번 학습 완료 표시" data-chk></button>
+  <span class="idx">537</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="strategy">
+    <span class="txt">strategy</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="전략">
+    <span class="res" aria-hidden="true"></span><span class="txt">전략</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="537번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="538">
+  <button class="chk" aria-pressed="false" aria-label="538번 학습 완료 표시" data-chk></button>
+  <span class="idx">538</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="challenge">
+    <span class="txt">challenge</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="도전, 난관; 도전하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">도전, 난관; 도전하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="538번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="539">
+  <button class="chk" aria-pressed="false" aria-label="539번 학습 완료 표시" data-chk></button>
+  <span class="idx">539</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="routine">
+    <span class="txt">routine</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="일과, 늘 하던 방식; 일상적인">
+    <span class="res" aria-hidden="true"></span><span class="txt">일과, 늘 하던 방식; 일상적인</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="539번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="540">
+  <button class="chk" aria-pressed="false" aria-label="540번 학습 완료 표시" data-chk></button>
+  <span class="idx">540</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="shelter">
+    <span class="txt">shelter</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="피난처, 주거지, 보호소; 보호하다, 피하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">피난처, 주거지, 보호소; 보호하다, 피하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="540번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="541">
+  <button class="chk" aria-pressed="false" aria-label="541번 학습 완료 표시" data-chk></button>
+  <span class="idx">541</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="withdraw">
+    <span class="txt">withdraw</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="인출하다, 철회하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">인출하다, 철회하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="541번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="542">
+  <button class="chk" aria-pressed="false" aria-label="542번 학습 완료 표시" data-chk></button>
+  <span class="idx">542</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="deposit">
+    <span class="txt">deposit</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="예금하다, 맡기다; 예금, 보증금">
+    <span class="res" aria-hidden="true"></span><span class="txt">예금하다, 맡기다; 예금, 보증금</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="542번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="543">
+  <button class="chk" aria-pressed="false" aria-label="543번 학습 완료 표시" data-chk></button>
+  <span class="idx">543</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="secure">
+    <span class="txt">secure</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="안전한, 안정된; 안전하게 하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">안전한, 안정된; 안전하게 하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="543번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="544">
+  <button class="chk" aria-pressed="false" aria-label="544번 학습 완료 표시" data-chk></button>
+  <span class="idx">544</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="chore">
+    <span class="txt">chore</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="허드렛일, 집안일">
+    <span class="res" aria-hidden="true"></span><span class="txt">허드렛일, 집안일</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="544번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="545">
+  <button class="chk" aria-pressed="false" aria-label="545번 학습 완료 표시" data-chk></button>
+  <span class="idx">545</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="react">
+    <span class="txt">react</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="반응하다, 반작용하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">반응하다, 반작용하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="545번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="546">
+  <button class="chk" aria-pressed="false" aria-label="546번 학습 완료 표시" data-chk></button>
+  <span class="idx">546</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="urban">
+    <span class="txt">urban</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="도시의">
+    <span class="res" aria-hidden="true"></span><span class="txt">도시의</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="546번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="547">
+  <button class="chk" aria-pressed="false" aria-label="547번 학습 완료 표시" data-chk></button>
+  <span class="idx">547</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="rural">
+    <span class="txt">rural</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="시골의">
+    <span class="res" aria-hidden="true"></span><span class="txt">시골의</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="547번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="548">
+  <button class="chk" aria-pressed="false" aria-label="548번 학습 완료 표시" data-chk></button>
+  <span class="idx">548</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="complicated">
+    <span class="txt">complicated</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="복잡한">
+    <span class="res" aria-hidden="true"></span><span class="txt">복잡한</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="548번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="549">
+  <button class="chk" aria-pressed="false" aria-label="549번 학습 완료 표시" data-chk></button>
+  <span class="idx">549</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="resident">
+    <span class="txt">resident</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="거주자; 수련의; 거주하는">
+    <span class="res" aria-hidden="true"></span><span class="txt">거주자; 수련의; 거주하는</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="549번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="550">
+  <button class="chk" aria-pressed="false" aria-label="550번 학습 완료 표시" data-chk></button>
+  <span class="idx">550</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="familiar">
+    <span class="txt">familiar</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="익숙한, 친숙한, 잘 아는">
+    <span class="res" aria-hidden="true"></span><span class="txt">익숙한, 친숙한, 잘 아는</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="550번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="551">
+  <button class="chk" aria-pressed="false" aria-label="551번 학습 완료 표시" data-chk></button>
+  <span class="idx">551</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="miracle">
+    <span class="txt">miracle</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="기적">
+    <span class="res" aria-hidden="true"></span><span class="txt">기적</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="551번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="552">
+  <button class="chk" aria-pressed="false" aria-label="552번 학습 완료 표시" data-chk></button>
+  <span class="idx">552</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="companion">
+    <span class="txt">companion</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="동반자, 동행, 친구">
+    <span class="res" aria-hidden="true"></span><span class="txt">동반자, 동행, 친구</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="552번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="553">
+  <button class="chk" aria-pressed="false" aria-label="553번 학습 완료 표시" data-chk></button>
+  <span class="idx">553</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="keep up with">
+    <span class="txt">keep up with</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="~에 뒤처지지 않다, ~을 따라가다">
+    <span class="res" aria-hidden="true"></span><span class="txt">~에 뒤처지지 않다, ~을 따라가다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="553번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="554">
+  <button class="chk" aria-pressed="false" aria-label="554번 학습 완료 표시" data-chk></button>
+  <span class="idx">554</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="make the most of">
+    <span class="txt">make the most of</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="~을 최대한 활용하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">~을 최대한 활용하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="554번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="555">
+  <button class="chk" aria-pressed="false" aria-label="555번 학습 완료 표시" data-chk></button>
+  <span class="idx">555</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="exchange">
+    <span class="txt">exchange</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="교환, 환전; 교환하다, 환전하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">교환, 환전; 교환하다, 환전하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="555번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="556">
+  <button class="chk" aria-pressed="false" aria-label="556번 학습 완료 표시" data-chk></button>
+  <span class="idx">556</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="strain">
+    <span class="txt">strain</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="긴장, 부담; 긴장시키다, 혹사하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">긴장, 부담; 긴장시키다, 혹사하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="556번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="557">
+  <button class="chk" aria-pressed="false" aria-label="557번 학습 완료 표시" data-chk></button>
+  <span class="idx">557</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="adventure">
+    <span class="txt">adventure</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="모험">
+    <span class="res" aria-hidden="true"></span><span class="txt">모험</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="557번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="558">
+  <button class="chk" aria-pressed="false" aria-label="558번 학습 완료 표시" data-chk></button>
+  <span class="idx">558</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="destination">
+    <span class="txt">destination</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="목적지, 도착지, 목표">
+    <span class="res" aria-hidden="true"></span><span class="txt">목적지, 도착지, 목표</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="558번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="559">
+  <button class="chk" aria-pressed="false" aria-label="559번 학습 완료 표시" data-chk></button>
+  <span class="idx">559</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="accompany">
+    <span class="txt">accompany</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="동행하다">
+    <span class="res" aria-hidden="true"></span><span class="txt">동행하다</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="559번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+<li class="row" data-n="560">
+  <button class="chk" aria-pressed="false" aria-label="560번 학습 완료 표시" data-chk></button>
+  <span class="idx">560</span>
+  <div class="cell eng" role="button" tabindex="0" aria-label="영어 단어, 눌러서 발음 듣기" data-cell data-word="remote">
+    <span class="txt">remote</span><span class="spk" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+  <div class="cell kor" role="button" tabindex="0" aria-label="뜻" data-cell data-answer="먼, 외진, 원격의">
+    <span class="res" aria-hidden="true"></span><span class="txt">먼, 외진, 원격의</span><span class="you"></span>
+    <input class="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="뜻 입력 후 Enter" aria-label="560번 뜻 입력">
+    <span class="cover" aria-hidden="true"><span class="ci">보기</span></span>
+  </div>
+</li>
+  </ul>
+
+  <div class="navbot">
+    <a class="backbtn" href="index.html"><span class="ar">←</span> 목차로 돌아가기</a>
+  </div>
+
+  <footer>
+    <b>표제어 암기 Day 14</b> · 자동 음성전사(STT) 기반이라 100% 정확하진 않습니다.
+    퀴즈 채점은 뜻이 여러 개면 <b>하나만 맞아도 정답</b>으로 처리합니다.
+    체크 상태는 이 브라우저에 저장됩니다. <button class="reset" id="resetProg" style="padding:0 2px">체크 초기화</button>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var list=document.getElementById('list');
+  var tgEng=document.getElementById('tgEng'), tgKor=document.getElementById('tgKor'), tgQuiz=document.getElementById('tgQuiz');
+  var reset=document.getElementById('reset'), resetProg=document.getElementById('resetProg');
+  var fill=document.getElementById('fill'), count=document.getElementById('count');
+  var score=document.getElementById('score'), hint=document.getElementById('hint');
+  var rows=Array.prototype.slice.call(document.querySelectorAll('.row'));
+  var total=rows.length;
+  var KEY='voca-headword-day14-done';
+
+  function loadDone(){ try{var v=localStorage.getItem(KEY);return v?JSON.parse(v):[];}catch(e){return [];} }
+  function saveDone(){ var a=[];document.querySelectorAll('.row.done').forEach(function(r){a.push(r.getAttribute('data-n'));});
+    try{localStorage.setItem(KEY,JSON.stringify(a));}catch(e){} }
+
+  function clearPeek(sel){document.querySelectorAll(sel).forEach(function(c){c.classList.remove('peek');c.setAttribute('aria-pressed','false');});}
+  function setHide(btn,cls,cellSel,on){btn.setAttribute('aria-pressed',on?'true':'false');list.classList.toggle(cls,on);if(on)clearPeek(cellSel);}
+
+  tgEng.addEventListener('click',function(){setHide(tgEng,'hide-eng','.cell.eng',tgEng.getAttribute('aria-pressed')!=='true');});
+  tgKor.addEventListener('click',function(){setHide(tgKor,'hide-kor','.cell.kor',tgKor.getAttribute('aria-pressed')!=='true');});
+
+  reset.addEventListener('click',function(){setHide(tgEng,'hide-eng','.cell.eng',false);setHide(tgKor,'hide-kor','.cell.kor',false);clearPeek('.cell');});
+
+  function peek(cell){var isEng=cell.classList.contains('eng');
+    var hidden=list.classList.contains(isEng?'hide-eng':'hide-kor');if(!hidden)return;
+    var now=cell.classList.toggle('peek');cell.setAttribute('aria-pressed',now?'true':'false');}
+
+  /* ---------- pronunciation (Web Speech API) ---------- */
+  var synth=window.speechSynthesis||null, enVoice=null;
+  function pickVoice(){
+    if(!synth)return; var vs=synth.getVoices();
+    enVoice = vs.filter(function(v){return /^en(-|_|$)/i.test(v.lang);})
+               .sort(function(a,b){return (/US/i.test(b.lang)?1:0)-(/US/i.test(a.lang)?1:0);})[0] || null;
+  }
+  if(synth){ pickVoice(); if(typeof synth.onvoiceschanged!=='undefined') synth.onvoiceschanged=pickVoice; }
+  function speak(cell){
+    if(!synth){ return; }
+    var word=cell.getAttribute('data-word')|| (cell.querySelector('.txt')||{}).textContent || '';
+    word=word.trim(); if(!word) return;
+    try{ synth.cancel();
+      var u=new SpeechSynthesisUtterance(word); u.lang='en-US'; u.rate=.92; if(enVoice)u.voice=enVoice;
+      cell.classList.add('speaking');
+      u.onend=u.onerror=function(){cell.classList.remove('speaking');};
+      synth.speak(u);
+      setTimeout(function(){cell.classList.remove('speaking');},2500);
+    }catch(e){ cell.classList.remove('speaking'); }
+  }
+  function engAction(cell){
+    var covered=list.classList.contains('hide-eng') && !cell.classList.contains('peek');
+    if(covered) peek(cell); else speak(cell);
+  }
+
+  /* ---------- quiz grading ---------- */
+  function norm(s){
+    s=(s||'').toLowerCase();
+    s=s.replace(/[\s,.;:/·・，。；：!?()\[\]{}"'`~\-]/g,'');
+    s=s.replace(/무엇을|무엇에게|무엇에|무엇으로|무엇과|무엇이/g,'');
+    return s;
+  }
+  function fragments(ans){
+    return ans.split(/[,;/·・，。；]/).map(function(x){return norm(x);}).filter(function(x){return x.length>0;});
+  }
+  function isCorrect(input, ans){
+    var u=norm(input); if(u.length===0) return false;
+    var whole=norm(ans); if(whole===u) return true;
+    var F=fragments(ans);
+    for(var i=0;i<F.length;i++){
+      var f=F[i];
+      if(f===u) return true;
+      if(u.length>=2 && f.indexOf(u)>=0) return true;
+      if(f.length>=2 && u.indexOf(f)>=0) return true;
+    }
+    return false;
+  }
+  function grade(cell){
+    var inp=cell.querySelector('.ans'); if(!inp) return;
+    var val=inp.value.trim(); if(!val.length){ inp.focus(); return; }
+    var ok=isCorrect(val, cell.getAttribute('data-answer'));
+    cell.classList.remove('correct','wrong');
+    cell.classList.add('graded', ok?'correct':'wrong');
+    cell.querySelector('.res').textContent = ok?'✓':'✗';
+    var you=cell.querySelector('.you'); you.textContent = ok?'':('입력: '+val);
+    updateScore();
+    // move to next unanswered input
+    var li=cell.closest('.row'), next=li.nextElementSibling;
+    while(next){ var ni=next.querySelector('.ans'); var nc=next.querySelector('.cell.kor');
+      if(ni && !nc.classList.contains('graded')){ ni.focus(); break; } next=next.nextElementSibling; }
+  }
+  function resetGrade(cell){
+    cell.classList.remove('graded','correct','wrong');
+    var inp=cell.querySelector('.ans'); if(inp){inp.value='';inp.focus();}
+    updateScore();
+  }
+  function updateScore(){ score.textContent='정답 '+document.querySelectorAll('.cell.kor.correct').length; }
+
+  list.addEventListener('keydown',function(e){
+    if(e.target.classList && e.target.classList.contains('ans')){
+      if(e.key==='Enter'){ e.preventDefault(); grade(e.target.closest('.cell.kor')); }
+      return;
+    }
+    var cell=e.target.closest('[data-cell]');
+    if(cell && (e.key==='Enter'||e.key===' ')){
+      if(cell.classList.contains('eng')){ e.preventDefault(); engAction(cell); return; }
+      if(!list.classList.contains('quiz')){ e.preventDefault(); peek(cell); }
+    }
+  });
+
+  list.addEventListener('click',function(e){
+    if(e.target.classList && e.target.classList.contains('ans')) return; // don't hijack input clicks
+    var chk=e.target.closest('[data-chk]'); if(chk){ toggleChk(chk); return; }
+    var cell=e.target.closest('[data-cell]'); if(!cell) return;
+    if(cell.classList.contains('eng')){ engAction(cell); return; }
+    if(list.classList.contains('quiz') && cell.classList.contains('kor')){
+      if(cell.classList.contains('graded')) resetGrade(cell);
+      else { var inp=cell.querySelector('.ans'); if(inp) inp.focus(); }
+      return;
+    }
+    peek(cell);
+  });
+
+  function toggleChk(chk){var on=chk.getAttribute('aria-pressed')!=='true';
+    chk.setAttribute('aria-pressed',on?'true':'false');chk.closest('.row').classList.toggle('done',on);
+    updateProgress();saveDone();}
+  function updateProgress(){var done=document.querySelectorAll('.row.done').length;
+    fill.style.width=(total?(done/total*100):0)+'%';count.textContent=done+' / '+total;}
+
+  resetProg.addEventListener('click',function(){
+    document.querySelectorAll('.row.done').forEach(function(r){r.classList.remove('done');
+      var c=r.querySelector('[data-chk]');if(c)c.setAttribute('aria-pressed','false');});
+    updateProgress();saveDone();});
+
+  /* ---------- quiz mode toggle ---------- */
+  tgQuiz.addEventListener('click',function(){
+    var on=tgQuiz.getAttribute('aria-pressed')!=='true';
+    tgQuiz.setAttribute('aria-pressed',on?'true':'false');
+    list.classList.toggle('quiz',on);
+    tgKor.hidden=on;                    // 뜻 가리기는 퀴즈 모드에서 숨김(뜻이 입력칸으로 대체됨)
+    score.hidden=!on;
+    if(on){
+      setHide(tgKor,'hide-kor','.cell.kor',false); // clear cover state
+      hint.innerHTML='뜻을 입력하고 <b>Enter</b>. 채점 후 칸을 <b>탭</b>하면 다시 입력할 수 있어요. 뜻이 여러 개면 <b>하나만</b> 맞아도 정답이에요.';
+      var first=list.querySelector('.ans'); if(first) first.focus();
+    }else{
+      document.querySelectorAll('.cell.kor.graded').forEach(function(c){c.classList.remove('graded','correct','wrong');
+        var i=c.querySelector('.ans');if(i)i.value='';});
+      hint.innerHTML='영어 단어를 <b>누르면 발음</b>이 나와요. 뜻은 <b>가려진 상태</b>로 시작하고, 가려진 칸을 <b>탭</b>하면 잠깐 열려요.';
+      setHide(tgKor,'hide-kor','.cell.kor',true); // back to default hidden
+    }
+  });
+
+  /* ---------- init ---------- */
+  (function init(){
+    loadDone().forEach(function(n){var r=list.querySelector('.row[data-n="'+n+'"]');
+      if(r){r.classList.add('done');var c=r.querySelector('[data-chk]');if(c)c.setAttribute('aria-pressed','true');}});
+    updateProgress();
+    setHide(tgKor,'hide-kor','.cell.kor',true); // default: meanings covered
+  })();
+})();
+</script>
+</body>
+</html>

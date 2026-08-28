@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>표제어 암기 · 수능 영단어 1200</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css">
+<style>
+  :root{
+    --desk:#E9E5DB; --paper:#FCFBF8; --ink:#22201C; --muted:#8C8677;
+    --teal:#22635C; --teal-soft:#E4EEEC; --teal-line:#BFD8D4;
+    --cover:#D8384A; --cover-2:#C42F41; --ok:#2E7D57;
+    --line:#E8E3D8;
+    --eng:'Space Grotesk', ui-monospace, system-ui, sans-serif;
+    --kor:'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    --shadow:0 1px 0 rgba(0,0,0,.02), 0 8px 24px -18px rgba(34,32,28,.35);
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:var(--desk);
+    background-image:radial-gradient(circle at 1px 1px, rgba(34,32,28,.05) 1px, transparent 0);
+    background-size:22px 22px; color:var(--ink); font-family:var(--kor);
+    -webkit-font-smoothing:antialiased; line-height:1.5; padding:32px 16px 80px;}
+  .wrap{max-width:860px;margin:0 auto}
+
+  header{margin:8px 4px 20px}
+  .eyebrow{font-family:var(--eng);font-weight:600;letter-spacing:.28em;text-transform:uppercase;font-size:11px;color:var(--teal)}
+  h1{font-family:var(--eng);font-weight:700;font-size:clamp(38px,8.4vw,64px);letter-spacing:-.02em;margin:.12em 0 .05em;line-height:.95}
+  h1 .no{color:var(--cover)}
+  .sub{color:var(--muted);font-size:14px}
+  .sub b{color:var(--ink);font-weight:600}
+
+  /* ---------- overall progress ---------- */
+  .bar{margin:18px 0 16px;background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:14px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .bar .lab{font-family:var(--eng);font-weight:600;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted)}
+  .prog{display:flex;align-items:center;gap:10px;margin-left:auto}
+  .track{width:150px;height:7px;border-radius:99px;background:var(--teal-soft);overflow:hidden}
+  .fill{height:100%;width:0;background:var(--teal);transition:width .35s ease}
+  .count{font-family:var(--eng);font-weight:600;font-size:13px;color:var(--teal);min-width:78px;text-align:right}
+
+  .hint{font-size:12.5px;color:var(--muted);margin:0 6px 16px}
+  .hint b{color:var(--teal)}
+
+  /* ---------- day grid ---------- */
+  ul.grid{list-style:none;margin:0;padding:0;
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
+  .card{display:block;text-decoration:none;color:inherit;background:var(--paper);
+    border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 15px 13px;
+    transition:transform .08s ease, border-color .15s ease, box-shadow .15s ease}
+  .card:hover{border-color:var(--teal-line);box-shadow:0 1px 0 rgba(0,0,0,.02), 0 14px 28px -18px rgba(34,32,28,.5)}
+  .card:active{transform:translateY(1px)}
+  .card .day{font-family:var(--eng);font-weight:700;font-size:12px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--teal)}
+  .card .n{font-family:var(--eng);font-weight:700;font-size:34px;line-height:1;letter-spacing:-.02em;margin:2px 0 6px}
+  .card .rng{font-family:var(--eng);font-weight:500;font-size:12.5px;color:var(--muted)}
+  .card .ctrack{height:6px;border-radius:99px;background:var(--teal-soft);overflow:hidden;margin-top:11px}
+  .card .cfill{height:100%;width:0;background:var(--teal);transition:width .35s ease}
+  .card .cnum{font-family:var(--eng);font-weight:600;font-size:11.5px;color:var(--muted);
+    margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+  .card.done{border-color:var(--teal-line);background:linear-gradient(0deg,var(--teal-soft),var(--teal-soft)),var(--paper)}
+  .card.done .n{color:var(--teal)}
+  .card .chk{color:var(--ok);font-weight:700}
+
+  footer{margin:28px 6px 0;font-size:12.5px;color:var(--muted);line-height:1.7}
+  footer b{color:var(--ink);font-weight:600}
+  .reset{background:none;border:none;color:var(--muted);font-family:var(--kor);font-weight:600;font-size:12.5px;
+    cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:0 2px}
+  .reset:hover{color:var(--cover)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">표제어 암기 · 수능 영단어</div>
+    <h1>Word <span class="no">1200</span></h1>
+    <div class="sub">하루 <b>40</b>단어 · 총 <b>30</b>일 과정</div>
+  </header>
+
+  <div class="bar">
+    <span class="lab">전체 진행률</span>
+    <div class="prog">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <span class="count" id="count">0 / 1200</span>
+    </div>
+  </div>
+
+  <p class="hint">공부할 <b>Day</b>를 선택하세요. 각 페이지의 체크 상태가 여기에 그대로 반영됩니다.</p>
+
+  <ul class="grid" id="grid"></ul>
+
+  <footer>
+    <b>표제어 암기 · 수능 영단어 1200</b> · 진행률은 이 브라우저에 저장된 체크 기록을 읽어옵니다.
+    브라우저를 바꾸거나 기록을 지우면 초기화됩니다.
+    <button class="reset" id="resetAll">전체 진행률 초기화</button>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var DAYS=30, PER=40, TOTAL=DAYS*PER;
+  var grid=document.getElementById('grid');
+  var fill=document.getElementById('fill'), count=document.getElementById('count');
+
+  function pad(n){ return (n<10?'0':'')+n; }
+  function key(n){ return 'voca-headword-day'+pad(n)+'-done'; }
+  function doneCount(n){
+    try{
+      var v=localStorage.getItem(key(n));
+      if(!v) return 0;
+      var a=JSON.parse(v);
+      return Object.prototype.toString.call(a)==='[object Array]' ? Math.min(a.length,PER) : 0;
+    }catch(e){ return 0; }
+  }
+
+  var html='';
+  for(var i=1;i<=DAYS;i++){
+    var from=(i-1)*PER+1, to=i*PER;
+    html+='<li>'
+      + '<a class="card" href="h1_day'+pad(i)+'.html" data-day="'+i+'">'
+      +   '<div class="day">Day</div>'
+      +   '<div class="n">'+pad(i)+'</div>'
+      +   '<div class="rng">'+from+'–'+to+'</div>'
+      +   '<div class="ctrack"><div class="cfill"></div></div>'
+      +   '<div class="cnum"><span class="c">0 / '+PER+'</span><span class="chk"></span></div>'
+      + '</a></li>';
+  }
+  grid.innerHTML=html;
+
+  function render(){
+    var sum=0;
+    Array.prototype.forEach.call(grid.querySelectorAll('.card'),function(card){
+      var d=parseInt(card.getAttribute('data-day'),10), c=doneCount(d);
+      sum+=c;
+      card.querySelector('.cfill').style.width=(c/PER*100)+'%';
+      card.querySelector('.c').textContent=c+' / '+PER;
+      var full=(c===PER);
+      card.classList.toggle('done',full);
+      card.querySelector('.chk').textContent=full?'완료':'';
+    });
+    fill.style.width=(sum/TOTAL*100)+'%';
+    count.textContent=sum+' / '+TOTAL;
+  }
+  render();
+
+  /* 다른 탭/페이지에서 돌아왔을 때 최신 상태로 */
+  window.addEventListener('pageshow',render);
+  window.addEventListener('focus',render);
+  window.addEventListener('storage',render);
+
+  document.getElementById('resetAll').addEventListener('click',function(){
+    if(!confirm('30일 전체의 체크 기록을 지웁니다. 계속할까요?')) return;
+    for(var i=1;i<=DAYS;i++){ try{ localStorage.removeItem(key(i)); }catch(e){} }
+    render();
+  });
+})();
+</script>
+</body>
+</html>
