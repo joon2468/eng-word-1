@@ -67,6 +67,7 @@
   .row.done{background:#F6F8F5;border-color:#DDE8DA}
   .row.done .idx{color:#9BB79A}
   .row.done .cell.eng .txt{color:#93A891;text-decoration:line-through;text-decoration-color:#C3D6C0}
+  .list.hide-done .row.done{display:none}
 
   .idx{font-family:var(--eng);font-weight:600;font-size:15px;color:var(--teal);text-align:right}
 
@@ -171,6 +172,7 @@
       <button class="tg" id="tgEng" aria-pressed="false"><span class="dot"></span>영어 가리기</button>
       <button class="tg" id="tgKor" aria-pressed="false"><span class="dot"></span>뜻 가리기</button>
       <button class="tg" id="tgQuiz" aria-pressed="false"><span class="dot"></span>퀴즈 모드</button>
+      <button class="tg" id="tgUndone" aria-pressed="false"><span class="dot"></span>미완료만 보기</button>
     </div>
     <div class="voicepick" id="voicePick" hidden>
       <span class="vlab">발음</span>
@@ -729,7 +731,7 @@
 <script>
 (function(){
   var list=document.getElementById('list');
-  var tgEng=document.getElementById('tgEng'), tgKor=document.getElementById('tgKor'), tgQuiz=document.getElementById('tgQuiz');
+  var tgEng=document.getElementById('tgEng'), tgKor=document.getElementById('tgKor'), tgQuiz=document.getElementById('tgQuiz'), tgUndone=document.getElementById('tgUndone');
   var reset=document.getElementById('reset'), resetProg=document.getElementById('resetProg');
   var fill=document.getElementById('fill'), count=document.getElementById('count');
   var score=document.getElementById('score'), hint=document.getElementById('hint');
@@ -941,6 +943,12 @@
       hint.innerHTML='영어 단어를 <b>누르면 발음</b>이 나와요. 뜻은 <b>가려진 상태</b>로 시작하고, 가려진 칸을 <b>탭</b>하면 잠깐 열려요.';
       setHide(tgKor,'hide-kor','.cell.kor',true); // back to default hidden
     }
+  });
+
+  tgUndone.addEventListener('click',function(){
+    var on=tgUndone.getAttribute('aria-pressed')!=='true';
+    tgUndone.setAttribute('aria-pressed',on?'true':'false');
+    list.classList.toggle('hide-done',on);
   });
 
   /* ---------- init ---------- */
