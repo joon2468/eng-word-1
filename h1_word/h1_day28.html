@@ -83,12 +83,18 @@
   .cell.eng .txt{font-family:var(--eng);font-weight:600;letter-spacing:-.01em}
   .cell.kor .txt{font-family:var(--kor)}
   .cell:focus-visible{box-shadow:0 0 0 3px var(--teal-soft)}
-  .cell.eng{cursor:pointer}
-  .spk{margin-left:9px;color:var(--teal-line);display:inline-flex;align-items:center;vertical-align:middle;flex:0 0 auto}
-  .cell.eng:hover .spk{color:var(--teal)}
+  .cell.eng{cursor:default}
+  .hide-eng .cell.eng:not(.peek){cursor:pointer}
+  .spk{margin-left:5px;margin-right:-2px;padding:8px;border:none;border-radius:9px;background:none;
+    color:var(--teal);display:inline-flex;align-items:center;flex:0 0 auto;cursor:pointer;
+    -webkit-tap-highlight-color:transparent}
+  .spk svg{width:18px;height:18px}
+  .spk:hover{background:var(--teal-soft)}
+  .spk:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
   .row.done .spk{color:#C3D6C0}
-  .dict{margin-left:6px;margin-right:-4px;padding:5px;border-radius:8px;color:var(--teal-line);
+  .dict{margin-left:2px;margin-right:-4px;padding:7px;border-radius:9px;color:var(--teal-line);
     display:inline-flex;align-items:center;flex:0 0 auto;text-decoration:none;-webkit-tap-highlight-color:transparent}
+  .dict svg{width:17px;height:17px}
   .dict:hover{color:var(--teal);background:var(--teal-soft)}
   .dict:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
   .row.done .dict{color:#C3D6C0}
@@ -193,7 +199,7 @@
     </div>
   </div>
 
-  <p class="hint" id="hint">영어 단어를 <b>누르면 발음</b>이 나와요. 뜻은 <b>가려진 상태</b>로 시작하고, 가려진 칸을 <b>탭</b>하면 잠깐 열려요. 단어 옆 <b>책 아이콘</b>은 네이버 사전을 새 창으로 열어요.</p>
+  <p class="hint" id="hint">단어 옆 <b>스피커</b>를 누르면 발음, <b>책 아이콘</b>은 네이버 사전이 새 창으로 열려요. 뜻은 <b>가려진 상태</b>로 시작하고, 가려진 칸을 <b>탭</b>하면 잠깐 열려요.</p>
 
   <div class="head">
     <span></span><span class="h-idx">#</span><span class="h-eng">Word</span><span class="h-kor">뜻</span>
@@ -847,9 +853,10 @@
       setTimeout(function(){cell.classList.remove('speaking');},2500);
     }catch(e){ cell.classList.remove('speaking'); }
   }
-  function engAction(cell){
+  function engAction(cell,target){
     var covered=list.classList.contains('hide-eng') && !cell.classList.contains('peek');
-    if(covered) peek(cell); else speak(cell);
+    if(covered){ peek(cell); return; }
+    if(target && target.closest('.spk')) speak(cell);   // 발음은 스피커 버튼에서만
   }
 
   /* ---------- quiz grading ---------- */
@@ -900,10 +907,10 @@
       if(e.key==='Enter'){ e.preventDefault(); grade(e.target.closest('.cell.kor')); }
       return;
     }
-    if(e.target.closest('.dict')) return;
+    if(e.target.closest('.dict')||e.target.closest('.spk')) return;
     var cell=e.target.closest('[data-cell]');
     if(cell && (e.key==='Enter'||e.key===' ')){
-      if(cell.classList.contains('eng')){ e.preventDefault(); engAction(cell); return; }
+      if(cell.classList.contains('eng')){ e.preventDefault(); engAction(cell,e.target); return; }
       if(!list.classList.contains('quiz')){ e.preventDefault(); peek(cell); }
     }
   });
@@ -913,7 +920,7 @@
     if(e.target.closest('.dict')) return;                               // 사전 링크는 새 창으로
     var chk=e.target.closest('[data-chk]'); if(chk){ toggleChk(chk); return; }
     var cell=e.target.closest('[data-cell]'); if(!cell) return;
-    if(cell.classList.contains('eng')){ engAction(cell); return; }
+    if(cell.classList.contains('eng')){ engAction(cell,e.target); return; }
     if(list.classList.contains('quiz') && cell.classList.contains('kor')){
       if(cell.classList.contains('graded')) resetGrade(cell);
       else { var inp=cell.querySelector('.ans'); if(inp) inp.focus(); }
@@ -947,7 +954,7 @@
     }else{
       document.querySelectorAll('.cell.kor.graded').forEach(function(c){c.classList.remove('graded','correct','wrong');
         var i=c.querySelector('.ans');if(i)i.value='';});
-      hint.innerHTML='영어 단어를 <b>누르면 발음</b>이 나와요. 뜻은 <b>가려진 상태</b>로 시작하고, 가려진 칸을 <b>탭</b>하면 잠깐 열려요. 단어 옆 <b>책 아이콘</b>은 네이버 사전을 새 창으로 열어요.';
+      hint.innerHTML='단어 옆 <b>스피커</b>를 누르면 발음, <b>책 아이콘</b>은 네이버 사전이 새 창으로 열려요. 뜻은 <b>가려진 상태</b>로 시작하고, 가려진 칸을 <b>탭</b>하면 잠깐 열려요.';
       setHide(tgKor,'hide-kor','.cell.kor',true); // back to default hidden
     }
   });
@@ -958,14 +965,26 @@
     list.classList.toggle('hide-done',on);
   });
 
-  /* ---------- naver dictionary links ---------- */
+  /* ---------- 단어 액션: 발음 버튼 · 네이버 사전 링크 ---------- */
   var DICT_ICON='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" '
     +'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
     +'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
-  function addDictLinks(){
+  function setupWordActions(){
     rows.forEach(function(r){
       var eng=r.querySelector('.cell.eng'); if(!eng) return;
       var w=(eng.getAttribute('data-word')||'').trim(); if(!w) return;
+      eng.setAttribute('aria-label','영어 단어');
+
+      /* 장식용 span이던 스피커를 실제 버튼으로 — 탭 영역을 확보한다 */
+      var spk=eng.querySelector('.spk');
+      if(spk && spk.tagName!=='BUTTON'){
+        var b=document.createElement('button');
+        b.type='button'; b.className='spk';
+        b.setAttribute('aria-label',w+' 발음 듣기');
+        b.innerHTML=spk.innerHTML;
+        eng.replaceChild(b,spk); spk=b;
+      }
+
       var a=document.createElement('a');
       a.className='dict';
       a.href='https://en.dict.naver.com/#/search?query='+encodeURIComponent(w);
@@ -973,14 +992,13 @@
       a.title='네이버 사전에서 찾기';
       a.setAttribute('aria-label',w+' 네이버 사전에서 찾기');
       a.innerHTML=DICT_ICON;
-      var spk=eng.querySelector('.spk');
       if(spk) spk.insertAdjacentElement('afterend',a); else eng.appendChild(a);
     });
   }
 
   /* ---------- init ---------- */
   (function init(){
-    addDictLinks();
+    setupWordActions();
     loadDone().forEach(function(n){var r=list.querySelector('.row[data-n="'+n+'"]');
       if(r){r.classList.add('done');var c=r.querySelector('[data-chk]');if(c)c.setAttribute('aria-pressed','true');}});
     updateProgress();
