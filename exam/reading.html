@@ -87,7 +87,8 @@
   .picker{display:none;background:var(--paper);border:1px solid var(--line);border-radius:16px;
     box-shadow:var(--shadow);padding:14px;margin:0 0 16px}
   .picker.open{display:block}
-  .picker h3{margin:2px 4px 11px;font-size:12px;font-family:var(--eng);letter-spacing:.14em;
+  .pickhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 11px}
+  .picker h3{margin:2px 4px;font-size:12px;font-family:var(--eng);letter-spacing:.14em;
     text-transform:uppercase;color:var(--muted);font-weight:600}
   .picklist{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:8px}
   .pick{display:flex;align-items:center;gap:10px;text-align:left;width:100%;
@@ -236,7 +237,10 @@
   </div>
 
   <div class="picker" id="picker">
-    <h3>지문 고르기</h3>
+    <div class="pickhead">
+      <h3>지문 고르기</h3>
+      <button class="store" id="resetBtn">기록 초기화</button>
+    </div>
     <div class="picklist" id="picklist"></div>
   </div>
 
@@ -406,7 +410,7 @@
     var found = setById(s.current);
     if(!found){
       found = pickSet();
-      if(found) openSet(found.id, true);
+      if(found) openSet(found.id, { silent: true });
     }
     return found;
   }
@@ -420,14 +424,16 @@
     return pick;
   }
   /* 세트를 연다. 이미 제출한 세트면 채점 결과를 그대로 다시 보여 준다. */
-  function openSet(id, silent){
-    var s = levelState(level), rec = s.done[id];
+  function openSet(id, opts){
+    opts = opts || {};
+    var s = levelState(level);
+    var rec = opts.fresh ? null : s.done[id];   /* fresh면 지난 결과를 펴지 않고 처음부터 */
     s.current = id;
     s.answers = (rec && rec.answers) ? rec.answers : {};
     s.submitted = !!rec;
     s.started = !!rec;
     s.elapsed = rec ? (rec.sec || 0) : 0;
-    if(!silent){ save(); render(); window.scrollTo({ top:0, behavior:'smooth' }); }
+    if(!opts.silent){ save(); render(); window.scrollTo({ top:0, behavior:'smooth' }); }
   }
 
   /* ---------- 타이머 ---------- */
@@ -614,9 +620,12 @@
         tb.textContent = open ? '해석 접기' : '해석 보기';
         if(open) t.scrollIntoView({ behavior:'smooth', block:'nearest' });
       });
+      var rb = el('button','btn','다시 풀기');
+      rb.addEventListener('click', retrySet);
       var nb = el('button','btn red','새 지문 풀기');
       nb.addEventListener('click', nextSet);
       right2.appendChild(tb);
+      right2.appendChild(rb);
       right2.appendChild(nb);
       foot.appendChild(right2);
 
@@ -733,6 +742,34 @@
     render();
   }
 
+  /* 같은 지문을 처음부터 다시. 지난 기록은 다시 제출할 때 덮어쓴다 */
+  function retrySet(){
+    var s = levelState(level), set = currentSet();
+    if(!set) return;
+    s.answers = {};
+    s.submitted = false;
+    s.started = false;
+    s.elapsed = 0;
+    save();
+    render();
+    window.scrollTo({ top: 0, behavior:'smooth' });
+  }
+
+  function resetLevel(){
+    var s = levelState(level), bank = bankOf(level);
+    var n = Object.keys(s.done).length;
+    if(!n){ alert('아직 지울 기록이 없어요.'); return; }
+    if(!confirm(labelOf(level) + ' 기록 ' + n + '개를 지울까요? 점수와 풀이 시간이 모두 사라집니다.')) return;
+    s.done = {};
+    s.answers = {};
+    s.submitted = false;
+    s.started = false;
+    s.elapsed = 0;
+    s.current = bank.length ? bank[0].id : null;
+    save();
+    render();
+  }
+
   function choose(qi, ci){
     var s = levelState(level);
     if(s.submitted) return;
@@ -765,12 +802,11 @@
     }
     var fresh = bank.filter(function(x){ return !s.done[x.id]; });
     if(!fresh.length){
-      if(!confirm(bank.length + '개 지문을 모두 풀었어요. 기록을 지우고 처음부터 다시 풀까요?')) return;
-      s.done = {};
+      if(!confirm(bank.length + '개 지문을 모두 풀었어요. 기록은 그대로 두고 다시 풀어 볼까요?')) return;
     }
     var pick = pickSet();
     if(!pick) return;
-    openSet(pick.id);
+    openSet(pick.id, { fresh: true });
   }
 
   function updateStoreBtn(){
@@ -784,6 +820,8 @@
     updateStoreBtn();
     load().then(function(data){ state = data || {}; render(); });
   });
+
+  document.getElementById('resetBtn').addEventListener('click', resetLevel);
 
   pickBtn.addEventListener('click', function(){
     var open = picker.classList.toggle('open');
