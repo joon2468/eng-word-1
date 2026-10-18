@@ -265,9 +265,9 @@
 
   <div class="opts" id="opts">
     <h3>설정</h3>
-    <h4>보여 줄 단원</h4>
+    <h4>보여 줄 지문 묶음</h4>
     <div id="tabOpts"></div>
-    <p class="opthint">끈 단원도 기록은 그대로 남아 있어요. 다시 켜면 이어서 볼 수 있습니다.</p>
+    <p class="opthint">꺼 둔 묶음도 기록은 그대로 남아 있어요. 다시 켜면 이어서 볼 수 있습니다.</p>
     <h4>저장 위치</h4>
     <div id="storeOpts"></div>
   </div>
@@ -275,7 +275,7 @@
   <div class="picker" id="picker">
     <div class="pickhead">
       <h3>지문 고르기</h3>
-      <button class="store" id="resetBtn">이 단원 기록 모두 지우기</button>
+      <button class="store" id="resetBtn">이 묶음 기록 모두 지우기</button>
     </div>
     <div class="picklist" id="picklist"></div>
   </div>
@@ -298,16 +298,17 @@
   'use strict';
 
   /* ---------- 문제은행 ---------- */
-  /* 단원 목록. 새 단원을 더하려면 세 군데만 손보면 된다.
+  /* 지문 묶음 목록. 이름은 '<수준> Vol.<번호>' 꼴로, 어느 수준의 지문인지 한눈에
+     보이게 둔다. 묶음을 더하려면 세 군데만 손보면 된다.
      1) exam/data/<key>.js 를 만들고  2) 아래 <script src="data/…"> 한 줄 추가
      3) 이 배열과 bankOf()에 한 줄씩 추가 */
   var TABS = [
-    { key:'h1', label:'1단원', desc:'고1 독해' },
-    { key:'h2', label:'고2',   desc:'고2 독해' },
-    { key:'sn', label:'수능',  desc:'수능 독해' }
+    { key:'h1', label:'고1 Vol.1',  desc:'고1 모의고사 수준' },
+    { key:'h2', label:'고2 Vol.1',  desc:'고2 모의고사 수준' },
+    { key:'sn', label:'수능 Vol.1', desc:'수능 수준' }
   ];
   var TAB_ON_DEFAULT = { h1:true, h2:false, sn:false };
-  var TABS_KEY = '__tabs';   /* 단원 키와 겹치지 않도록 */
+  var TABS_KEY = '__tabs';   /* 묶음 키와 겹치지 않도록 */
 
   function bankOf(key){
     if(key==='h1' && typeof EXAM_SETS_H1 !== 'undefined') return EXAM_SETS_H1;
@@ -729,7 +730,7 @@
     });
   }
 
-  /* 탭 줄은 보이는 단원이 둘 이상일 때만 띄운다 */
+  /* 탭 줄은 보이는 묶음이 둘 이상일 때만 띄운다 */
   function renderTabs(){
     var box = document.getElementById('tabs'), vis = visibleTabs();
     box.innerHTML = '';
@@ -761,12 +762,12 @@
       picker.classList.remove('open');
       document.getElementById('timer').hidden = true;
       var box = el('div','empty');
-      box.appendChild(el('b', null, '보여 줄 단원이 없어요'));
-      box.appendChild(document.createTextNode('설정에서 단원을 켜 주세요.'));
+      box.appendChild(el('b', null, '보여 줄 지문 묶음이 없어요'));
+      box.appendChild(document.createTextNode('설정에서 묶음을 켜 주세요.'));
       main.appendChild(box);
       return;
     }
-    /* 보던 단원이 꺼졌으면 켜져 있는 첫 단원으로 */
+    /* 보던 묶음이 꺼졌으면 켜져 있는 첫 묶음으로 */
     if(!tabOn(level) || !bankOf(level).length) level = vis[0].key;
     renderTabs();
 
@@ -945,7 +946,7 @@
   function toggleTab(key, on){
     var vis = visibleTabs();
     if(!on && vis.length <= 1 && vis[0] && vis[0].key === key){
-      alert('단원을 적어도 하나는 켜 두어야 해요.');
+      alert('묶음을 적어도 하나는 켜 두어야 해요.');
       renderOpts();
       return;
     }
