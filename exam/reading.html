@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>영어 독해 연습</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --desk:#E9E5DB; --paper:#FCFBF8; --ink:#22201C; --muted:#8C8677;
+    --teal:#22635C; --teal-soft:#E4EEEC; --teal-line:#BFD8D4;
+    --cover:#D8384A; --cover-2:#C42F41; --ok:#2E7D57; --ok-soft:#E8F3EC;
+    --line:#E8E3D8;
+    --eng:'Space Grotesk', ui-monospace, system-ui, sans-serif;
+    --kor:'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    --shadow:0 1px 0 rgba(0,0,0,.02), 0 8px 24px -18px rgba(34,32,28,.35);
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:var(--desk);
+    background-image:radial-gradient(circle at 1px 1px, rgba(34,32,28,.05) 1px, transparent 0);
+    background-size:22px 22px; color:var(--ink); font-family:var(--kor);
+    -webkit-font-smoothing:antialiased; line-height:1.5; padding:32px 16px 80px;
+    touch-action:manipulation;}   /* 더블탭 확대만 끈다. 손가락 두 개로 벌리는 확대는 그대로 */
+  .wrap{max-width:780px;margin:0 auto}
+
+  .navtop{display:flex;align-items:center;gap:10px;margin:0 4px 6px}
+  .backbtn{font-family:var(--kor);font-weight:600;font-size:13.5px;text-decoration:none;cursor:pointer;
+    display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:11px;
+    border:1px solid var(--teal-line);background:var(--paper);color:var(--teal);box-shadow:var(--shadow);
+    -webkit-tap-highlight-color:transparent;
+    transition:background .15s ease,color .15s ease,border-color .15s ease,transform .06s ease}
+  .backbtn:hover{background:var(--teal);border-color:var(--teal);color:#fff}
+  .backbtn:active{transform:translateY(1px)}
+  .backbtn .ar{font-family:var(--eng);font-weight:700;font-size:15px;line-height:1}
+
+  header{margin:8px 4px 18px}
+  .eyebrow{font-family:var(--eng);font-weight:600;letter-spacing:.28em;text-transform:uppercase;font-size:11px;color:var(--teal)}
+  h1{font-family:var(--eng);font-weight:700;font-size:clamp(34px,8vw,56px);letter-spacing:-.02em;margin:.12em 0 .05em;line-height:.98}
+  h1 .no{color:var(--cover)}
+  .sub{color:var(--muted);font-size:14px}
+
+  /* tabs */
+  .tabs{display:flex;gap:8px;margin:18px 0 14px;flex-wrap:wrap}
+  .tab{font-family:var(--kor);font-weight:600;font-size:15px;cursor:pointer;border:1px solid var(--teal-line);
+    background:var(--paper);color:var(--teal);padding:10px 18px;border-radius:12px;box-shadow:var(--shadow);
+    -webkit-tap-highlight-color:transparent;
+    transition:background .15s ease,color .15s ease,border-color .15s ease,transform .06s ease}
+  .tab[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+  .tab:active{transform:translateY(1px)}
+  .tab .n{font-family:var(--eng);font-size:11.5px;opacity:.75;margin-left:6px}
+
+  /* bar */
+  .bar{position:sticky;top:12px;z-index:20;margin:0 0 16px;background:var(--paper);
+    border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:12px 14px;
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .setname{font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto}
+  .setname .tag{font-family:var(--eng);font-size:11.5px;font-weight:700;letter-spacing:.04em;
+    color:#fff;background:var(--teal);border-radius:8px;padding:4px 9px;flex:0 0 auto}
+  .setname .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .barright{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .timer{font-family:var(--eng);font-weight:700;font-size:17px;color:var(--teal);
+    background:var(--teal-soft);border-radius:10px;padding:6px 11px;letter-spacing:.02em}
+  .timer.over{color:var(--cover);background:#FDF0F1}
+  .timer[hidden]{display:none}
+  .count{font-family:var(--eng);font-weight:600;font-size:13px;color:var(--teal)}
+  .btn{font-family:var(--kor);font-weight:600;font-size:14px;cursor:pointer;border-radius:11px;
+    padding:10px 16px;border:1px solid var(--teal-line);background:#fff;color:var(--teal);
+    -webkit-tap-highlight-color:transparent;transition:background .15s ease,color .15s ease,transform .06s ease}
+  .btn:hover{background:var(--teal-soft)}
+  .btn:active{transform:translateY(1px)}
+  .btn.solid{background:var(--teal);border-color:var(--teal);color:#fff}
+  .btn.solid:hover{background:#1B544E}
+  .btn.red{background:var(--cover);border-color:var(--cover-2);color:#fff}
+  .btn.red:hover{background:var(--cover-2)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .btn.small{padding:8px 13px;font-size:13.5px}
+  .store{background:none;border:none;color:var(--muted);font-family:var(--kor);font-size:12.5px;
+    cursor:pointer;padding:6px}
+  .store:hover{color:var(--ink)}
+
+  /* 지문 고르기 */
+  .picker{display:none;background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:14px;margin:0 0 16px}
+  .picker.open{display:block}
+  .picker h3{margin:2px 4px 11px;font-size:12px;font-family:var(--eng);letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);font-weight:600}
+  .picklist{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:8px}
+  .pick{display:flex;align-items:center;gap:10px;text-align:left;width:100%;
+    border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 12px;cursor:pointer;
+    font-family:var(--kor);font-size:14.5px;color:var(--ink);-webkit-tap-highlight-color:transparent;
+    transition:border-color .15s ease,background .15s ease}
+  .pick:hover{border-color:var(--teal-line);background:var(--teal-soft)}
+  .pick.cur{border-color:var(--teal);background:var(--teal-soft)}
+  .pick .pn{font-family:var(--eng);font-weight:700;font-size:13px;color:var(--teal);
+    background:var(--teal-soft);border:1px solid var(--teal-line);border-radius:8px;
+    min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .pick.cur .pn{background:var(--teal);border-color:var(--teal);color:#fff}
+  .pick .pt{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+  .pick .ps{font-family:var(--eng);font-size:12px;color:var(--muted);flex:0 0 auto}
+  .pick .ps.done{color:var(--ok)}
+
+  /* 시작 화면 */
+  .gate{background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:40px 24px;text-align:center}
+  .gate .gn{font-family:var(--eng);font-weight:700;font-size:13px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--teal)}
+  .gate h2{font-size:24px;margin:8px 0 18px;font-weight:700}
+  .gate .meta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 22px}
+  .gate .chip{font-size:13.5px;color:var(--muted);background:#fff;border:1px solid var(--line);
+    border-radius:99px;padding:7px 14px}
+  .gate .chip b{color:var(--teal);font-family:var(--eng);font-weight:700}
+  .gate .go{font-size:17px;padding:15px 44px;border-radius:14px}
+  .gate .hint{margin:16px 0 0;font-size:12.5px;color:var(--muted);line-height:1.7}
+
+  /* passage */
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:22px;margin:0 0 16px}
+  .plabel{font-family:var(--eng);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:10px}
+  .passage{font-family:var(--eng);font-weight:400;font-size:17px;line-height:1.85;letter-spacing:-.005em;
+    word-break:normal;overflow-wrap:break-word}
+  .passage mark{background:#FDF0C8;color:inherit;padding:1px 2px;border-radius:3px}
+
+  /* questions */
+  .q{background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:20px;margin:0 0 14px}
+  .qhead{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+  .qno{font-family:var(--eng);font-weight:700;font-size:14px;color:#fff;background:var(--teal);
+    border-radius:8px;min-width:26px;height:26px;display:inline-flex;align-items:center;
+    justify-content:center;flex:0 0 auto}
+  .qtype{font-size:11.5px;font-weight:600;color:var(--teal);background:var(--teal-soft);
+    border-radius:7px;padding:3px 8px;flex:0 0 auto;align-self:center}
+  .qmark{margin-left:auto;font-family:var(--eng);font-weight:700;font-size:19px;line-height:1;align-self:center}
+  .qmark.o{color:var(--ok)} .qmark.x{color:var(--cover)}
+  .prompt{font-weight:600;font-size:15.5px;margin:2px 0 12px}
+  .qsentence{font-family:var(--eng);font-size:16px;line-height:1.75;background:#fff;
+    border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin:0 0 12px}
+
+  .choices{display:flex;flex-direction:column;gap:7px}
+  .choice{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border-radius:11px;
+    border:1px solid var(--line);background:#fff;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;transition:border-color .15s ease,background .15s ease}
+  .choice:hover{border-color:var(--teal-line)}
+  .choice input{position:absolute;opacity:0;width:0;height:0}
+  .choice .mk{font-family:var(--eng);font-weight:600;font-size:14px;color:var(--teal);
+    width:22px;height:22px;border-radius:50%;border:1.5px solid var(--teal-line);flex:0 0 auto;
+    display:inline-flex;align-items:center;justify-content:center;transition:.15s}
+  .choice .ctext{font-size:15.5px;line-height:1.55;padding-top:1px}
+  .choice.eng .ctext{font-family:var(--eng);font-size:15px}
+  .choice.sel{border-color:var(--teal);background:var(--teal-soft)}
+  .choice.sel .mk{background:var(--teal);border-color:var(--teal);color:#fff}
+  .choice input:focus-visible + .mk{box-shadow:0 0 0 3px var(--teal-soft)}
+  .graded .choice{cursor:default}
+  .graded .choice:hover{border-color:var(--line)}
+  .choice.right{border-color:#B6D8C4;background:var(--ok-soft)}
+  .choice.right .mk{background:var(--ok);border-color:var(--ok);color:#fff}
+  .choice.wrong{border-color:#F0BDC4;background:#FDF0F1}
+  .choice.wrong .mk{background:var(--cover);border-color:var(--cover-2);color:#fff}
+
+  .exbtn{margin-top:12px;background:none;border:none;color:var(--teal);font-family:var(--kor);
+    font-weight:600;font-size:13.5px;cursor:pointer;padding:6px 0;text-decoration:underline;
+    text-underline-offset:3px;display:none}
+  .graded .exbtn{display:inline-block}
+  .explain{display:none;margin-top:10px;background:#fff;border:1px solid var(--line);
+    border-left:3px solid var(--teal);border-radius:0 11px 11px 0;padding:13px 15px;
+    font-size:14.5px;line-height:1.75;color:#3A372F}
+  .explain.open{display:block}
+
+  /* submit / result */
+  .foot{background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .score{font-family:var(--eng);font-weight:700;font-size:20px;color:var(--teal)}
+  .score .bad{color:var(--cover)}
+  .timeline{width:100%;font-size:13.5px;color:var(--muted);margin:-2px 0 0}
+  .timeline b{font-family:var(--eng);font-size:14.5px}
+  .timeline .fast{color:var(--ok)} .timeline .slow{color:var(--cover)}
+  .footright{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+  .trans{display:none;margin:14px 0 0;background:var(--paper);border:1px solid var(--line);
+    border-radius:16px;box-shadow:var(--shadow);padding:20px;font-size:15px;line-height:1.85;color:#3A372F}
+  .trans.open{display:block}
+  .trans h3{margin:0 0 10px;font-size:13px;font-family:var(--eng);letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);font-weight:600}
+
+  .empty{background:var(--paper);border:1px dashed var(--teal-line);border-radius:16px;
+    padding:46px 24px;text-align:center;color:var(--muted);font-size:15px;line-height:1.8}
+  .empty b{color:var(--ink);display:block;font-size:17px;margin-bottom:6px}
+
+  .note{font-size:12.5px;color:var(--muted);margin:22px 6px 0;line-height:1.7}
+
+  @media (max-width:600px){
+    body{padding:22px 12px 70px}
+    .card,.q,.foot,.trans{padding:16px}
+    .gate{padding:32px 18px}
+    .passage{font-size:16px;line-height:1.8}
+    .barright{width:100%;margin-left:0;justify-content:space-between}
+    .footright{width:100%;margin-left:0}
+    .footright .btn{flex:1}
+    .picklist{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="navtop">
+    <a class="backbtn" href="index.html"><span class="ar">←</span> 훈련 목록</a>
+  </nav>
+  <header>
+    <div class="eyebrow">영어 독해 연습</div>
+    <h1>Reading<span class="no">.</span></h1>
+    <div class="sub">지문 하나를 읽고 문제를 풉니다. 제출하면 채점·해설과 함께 이번 처리 속도가 나와요.</div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-level="h1" aria-selected="true">고1<span class="n"></span></button>
+    <button class="tab" role="tab" data-level="h2" aria-selected="false">고2<span class="n"></span></button>
+    <button class="tab" role="tab" data-level="sn" aria-selected="false">수능<span class="n"></span></button>
+  </div>
+
+  <div class="bar">
+    <div class="setname">
+      <span class="tag" id="setTag">—</span>
+      <span class="nm" id="setName">불러오는 중…</span>
+    </div>
+    <div class="barright">
+      <span class="timer" id="timer" hidden>0:00</span>
+      <span class="count" id="count">0 / 0</span>
+      <button class="store" id="storeBtn" title="저장 위치 바꾸기">☁️ 웹</button>
+      <button class="btn small" id="pickBtn">지문 고르기</button>
+      <button class="btn small" id="newBtn">새 지문</button>
+    </div>
+  </div>
+
+  <div class="picker" id="picker">
+    <h3>지문 고르기</h3>
+    <div class="picklist" id="picklist"></div>
+  </div>
+
+  <div id="main"></div>
+
+  <p class="note">
+    지문은 모두 <b>창작</b>이며 실제 기출·EBS 지문이 아닙니다.
+    <b>처리 속도</b>는 지문 단어 수를 걸린 시간으로 나눈 값이라, 읽는 속도만이 아니라 푸는 시간까지 들어 있어요.
+    목표 시간은 세 번 이상 풀고 나면 <b>최근 평균보다 조금 빠른 속도</b>로 바뀝니다.
+    푼 기록·고른 답·풀이 시간은 저장되어 다음에 들어와도 이어서 볼 수 있어요.
+  </p>
+</div>
+
+<script src="data/h1.js"></script>
+<script src="data/h2.js"></script>
+<script src="data/sn.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- 문제은행 ---------- */
+  var LEVELS = [
+    { key:'h1', label:'고1' },
+    { key:'h2', label:'고2' },
+    { key:'sn', label:'수능' }
+  ];
+  function bankOf(level){
+    if(level==='h1' && typeof EXAM_SETS_H1 !== 'undefined') return EXAM_SETS_H1;
+    if(level==='h2' && typeof EXAM_SETS_H2 !== 'undefined') return EXAM_SETS_H2;
+    if(level==='sn' && typeof EXAM_SETS_SN !== 'undefined') return EXAM_SETS_SN;
+    return [];
+  }
+  var TYPE_LABEL = {
+    theme:'주제', title:'제목', gist:'요지', purpose:'목적', mood:'심경',
+    blank:'빈칸추론', implicit:'함축의미', vocab:'어휘', grammar:'어법',
+    summary:'요약문', detail:'내용일치'
+  };
+  /* 유형별 풀이 시간(초). 지문 읽는 시간은 따로 더한다. 기록이 쌓이기 전의 첫 목표에만 쓴다. */
+  var TYPE_SEC = {
+    theme:60, title:60, gist:60, purpose:50, mood:50,
+    blank:90, implicit:90, vocab:50, grammar:60,
+    summary:80, detail:60
+  };
+  var CIRCLED = ['①','②','③','④','⑤'];
+  var GOAL_GAIN = 1.05;   /* 최근 평균보다 5% 빠른 속도를 목표로 삼는다 */
+  var GOAL_MIN_RECORDS = 3;
+  /* 답만 찍고 바로 제출한 기록 하나가 평균을 망가뜨리지 않도록 걸러 낸다 */
+  var MAX_WPM = 400;
+
+  function wordCount(text){ return text.trim().split(/\s+/).length; }
+
+  /* 처리 속도 — 읽기만이 아니라 푸는 시간까지 포함한 값이다 */
+  function wpm(words, sec){ return sec > 0 ? Math.round(words / (sec / 60)) : 0; }
+
+  /* 기록이 없을 때 쓰는 첫 목표: 분당 100단어로 한 번 읽는 시간 + 문항별 시간 */
+  function baselineSec(set){
+    var read = wordCount(set.passage) / 100 * 60;
+    var solve = set.questions.reduce(function(a, q){ return a + (TYPE_SEC[q.type] || 60); }, 0);
+    return Math.round((read + solve) / 10) * 10;
+  }
+  /* 최근 n회의 평균 처리 속도. 기록이 모자라면 null */
+  function recentWpm(lv, n, excludeId){
+    var s = levelState(lv), bank = bankOf(lv), out = [];
+    Object.keys(s.done).forEach(function(id){
+      if(id === excludeId) return;
+      var rec = s.done[id], set = null;
+      for(var i=0;i<bank.length;i++){ if(bank[i].id === id){ set = bank[i]; break; } }
+      if(!set || !(rec.sec > 0)) return;
+      var v = wpm(wordCount(set.passage), rec.sec);
+      if(v <= MAX_WPM) out.push({ at: rec.at || 0, v: v });
+    });
+    if(out.length < GOAL_MIN_RECORDS) return null;
+    out.sort(function(a, b){ return b.at - a.at; });
+    out = out.slice(0, n || 5);
+    return Math.round(out.reduce(function(a, r){ return a + r.v; }, 0) / out.length);
+  }
+  /* 목표 시간 — 기록이 쌓이면 '어제의 나보다 조금 빠르게'로 바뀐다 */
+  function goalSec(set){
+    var avg = recentWpm(level, 5, set.id);
+    if(!avg) return baselineSec(set);
+    return Math.round(wordCount(set.passage) / (avg * GOAL_GAIN) * 60 / 5) * 5;
+  }
+  function fmt(sec){
+    sec = Math.max(0, Math.round(sec));
+    return Math.floor(sec / 60) + ':' + ('0' + (sec % 60)).slice(-2);
+  }
+  function fmtKo(sec){
+    sec = Math.max(0, Math.round(sec));
+    var m = Math.floor(sec / 60), s = sec % 60;
+    return m ? (m + '분 ' + s + '초') : (s + '초');
+  }
+
+  /* ---------- Firebase ---------- */
+  var firebaseConfig = {
+    apiKey: "AIzaSyBBLliEhUZHFzw4r3Xk6piiYjk9UFauJvE",
+    authDomain: "eng-word-1.firebaseapp.com",
+    projectId: "eng-word-1",
+    storageBucket: "eng-word-1.firebasestorage.app",
+    messagingSenderId: "342379526397",
+    appId: "1:342379526397:web:946215d945f6f3da0ea694"
+  };
+  var db = null;
+  try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); } catch(e){ db = null; }
+
+  /* ---------- 저장 ---------- */
+  var KEY = 'exam_progress';
+  var MODE_KEY = 'storage_mode';               /* 다른 페이지와 같은 설정을 쓴다 */
+  function getMode(){ try{ return localStorage.getItem(MODE_KEY) || 'web'; }catch(e){ return 'local'; } }
+  function setMode(m){ try{ localStorage.setItem(MODE_KEY, m); }catch(e){} }
+
+  function loadLocal(){
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ return {}; }
+  }
+  function saveLocal(data){
+    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e){}
+  }
+  function loadRemote(){
+    if(!db) return Promise.resolve(loadLocal());
+    return db.collection('examData').doc('progress').get()
+      .then(function(snap){ return snap.exists ? (snap.data().data || {}) : {}; })
+      .catch(function(){ return loadLocal(); });
+  }
+  var saveTimer = null;
+  function saveRemote(data){
+    if(!db) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){
+      db.collection('examData').doc('progress').set({ data: data }).catch(function(){});
+    }, 800);
+  }
+  /* 네트워크가 막히면 Firestore 요청이 응답 없이 오래 걸린다. 화면이 빈 채로
+     멈추지 않도록 먼저 끝나는 쪽을 쓴다. */
+  function load(){
+    if(getMode() !== 'web') return Promise.resolve(loadLocal());
+    return Promise.race([
+      loadRemote(),
+      new Promise(function(resolve){ setTimeout(function(){ resolve(loadLocal()); }, 3500); })
+    ]);
+  }
+  function save(){
+    saveLocal(state);                          /* 어느 모드든 이 기기에는 남겨 둔다 */
+    if(getMode() === 'web') saveRemote(state);
+  }
+
+  /* ---------- 상태 ---------- */
+  var state = {};     /* { h1:{current, answers, submitted, started, elapsed, done:{}}, ... } */
+  var level = 'h1';
+
+  function levelState(lv){
+    if(!state[lv]) state[lv] = {};
+    var s = state[lv];
+    if(!s.answers) s.answers = {};
+    if(!s.done) s.done = {};
+    if(typeof s.elapsed !== 'number') s.elapsed = 0;
+    if(typeof s.started !== 'boolean') s.started = false;
+    if(typeof s.submitted !== 'boolean') s.submitted = false;
+    return s;
+  }
+  function setById(id){
+    var bank = bankOf(level);
+    for(var i=0;i<bank.length;i++){ if(bank[i].id === id) return bank[i]; }
+    return null;
+  }
+  function currentSet(){
+    var bank = bankOf(level), s = levelState(level);
+    if(!bank.length) return null;
+    var found = setById(s.current);
+    if(!found){
+      found = pickSet();
+      if(found) openSet(found.id, true);
+    }
+    return found;
+  }
+  function pickSet(){
+    var bank = bankOf(level), s = levelState(level);
+    var fresh = bank.filter(function(x){ return !s.done[x.id]; });
+    var pool = fresh.length ? fresh : bank;
+    if(!pool.length) return null;
+    var pick = pool[Math.floor(Math.random() * pool.length)];
+    if(pool.length > 1 && pick.id === s.current) pick = pool[(pool.indexOf(pick) + 1) % pool.length];
+    return pick;
+  }
+  /* 세트를 연다. 이미 제출한 세트면 채점 결과를 그대로 다시 보여 준다. */
+  function openSet(id, silent){
+    var s = levelState(level), rec = s.done[id];
+    s.current = id;
+    s.answers = (rec && rec.answers) ? rec.answers : {};
+    s.submitted = !!rec;
+    s.started = !!rec;
+    s.elapsed = rec ? (rec.sec || 0) : 0;
+    if(!silent){ save(); render(); window.scrollTo({ top:0, behavior:'smooth' }); }
+  }
+
+  /* ---------- 타이머 ---------- */
+  var tick = null;
+  function running(){
+    var s = levelState(level);
+    return s.started && !s.submitted && bankOf(level).length > 0;
+  }
+  function startTimer(){
+    stopTimer();
+    tick = setInterval(function(){
+      if(document.hidden) return;              /* 화면을 떠나 있는 동안은 세지 않는다 */
+      if(!running()){ stopTimer(); return; }
+      var s = levelState(level);
+      s.elapsed += 1;
+      paintTimer();
+      if(s.elapsed % 15 === 0) save();
+    }, 1000);
+  }
+  function stopTimer(){ if(tick){ clearInterval(tick); tick = null; } }
+  function paintTimer(){
+    var s = levelState(level), set = setById(s.current);
+    var el = document.getElementById('timer');
+    if(!set || !s.started){ el.hidden = true; return; }
+    el.hidden = false;
+    el.textContent = fmt(s.elapsed);
+    el.classList.toggle('over', s.elapsed > goalSec(set));
+  }
+
+  /* ---------- 그리기 ---------- */
+  var main = document.getElementById('main');
+  var setTag = document.getElementById('setTag');
+  var setName = document.getElementById('setName');
+  var countEl = document.getElementById('count');
+  var newBtn = document.getElementById('newBtn');
+  var pickBtn = document.getElementById('pickBtn');
+  var picker = document.getElementById('picker');
+  var picklist = document.getElementById('picklist');
+  var storeBtn = document.getElementById('storeBtn');
+
+  function el(tag, cls, text){
+    var n = document.createElement(tag);
+    if(cls) n.className = cls;
+    if(text != null) n.textContent = text;
+    return n;
+  }
+
+  /* 지문을 그리면서 문항이 가리키는 낱말·구절을 표시한다 (textContent만 쓰므로 안전) */
+  function renderPassage(set){
+    var card = el('div','card');
+    card.appendChild(el('div','plabel','Passage'));
+    var p = el('div','passage');
+    var targets = set.questions
+      .map(function(q){ return q.target; })
+      .filter(function(t){ return !!t; })
+      .sort(function(a, b){ return b.length - a.length; });   /* 긴 구절을 먼저 잡는다 */
+
+    if(targets.length){
+      var re = new RegExp('\\b(' + targets.map(function(t){
+        return t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      }).join('|') + ')\\b', 'g');
+      var rest = set.passage, m;
+      while((m = re.exec(rest)) !== null){
+        if(m.index > 0) p.appendChild(document.createTextNode(rest.slice(0, m.index)));
+        p.appendChild(el('mark', null, m[0]));
+        rest = rest.slice(m.index + m[0].length);
+        re.lastIndex = 0;
+      }
+      p.appendChild(document.createTextNode(rest));
+    } else {
+      p.textContent = set.passage;
+    }
+    card.appendChild(p);
+    return card;
+  }
+
+  function renderQuestion(set, q, qi){
+    var s = levelState(level);
+    var graded = !!s.submitted;
+    var chosen = s.answers[qi];
+    var box = el('div','q' + (graded ? ' graded' : ''));
+
+    var head = el('div','qhead');
+    head.appendChild(el('span','qno', String(qi + 1)));
+    head.appendChild(el('span','qtype', TYPE_LABEL[q.type] || ''));
+    if(graded){
+      var ok = chosen === q.answer;
+      head.appendChild(el('span','qmark ' + (ok ? 'o' : 'x'), ok ? 'O' : 'X'));
+    }
+    box.appendChild(head);
+    box.appendChild(el('div','prompt', q.prompt));
+    if(q.sentence) box.appendChild(el('div','qsentence', q.sentence));
+
+    var isEng = q.type !== 'detail';
+    var list = el('div','choices');
+    q.choices.forEach(function(text, ci){
+      var lab = el('label','choice' + (isEng ? ' eng' : ''));
+      if(graded){
+        if(ci === q.answer) lab.className += ' right';
+        else if(ci === chosen) lab.className += ' wrong';
+      } else if(ci === chosen){
+        lab.className += ' sel';
+      }
+      var input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'q' + qi;
+      input.value = String(ci);
+      input.checked = ci === chosen;
+      input.disabled = graded;
+      input.addEventListener('change', function(){ choose(qi, ci); });
+      lab.appendChild(input);
+      lab.appendChild(el('span','mk', CIRCLED[ci]));
+      lab.appendChild(el('span','ctext', text));
+      list.appendChild(lab);
+    });
+    box.appendChild(list);
+
+    var exBtn = el('button','exbtn','해설 보기');
+    var ex = el('div','explain', q.explain);
+    if(graded && chosen !== q.answer){ ex.className += ' open'; exBtn.textContent = '해설 접기'; }
+    exBtn.addEventListener('click', function(){
+      var open = ex.classList.toggle('open');
+      exBtn.textContent = open ? '해설 접기' : '해설 보기';
+    });
+    box.appendChild(exBtn);
+    box.appendChild(ex);
+    return box;
+  }
+
+  /* 시작 전 화면 — 여기서 타이머가 시작된다 */
+  function renderGate(set, no){
+    var g = el('div','gate');
+    g.appendChild(el('div','gn','지문 ' + no));
+    g.appendChild(el('h2', null, set.title));
+    var meta = el('div','meta');
+    var c1 = el('span','chip');
+    c1.appendChild(document.createTextNode('문항 '));
+    c1.appendChild(el('b', null, String(set.questions.length) + '개'));
+    var c2 = el('span','chip');
+    c2.appendChild(document.createTextNode('지문 '));
+    c2.appendChild(el('b', null, wordCount(set.passage) + ' words'));
+    var c3 = el('span','chip');
+    c3.appendChild(document.createTextNode('목표 시간 '));
+    c3.appendChild(el('b', null, fmtKo(goalSec(set))));
+    meta.appendChild(c1); meta.appendChild(c2); meta.appendChild(c3);
+    g.appendChild(meta);
+    var go = el('button','btn solid go','시작하기');
+    go.id = 'startBtn';
+    go.addEventListener('click', startSet);
+    g.appendChild(go);
+    var avg = recentWpm(level, 5, set.id);
+    g.appendChild(el('p','hint', avg
+      ? ('최근 평균 ' + avg + ' words/분. 목표 시간은 그보다 조금 빠른 속도로 잡았어요.')
+      : '시작을 누르면 지문이 열리고 시간이 흘러갑니다. 제출하면 멈춰요.'));
+    return g;
+  }
+
+  function renderFoot(set){
+    var s = levelState(level);
+    var foot = el('div','foot');
+    if(!s.submitted){
+      var answered = set.questions.filter(function(_, i){ return s.answers[i] != null; }).length;
+      foot.appendChild(el('span','score', answered + ' / ' + set.questions.length + ' 선택'));
+      var right = el('div','footright');
+      var sub = el('button','btn solid','제출하기');
+      sub.id = 'submitBtn';
+      sub.disabled = answered < set.questions.length;
+      sub.addEventListener('click', submit);
+      right.appendChild(sub);
+      foot.appendChild(right);
+    } else {
+      var score = set.questions.filter(function(q, i){ return s.answers[i] === q.answer; }).length;
+      var sc = el('span','score');
+      sc.appendChild(document.createTextNode('점수 '));
+      sc.appendChild(el('span', score === set.questions.length ? '' : 'bad', String(score)));
+      sc.appendChild(document.createTextNode(' / ' + set.questions.length));
+      foot.appendChild(sc);
+
+      var right2 = el('div','footright');
+      var tb = el('button','btn','해석 보기');
+      tb.addEventListener('click', function(){
+        var t = document.getElementById('trans');
+        var open = t.classList.toggle('open');
+        tb.textContent = open ? '해석 접기' : '해석 보기';
+        if(open) t.scrollIntoView({ behavior:'smooth', block:'nearest' });
+      });
+      var nb = el('button','btn red','새 지문 풀기');
+      nb.addEventListener('click', nextSet);
+      right2.appendChild(tb);
+      right2.appendChild(nb);
+      foot.appendChild(right2);
+
+      var goal = goalSec(set), used = s.elapsed;
+      var line = el('div','timeline');
+      line.appendChild(document.createTextNode('풀이 시간 '));
+      line.appendChild(el('b', used <= goal ? 'fast' : 'slow', fmtKo(used)));
+      line.appendChild(document.createTextNode(' · 목표 ' + fmtKo(goal)));
+      foot.appendChild(line);
+
+      /* 속도 — 이번 기록과 그 전까지의 평균을 나란히 */
+      var mine = wpm(wordCount(set.passage), used);
+      var before = recentWpm(level, 5, set.id);
+      var speed = el('div','timeline');
+      speed.appendChild(document.createTextNode('처리 속도 '));
+      speed.appendChild(el('b', before && mine >= before ? 'fast' : (before ? 'slow' : ''), mine + ' words/분'));
+      if(before){
+        var diff = mine - before;
+        speed.appendChild(document.createTextNode(' · 최근 평균 ' + before + ' — '));
+        speed.appendChild(el('span', diff >= 0 ? 'fast' : 'slow',
+          diff >= 0 ? ('평균보다 ' + diff + ' 빨라요') : ('평균보다 ' + (-diff) + ' 느려요')));
+      } else {
+        speed.appendChild(document.createTextNode(' · ' + GOAL_MIN_RECORDS + '회 이상 쌓이면 평균과 견줘 볼 수 있어요'));
+      }
+      foot.appendChild(speed);
+    }
+    return foot;
+  }
+
+  function renderPicker(){
+    var bank = bankOf(level), s = levelState(level);
+    picklist.innerHTML = '';
+    bank.forEach(function(set, i){
+      var rec = s.done[set.id];
+      var b = el('button','pick' + (set.id === s.current ? ' cur' : ''));
+      b.appendChild(el('span','pn', String(i + 1)));
+      b.appendChild(el('span','pt', set.title));
+      b.appendChild(el('span','ps' + (rec ? ' done' : ''),
+        rec ? (rec.score + '/' + rec.total + ' · ' + fmt(rec.sec || 0)) : '—'));
+      b.addEventListener('click', function(){
+        picker.classList.remove('open');
+        openSet(set.id);
+      });
+      picklist.appendChild(b);
+    });
+  }
+
+  function render(){
+    var bank = bankOf(level), s = levelState(level);
+    main.innerHTML = '';
+    stopTimer();
+
+    document.querySelectorAll('.tab').forEach(function(t){
+      var n = t.querySelector('.n'), lv = t.getAttribute('data-level');
+      var b = bankOf(lv);
+      n.textContent = b.length ? (Object.keys(levelState(lv).done).length + '/' + b.length) : '';
+    });
+
+    if(!bank.length){
+      setTag.textContent = '—';
+      setName.textContent = '준비 중';
+      countEl.textContent = '0 / 0';
+      newBtn.disabled = true;
+      pickBtn.disabled = true;
+      picker.classList.remove('open');
+      document.getElementById('timer').hidden = true;
+      var box = el('div','empty');
+      box.appendChild(el('b', null, labelOf(level) + ' 지문은 아직 준비 중이에요'));
+      box.appendChild(document.createTextNode('다른 탭에서 먼저 연습할 수 있어요.'));
+      main.appendChild(box);
+      return;
+    }
+    newBtn.disabled = false;
+    pickBtn.disabled = false;
+
+    var set = currentSet();
+    if(!set) return;
+    var no = bank.indexOf(set) + 1;
+    setTag.textContent = '지문 ' + no + '/' + bank.length;
+    setName.textContent = set.title;
+    countEl.textContent = Object.keys(s.done).length + ' / ' + bank.length + ' 완료';
+    renderPicker();
+    paintTimer();
+
+    if(!s.started){
+      main.appendChild(renderGate(set, no));
+      return;
+    }
+
+    main.appendChild(renderPassage(set));
+    set.questions.forEach(function(q, qi){ main.appendChild(renderQuestion(set, q, qi)); });
+    main.appendChild(renderFoot(set));
+
+    var trans = el('div','trans');
+    trans.id = 'trans';
+    trans.appendChild(el('h3', null, '지문 해석'));
+    trans.appendChild(el('div', null, set.translation));
+    main.appendChild(trans);
+
+    if(running()) startTimer();
+  }
+
+  function labelOf(lv){
+    for(var i=0;i<LEVELS.length;i++){ if(LEVELS[i].key === lv) return LEVELS[i].label; }
+    return lv;
+  }
+
+  /* ---------- 동작 ---------- */
+  function startSet(){
+    var s = levelState(level);
+    s.started = true;
+    s.elapsed = 0;
+    save();
+    render();
+  }
+
+  function choose(qi, ci){
+    var s = levelState(level);
+    if(s.submitted) return;
+    s.answers[qi] = ci;
+    save();
+    render();
+  }
+
+  function submit(){
+    var s = levelState(level), set = currentSet();
+    if(!set || s.submitted) return;
+    stopTimer();
+    var score = set.questions.filter(function(q, i){ return s.answers[i] === q.answer; }).length;
+    s.submitted = true;
+    s.done[set.id] = {
+      score: score, total: set.questions.length,
+      sec: s.elapsed, at: Date.now(),
+      answers: s.answers                        /* 다시 열었을 때 그대로 보여 주려고 남긴다 */
+    };
+    save();
+    render();
+    window.scrollTo({ top: 0, behavior:'smooth' });
+  }
+
+  function nextSet(){
+    var s = levelState(level), bank = bankOf(level);
+    if(!bank.length) return;
+    if(s.started && !s.submitted && Object.keys(s.answers).length){
+      if(!confirm('아직 제출하지 않았어요. 지금 고른 답은 사라집니다. 새 지문으로 넘어갈까요?')) return;
+    }
+    var fresh = bank.filter(function(x){ return !s.done[x.id]; });
+    if(!fresh.length){
+      if(!confirm(bank.length + '개 지문을 모두 풀었어요. 기록을 지우고 처음부터 다시 풀까요?')) return;
+      s.done = {};
+    }
+    var pick = pickSet();
+    if(!pick) return;
+    openSet(pick.id);
+  }
+
+  function updateStoreBtn(){
+    storeBtn.textContent = getMode() === 'web' ? '☁️ 웹' : '💾 로컬';
+  }
+  storeBtn.addEventListener('click', function(){
+    var toWeb = getMode() !== 'web';
+    if(!confirm(toWeb ? '웹(기기 간 동기화)으로 바꿀까요? 다른 기기에 저장된 기록을 불러옵니다.'
+                      : '이 브라우저에만 저장하도록 바꿀까요?')) return;
+    setMode(toWeb ? 'web' : 'local');
+    updateStoreBtn();
+    load().then(function(data){ state = data || {}; render(); });
+  });
+
+  pickBtn.addEventListener('click', function(){
+    var open = picker.classList.toggle('open');
+    if(open){ renderPicker(); picker.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+  });
+
+  document.querySelectorAll('.tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      stopTimer();
+      save();
+      level = tab.getAttribute('data-level');
+      document.querySelectorAll('.tab').forEach(function(t){
+        t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+      });
+      picker.classList.remove('open');
+      render();
+    });
+  });
+
+  newBtn.addEventListener('click', nextSet);
+  window.addEventListener('beforeunload', function(){ saveLocal(state); });
+
+  /* ---------- 시작 ---------- */
+  updateStoreBtn();
+  load().then(function(data){
+    state = data || {};
+    render();
+    save();                                   /* 처음 고른 세트를 기록해 둔다 */
+  });
+})();
+</script>
+</body>
+</html>
