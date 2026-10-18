@@ -20,6 +20,8 @@ body {
   background: var(--color-bg);
   color: #222;
   min-height: 100vh;
+  /* 더블탭 확대만 끈다. 손가락 두 개로 벌리는 확대는 그대로 */
+  touch-action: manipulation;
 }
 
 /* ===== Nav ===== */
