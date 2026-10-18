@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>영어 독해 연습</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --desk:#E9E5DB; --paper:#FCFBF8; --ink:#22201C; --muted:#8C8677;
+    --teal:#22635C; --teal-soft:#E4EEEC; --teal-line:#BFD8D4;
+    --cover:#D8384A; --cover-2:#C42F41; --ok:#2E7D57; --ok-soft:#E8F3EC;
+    --line:#E8E3D8;
+    --eng:'Space Grotesk', ui-monospace, system-ui, sans-serif;
+    --kor:'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    --shadow:0 1px 0 rgba(0,0,0,.02), 0 8px 24px -18px rgba(34,32,28,.35);
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:var(--desk);
+    background-image:radial-gradient(circle at 1px 1px, rgba(34,32,28,.05) 1px, transparent 0);
+    background-size:22px 22px; color:var(--ink); font-family:var(--kor);
+    -webkit-font-smoothing:antialiased; line-height:1.5; padding:32px 16px 80px;}
+  .wrap{max-width:780px;margin:0 auto}
+
+  header{margin:8px 4px 18px}
+  .eyebrow{font-family:var(--eng);font-weight:600;letter-spacing:.28em;text-transform:uppercase;font-size:11px;color:var(--teal)}
+  h1{font-family:var(--eng);font-weight:700;font-size:clamp(34px,8vw,56px);letter-spacing:-.02em;margin:.12em 0 .05em;line-height:.98}
+  h1 .no{color:var(--cover)}
+  .sub{color:var(--muted);font-size:14px}
+
+  /* tabs */
+  .tabs{display:flex;gap:8px;margin:18px 0 14px;flex-wrap:wrap}
+  .tab{font-family:var(--kor);font-weight:600;font-size:15px;cursor:pointer;border:1px solid var(--teal-line);
+    background:var(--paper);color:var(--teal);padding:10px 18px;border-radius:12px;box-shadow:var(--shadow);
+    transition:background .15s ease,color .15s ease,border-color .15s ease,transform .06s ease}
+  .tab[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+  .tab:active{transform:translateY(1px)}
+
+  /* bar */
+  .bar{position:sticky;top:12px;z-index:20;margin:0 0 16px;background:var(--paper);
+    border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:12px 14px;
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .setname{font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;min-width:0}
+  .setname .tag{font-family:var(--eng);font-size:11px;font-weight:600;letter-spacing:.1em;
+    color:var(--teal);background:var(--teal-soft);border-radius:7px;padding:3px 7px;flex:0 0 auto}
+  .setname .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .barright{margin-left:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .count{font-family:var(--eng);font-weight:600;font-size:13px;color:var(--teal)}
+  .btn{font-family:var(--kor);font-weight:600;font-size:14px;cursor:pointer;border-radius:11px;
+    padding:10px 16px;border:1px solid var(--teal-line);background:#fff;color:var(--teal);
+    -webkit-tap-highlight-color:transparent;transition:background .15s ease,color .15s ease,transform .06s ease}
+  .btn:hover{background:var(--teal-soft)}
+  .btn:active{transform:translateY(1px)}
+  .btn.solid{background:var(--teal);border-color:var(--teal);color:#fff}
+  .btn.solid:hover{background:#1B544E}
+  .btn.red{background:var(--cover);border-color:var(--cover-2);color:#fff}
+  .btn.red:hover{background:var(--cover-2)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .store{background:none;border:none;color:var(--muted);font-family:var(--kor);font-size:12.5px;
+    cursor:pointer;padding:6px}
+  .store:hover{color:var(--ink)}
+
+  /* passage */
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:22px;margin:0 0 16px}
+  .plabel{font-family:var(--eng);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:10px}
+  .passage{font-family:var(--eng);font-weight:400;font-size:17px;line-height:1.85;letter-spacing:-.005em;
+    word-break:normal;overflow-wrap:break-word}
+  .passage mark{background:#FDF0C8;color:inherit;padding:1px 2px;border-radius:3px}
+
+  /* questions */
+  .q{background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:20px;margin:0 0 14px}
+  .qhead{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+  .qno{font-family:var(--eng);font-weight:700;font-size:14px;color:#fff;background:var(--teal);
+    border-radius:8px;min-width:26px;height:26px;display:inline-flex;align-items:center;
+    justify-content:center;flex:0 0 auto}
+  .qtype{font-size:11.5px;font-weight:600;color:var(--teal);background:var(--teal-soft);
+    border-radius:7px;padding:3px 8px;flex:0 0 auto;align-self:center}
+  .qmark{margin-left:auto;font-family:var(--eng);font-weight:700;font-size:19px;line-height:1;align-self:center}
+  .qmark.o{color:var(--ok)} .qmark.x{color:var(--cover)}
+  .prompt{font-weight:600;font-size:15.5px;margin:2px 0 12px}
+  .qsentence{font-family:var(--eng);font-size:16px;line-height:1.75;background:#fff;
+    border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin:0 0 12px}
+
+  .choices{display:flex;flex-direction:column;gap:7px}
+  .choice{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border-radius:11px;
+    border:1px solid var(--line);background:#fff;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;transition:border-color .15s ease,background .15s ease}
+  .choice:hover{border-color:var(--teal-line)}
+  .choice input{position:absolute;opacity:0;width:0;height:0}
+  .choice .mk{font-family:var(--eng);font-weight:600;font-size:14px;color:var(--teal);
+    width:22px;height:22px;border-radius:50%;border:1.5px solid var(--teal-line);flex:0 0 auto;
+    display:inline-flex;align-items:center;justify-content:center;transition:.15s}
+  .choice .ctext{font-size:15.5px;line-height:1.55;padding-top:1px}
+  .choice.eng .ctext{font-family:var(--eng);font-size:15px}
+  .choice.sel{border-color:var(--teal);background:var(--teal-soft)}
+  .choice.sel .mk{background:var(--teal);border-color:var(--teal);color:#fff}
+  .choice input:focus-visible + .mk{box-shadow:0 0 0 3px var(--teal-soft)}
+  .graded .choice{cursor:default}
+  .graded .choice:hover{border-color:var(--line)}
+  .choice.right{border-color:#B6D8C4;background:var(--ok-soft)}
+  .choice.right .mk{background:var(--ok);border-color:var(--ok);color:#fff}
+  .choice.wrong{border-color:#F0BDC4;background:#FDF0F1}
+  .choice.wrong .mk{background:var(--cover);border-color:var(--cover-2);color:#fff}
+
+  .exbtn{margin-top:12px;background:none;border:none;color:var(--teal);font-family:var(--kor);
+    font-weight:600;font-size:13.5px;cursor:pointer;padding:6px 0;text-decoration:underline;
+    text-underline-offset:3px;display:none}
+  .graded .exbtn{display:inline-block}
+  .explain{display:none;margin-top:10px;background:#fff;border:1px solid var(--line);
+    border-left:3px solid var(--teal);border-radius:0 11px 11px 0;padding:13px 15px;
+    font-size:14.5px;line-height:1.75;color:#3A372F}
+  .explain.open{display:block}
+
+  /* submit / result */
+  .foot{background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .score{font-family:var(--eng);font-weight:700;font-size:20px;color:var(--teal)}
+  .score .bad{color:var(--cover)}
+  .footright{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+  .trans{display:none;margin:14px 0 0;background:var(--paper);border:1px solid var(--line);
+    border-radius:16px;box-shadow:var(--shadow);padding:20px;font-size:15px;line-height:1.85;color:#3A372F}
+  .trans.open{display:block}
+  .trans h3{margin:0 0 10px;font-size:13px;font-family:var(--eng);letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);font-weight:600}
+
+  .empty{background:var(--paper);border:1px dashed var(--teal-line);border-radius:16px;
+    padding:46px 24px;text-align:center;color:var(--muted);font-size:15px;line-height:1.8}
+  .empty b{color:var(--ink);display:block;font-size:17px;margin-bottom:6px}
+
+  .note{font-size:12.5px;color:var(--muted);margin:22px 6px 0;line-height:1.7}
+
+  @media (max-width:600px){
+    body{padding:22px 12px 70px}
+    .card,.q,.foot,.trans{padding:16px}
+    .passage{font-size:16px;line-height:1.8}
+    .barright{width:100%;margin-left:0;justify-content:space-between}
+    .footright{width:100%;margin-left:0}
+    .footright .btn{flex:1}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">영어 독해 연습</div>
+    <h1>Reading<span class="no">.</span></h1>
+    <div class="sub">지문 하나를 읽고 네 문제를 풉니다. 제출하면 채점과 해설이 나와요.</div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-level="h1" aria-selected="true">고1</button>
+    <button class="tab" role="tab" data-level="h2" aria-selected="false">고2</button>
+    <button class="tab" role="tab" data-level="sn" aria-selected="false">수능</button>
+  </div>
+
+  <div class="bar">
+    <div class="setname">
+      <span class="tag" id="setTag">—</span>
+      <span class="nm" id="setName">불러오는 중…</span>
+    </div>
+    <div class="barright">
+      <span class="count" id="count">0 / 0</span>
+      <button class="store" id="storeBtn" title="저장 위치 바꾸기">☁️ 웹</button>
+      <button class="btn" id="newBtn">새 지문</button>
+    </div>
+  </div>
+
+  <div id="main"></div>
+
+  <p class="note">
+    지문은 모두 <b>창작</b>이며 실제 기출·EBS 지문이 아닙니다.
+    푼 기록과 고른 답은 저장되어 다음에 들어와도 이어서 볼 수 있어요.
+  </p>
+</div>
+
+<script src="data/h1.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- 문제은행 ---------- */
+  var LEVELS = [
+    { key:'h1', label:'고1' },
+    { key:'h2', label:'고2' },
+    { key:'sn', label:'수능' }
+  ];
+  function bankOf(level){
+    if(level==='h1' && typeof EXAM_SETS_H1 !== 'undefined') return EXAM_SETS_H1;
+    if(level==='h2' && typeof EXAM_SETS_H2 !== 'undefined') return EXAM_SETS_H2;
+    if(level==='sn' && typeof EXAM_SETS_SN !== 'undefined') return EXAM_SETS_SN;
+    return [];
+  }
+  var TYPE_LABEL = { theme:'주제', blank:'빈칸추론', vocab:'어휘', detail:'내용일치' };
+  var CIRCLED = ['①','②','③','④','⑤'];
+
+  /* ---------- Firebase ---------- */
+  var firebaseConfig = {
+    apiKey: "AIzaSyBBLliEhUZHFzw4r3Xk6piiYjk9UFauJvE",
+    authDomain: "eng-word-1.firebaseapp.com",
+    projectId: "eng-word-1",
+    storageBucket: "eng-word-1.firebasestorage.app",
+    messagingSenderId: "342379526397",
+    appId: "1:342379526397:web:946215d945f6f3da0ea694"
+  };
+  var db = null;
+  try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); } catch(e){ db = null; }
+
+  /* ---------- 저장 ---------- */
+  var KEY = 'exam_progress';
+  var MODE_KEY = 'storage_mode';               /* 다른 페이지와 같은 설정을 쓴다 */
+  function getMode(){ try{ return localStorage.getItem(MODE_KEY) || 'web'; }catch(e){ return 'local'; } }
+  function setMode(m){ try{ localStorage.setItem(MODE_KEY, m); }catch(e){} }
+
+  function loadLocal(){
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ return {}; }
+  }
+  function saveLocal(data){
+    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e){}
+  }
+  function loadRemote(){
+    if(!db) return Promise.resolve(loadLocal());
+    return db.collection('examData').doc('progress').get()
+      .then(function(snap){ return snap.exists ? (snap.data().data || {}) : {}; })
+      .catch(function(){ return loadLocal(); });
+  }
+  var saveTimer = null;
+  function saveRemote(data){
+    if(!db) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){
+      db.collection('examData').doc('progress').set({ data: data }).catch(function(){});
+    }, 800);
+  }
+  /* 네트워크가 막히면 Firestore 요청이 응답 없이 오래 걸린다. 화면이 빈 채로
+     멈추지 않도록 먼저 끝나는 쪽을 쓴다. */
+  function load(){
+    if(getMode() !== 'web') return Promise.resolve(loadLocal());
+    return Promise.race([
+      loadRemote(),
+      new Promise(function(resolve){ setTimeout(function(){ resolve(loadLocal()); }, 3500); })
+    ]);
+  }
+  function save(){
+    saveLocal(state);                          /* 어느 모드든 이 기기에는 남겨 둔다 */
+    if(getMode() === 'web') saveRemote(state);
+  }
+
+  /* ---------- 상태 ---------- */
+  var state = {};            /* { h1:{current, answers, submitted, done:{}}, ... } */
+  var level = 'h1';
+
+  function levelState(lv){
+    if(!state[lv]) state[lv] = { current:null, answers:{}, submitted:false, done:{} };
+    var s = state[lv];
+    if(!s.answers) s.answers = {};
+    if(!s.done) s.done = {};
+    return s;
+  }
+  function currentSet(){
+    var bank = bankOf(level), s = levelState(level);
+    if(!bank.length) return null;
+    var found = null;
+    for(var i=0;i<bank.length;i++){ if(bank[i].id === s.current){ found = bank[i]; break; } }
+    if(!found){ found = pickSet(); if(found){ s.current = found.id; s.answers = {}; s.submitted = false; } }
+    return found;
+  }
+  function pickSet(){
+    var bank = bankOf(level), s = levelState(level);
+    var fresh = bank.filter(function(x){ return !s.done[x.id]; });
+    var pool = fresh.length ? fresh : bank;
+    if(!pool.length) return null;
+    var pick = pool[Math.floor(Math.random() * pool.length)];
+    if(pool.length > 1 && pick.id === s.current) pick = pool[(pool.indexOf(pick) + 1) % pool.length];
+    return pick;
+  }
+
+  /* ---------- 그리기 ---------- */
+  var main = document.getElementById('main');
+  var setTag = document.getElementById('setTag');
+  var setName = document.getElementById('setName');
+  var countEl = document.getElementById('count');
+  var newBtn = document.getElementById('newBtn');
+  var storeBtn = document.getElementById('storeBtn');
+
+  function el(tag, cls, text){
+    var n = document.createElement(tag);
+    if(cls) n.className = cls;
+    if(text != null) n.textContent = text;
+    return n;
+  }
+
+  /* 지문을 그리면서 어휘 문항의 낱말만 표시한다 (textContent만 쓰므로 안전) */
+  function renderPassage(set){
+    var card = el('div','card');
+    card.appendChild(el('div','plabel','Passage'));
+    var p = el('div','passage');
+    var target = null;
+    set.questions.forEach(function(q){ if(q.type === 'vocab' && q.target) target = q.target; });
+    if(target){
+      var re = new RegExp('\\b' + target.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\b');
+      var rest = set.passage, m;
+      while((m = re.exec(rest)) !== null){
+        if(m.index > 0) p.appendChild(document.createTextNode(rest.slice(0, m.index)));
+        p.appendChild(el('mark', null, m[0]));
+        rest = rest.slice(m.index + m[0].length);
+      }
+      p.appendChild(document.createTextNode(rest));
+    } else {
+      p.textContent = set.passage;
+    }
+    card.appendChild(p);
+    return card;
+  }
+
+  function renderQuestion(set, q, qi){
+    var s = levelState(level);
+    var graded = !!s.submitted;
+    var chosen = s.answers[qi];
+    var box = el('div','q' + (graded ? ' graded' : ''));
+
+    var head = el('div','qhead');
+    head.appendChild(el('span','qno', String(qi + 1)));
+    head.appendChild(el('span','qtype', TYPE_LABEL[q.type] || ''));
+    if(graded){
+      var ok = chosen === q.answer;
+      head.appendChild(el('span','qmark ' + (ok ? 'o' : 'x'), ok ? 'O' : 'X'));
+    }
+    box.appendChild(head);
+    box.appendChild(el('div','prompt', q.prompt));
+    if(q.type === 'blank' && q.sentence) box.appendChild(el('div','qsentence', q.sentence));
+
+    var isEng = q.type !== 'detail';
+    var list = el('div','choices');
+    q.choices.forEach(function(text, ci){
+      var lab = el('label','choice' + (isEng ? ' eng' : ''));
+      if(graded){
+        if(ci === q.answer) lab.className += ' right';
+        else if(ci === chosen) lab.className += ' wrong';
+      } else if(ci === chosen){
+        lab.className += ' sel';
+      }
+      var input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'q' + qi;
+      input.value = String(ci);
+      input.checked = ci === chosen;
+      input.disabled = graded;
+      input.addEventListener('change', function(){ choose(qi, ci); });
+      lab.appendChild(input);
+      lab.appendChild(el('span','mk', CIRCLED[ci]));
+      lab.appendChild(el('span','ctext', text));
+      list.appendChild(lab);
+    });
+    box.appendChild(list);
+
+    var exBtn = el('button','exbtn','해설 보기');
+    var ex = el('div','explain', q.explain);
+    if(graded && chosen !== q.answer){ ex.className += ' open'; exBtn.textContent = '해설 접기'; }
+    exBtn.addEventListener('click', function(){
+      var open = ex.classList.toggle('open');
+      exBtn.textContent = open ? '해설 접기' : '해설 보기';
+    });
+    box.appendChild(exBtn);
+    box.appendChild(ex);
+    return box;
+  }
+
+  function renderFoot(set){
+    var s = levelState(level);
+    var foot = el('div','foot');
+    if(!s.submitted){
+      var answered = set.questions.filter(function(_, i){ return s.answers[i] != null; }).length;
+      foot.appendChild(el('span','score', answered + ' / ' + set.questions.length + ' 선택'));
+      var right = el('div','footright');
+      var sub = el('button','btn solid','제출하기');
+      sub.id = 'submitBtn';
+      sub.disabled = answered < set.questions.length;
+      sub.addEventListener('click', submit);
+      right.appendChild(sub);
+      foot.appendChild(right);
+    } else {
+      var score = set.questions.filter(function(q, i){ return s.answers[i] === q.answer; }).length;
+      var sc = el('span','score');
+      sc.appendChild(document.createTextNode('점수 '));
+      var num = el('span', score === set.questions.length ? '' : 'bad', String(score));
+      sc.appendChild(num);
+      sc.appendChild(document.createTextNode(' / ' + set.questions.length));
+      foot.appendChild(sc);
+      var right2 = el('div','footright');
+      var tb = el('button','btn','해석 보기');
+      tb.addEventListener('click', function(){
+        var t = document.getElementById('trans');
+        var open = t.classList.toggle('open');
+        tb.textContent = open ? '해석 접기' : '해석 보기';
+        if(open) t.scrollIntoView({ behavior:'smooth', block:'nearest' });
+      });
+      var nb = el('button','btn red','새 지문 풀기');
+      nb.addEventListener('click', nextSet);
+      right2.appendChild(tb);
+      right2.appendChild(nb);
+      foot.appendChild(right2);
+    }
+    return foot;
+  }
+
+  function render(){
+    var bank = bankOf(level), s = levelState(level);
+    main.innerHTML = '';
+
+    if(!bank.length){
+      setTag.textContent = '—';
+      setName.textContent = '준비 중';
+      countEl.textContent = '0 / 0';
+      newBtn.disabled = true;
+      var box = el('div','empty');
+      box.appendChild(el('b', null, labelOf(level) + ' 지문은 아직 준비 중이에요'));
+      box.appendChild(document.createTextNode('고1 탭에서 먼저 연습할 수 있어요.'));
+      main.appendChild(box);
+      return;
+    }
+    newBtn.disabled = false;
+
+    var set = currentSet();
+    if(!set) return;
+    setTag.textContent = set.id.toUpperCase();
+    setName.textContent = set.title;
+    countEl.textContent = Object.keys(s.done).length + ' / ' + bank.length + ' 완료';
+
+    main.appendChild(renderPassage(set));
+    set.questions.forEach(function(q, qi){ main.appendChild(renderQuestion(set, q, qi)); });
+    main.appendChild(renderFoot(set));
+
+    var trans = el('div','trans');
+    trans.id = 'trans';
+    trans.appendChild(el('h3', null, '지문 해석'));
+    trans.appendChild(el('div', null, set.translation));
+    main.appendChild(trans);
+  }
+
+  function labelOf(lv){
+    for(var i=0;i<LEVELS.length;i++){ if(LEVELS[i].key === lv) return LEVELS[i].label; }
+    return lv;
+  }
+
+  /* ---------- 동작 ---------- */
+  function choose(qi, ci){
+    var s = levelState(level);
+    if(s.submitted) return;
+    s.answers[qi] = ci;
+    save();
+    render();
+  }
+
+  function submit(){
+    var s = levelState(level), set = currentSet();
+    if(!set || s.submitted) return;
+    var score = set.questions.filter(function(q, i){ return s.answers[i] === q.answer; }).length;
+    s.submitted = true;
+    s.done[set.id] = { score: score, total: set.questions.length, at: Date.now() };
+    save();
+    render();
+    window.scrollTo({ top: 0, behavior:'smooth' });
+  }
+
+  function nextSet(){
+    var s = levelState(level), bank = bankOf(level);
+    if(!bank.length) return;
+    if(!s.submitted && Object.keys(s.answers).length){
+      if(!confirm('아직 제출하지 않았어요. 지금 고른 답은 사라집니다. 새 지문으로 넘어갈까요?')) return;
+    }
+    var fresh = bank.filter(function(x){ return !s.done[x.id]; });
+    if(!fresh.length){
+      if(!confirm(bank.length + '세트를 모두 풀었어요. 기록을 지우고 처음부터 다시 풀까요?')) return;
+      s.done = {};
+    }
+    var pick = pickSet();
+    if(!pick) return;
+    s.current = pick.id;
+    s.answers = {};
+    s.submitted = false;
+    save();
+    render();
+    window.scrollTo({ top: 0, behavior:'smooth' });
+  }
+
+  function updateStoreBtn(){
+    storeBtn.textContent = getMode() === 'web' ? '☁️ 웹' : '💾 로컬';
+  }
+  storeBtn.addEventListener('click', function(){
+    var toWeb = getMode() !== 'web';
+    if(!confirm(toWeb ? '웹(기기 간 동기화)으로 바꿀까요? 다른 기기에 저장된 기록을 불러옵니다.'
+                      : '이 브라우저에만 저장하도록 바꿀까요?')) return;
+    setMode(toWeb ? 'web' : 'local');
+    updateStoreBtn();
+    load().then(function(data){ state = data || {}; render(); });
+  });
+
+  document.querySelectorAll('.tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      level = tab.getAttribute('data-level');
+      document.querySelectorAll('.tab').forEach(function(t){
+        t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+      });
+      render();
+    });
+  });
+
+  newBtn.addEventListener('click', nextSet);
+
+  /* ---------- 시작 ---------- */
+  updateStoreBtn();
+  load().then(function(data){
+    state = data || {};
+    render();
+    save();                                   /* 처음 고른 세트를 기록해 둔다 */
+  });
+})();
+</script>
+</body>
+</html>
