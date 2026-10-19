@@ -823,6 +823,7 @@
     var vis = visibleTabs();
     main.innerHTML = '';
     stopTimer();
+    paintSync();        /* 기록이 생기거나 지워지면 경고 노출 조건도 달라진다 */
 
     if(!vis.length){
       document.getElementById('tabs').hidden = true;
@@ -1036,21 +1037,37 @@
     load().then(function(data){ state = data || {}; render(); renderOpts(); paintSync(); save(); });
   }
 
+  /* 이 기기에 올려 보낼 기록이 실제로 있는지 */
+  function hasRecords(){
+    for(var k in state){
+      if(k === TABS_KEY || !state[k]) continue;
+      var d = state[k].done;
+      if(d && Object.keys(d).length) return true;
+    }
+    return false;
+  }
+
   function paintSync(){
     var box = document.getElementById('syncState');
     var warn = document.getElementById('syncWarn');
     var web = getMode() === 'web';
+    var pending = hasRecords();
     var txt, cls = '';
     if(!web) txt = '이 기기에만 저장하고 있어요. 다른 기기에서는 보이지 않습니다.';
-    else if(sync.err) txt = '웹에 저장되지 않았어요 — ' + sync.err + '. 기록은 이 기기에 남아 있습니다.';
+    else if(sync.err){
+      cls = 'bad';
+      txt = pending
+        ? ('웹에 저장되지 않았어요 — ' + sync.err + '. 기록은 이 기기에 남아 있습니다.')
+        : ('웹에 연결되지 않아요 — ' + sync.err + '. 아직 저장할 기록은 없습니다.');
+    }
     else if(sync.ok){
       cls = 'ok';
       txt = '웹에 저장됨' + (sync.at ? (' · ' + new Date(sync.at)
         .toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit' })) : '');
     } else txt = '웹에 연결하는 중…';
-    if(web && sync.err) cls = 'bad';
     if(box){ box.textContent = txt; box.className = 'syncstate' + (cls ? ' ' + cls : ''); }
-    if(warn) warn.hidden = !(web && sync.err);
+    /* 잃을 기록이 있을 때만 경고한다. 풀지도 않았는데 띄우면 잔소리일 뿐이다. */
+    if(warn) warn.hidden = !(web && sync.err && pending);
   }
 
   function syncNow(){
