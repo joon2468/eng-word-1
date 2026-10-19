@@ -100,45 +100,29 @@
   </p>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="data/h1.js"></script>
 <script src="data/h2.js"></script>
 <script src="data/sn.js"></script>
 <script>
 (function(){
   'use strict';
-  /* 요약만 보여 주므로 Firestore를 기다리지 않고 이 기기 기록을 읽는다.
-     독해 페이지가 어느 모드에서든 localStorage에 함께 남기기 때문에 값은 최신이다. */
   /* 지문 묶음 목록과 기본 노출 여부는 reading.html과 같은 값을 쓴다 */
-  var LEVELS = [
+  var ALL = [
     { key:'h1', bank: typeof EXAM_SETS_H1 !== 'undefined' ? EXAM_SETS_H1 : [] },
     { key:'h2', bank: typeof EXAM_SETS_H2 !== 'undefined' ? EXAM_SETS_H2 : [] },
     { key:'sn', bank: typeof EXAM_SETS_SN !== 'undefined' ? EXAM_SETS_SN : [] }
   ];
   var TAB_ON_DEFAULT = { h1:true, h2:false, sn:false };
-  var state = {};
-  try { state = JSON.parse(localStorage.getItem('exam_progress')) || {}; } catch(e) { state = {}; }
 
-  /* 설정에서 꺼 둔 묶음은 세지 않는다 — 화면에 보이는 것과 숫자가 맞아야 하니까 */
-  var tabPref = state.__tabs || {};
-  LEVELS = LEVELS.filter(function(lv){
-    return (lv.key in tabPref) ? !!tabPref[lv.key] : !!TAB_ON_DEFAULT[lv.key];
-  });
-
+  function localState(){
+    try { return JSON.parse(localStorage.getItem('exam_progress')) || {}; } catch(e){ return {}; }
+  }
+  function webMode(){
+    try { return (localStorage.getItem('storage_mode') || 'web') === 'web'; } catch(e){ return false; }
+  }
   function words(set){ return set.passage.trim().split(/\s+/).length; }
-
-  var totalSets = 0, doneCount = 0, speeds = [];
-  LEVELS.forEach(function(lv){
-    totalSets += lv.bank.length;
-    var done = (state[lv.key] && state[lv.key].done) || {};
-    lv.bank.forEach(function(set){
-      var rec = done[set.id];
-      if(!rec) return;
-      doneCount++;
-      if(!(rec.sec > 0)) return;
-      var v = words(set) / (rec.sec / 60);
-      if(v <= 400) speeds.push({ at: rec.at || 0, v: v });   /* 찍고 바로 제출한 기록은 제외 */
-    });
-  });
 
   var box = document.getElementById('readingStat');
   function chip(label, value){
@@ -149,16 +133,62 @@
     s.appendChild(b);
     box.appendChild(s);
   }
-  chip('지문', doneCount + ' / ' + totalSets);
-  if(speeds.length){
-    speeds.sort(function(a, b){ return b.at - a.at; });
-    var recent = speeds.slice(0, 5);
-    var avg = Math.round(recent.reduce(function(a, r){ return a + r.v; }, 0) / recent.length);
-    chip('최근 처리 속도', avg + ' words/분');
-  } else {
-    var s = document.createElement('span');
-    s.textContent = '아직 푼 기록이 없어요';
-    box.appendChild(s);
+
+  function paint(state){
+    box.innerHTML = '';
+    /* 설정에서 꺼 둔 묶음은 세지 않는다 — 화면에 보이는 것과 숫자가 맞아야 하니까 */
+    var pref = state.__tabs || {};
+    var levels = ALL.filter(function(lv){
+      return (lv.key in pref) ? !!pref[lv.key] : !!TAB_ON_DEFAULT[lv.key];
+    });
+
+    var total = 0, done = 0, speeds = [];
+    levels.forEach(function(lv){
+      total += lv.bank.length;
+      var recs = (state[lv.key] && state[lv.key].done) || {};
+      lv.bank.forEach(function(set){
+        var rec = recs[set.id];
+        if(!rec) return;
+        done++;
+        if(!(rec.sec > 0)) return;
+        var v = words(set) / (rec.sec / 60);
+        if(v <= 400) speeds.push({ at: rec.at || 0, v: v });   /* 찍고 바로 제출한 기록은 제외 */
+      });
+    });
+
+    chip('지문', done + ' / ' + total);
+    if(speeds.length){
+      speeds.sort(function(a, b){ return b.at - a.at; });
+      var recent = speeds.slice(0, 5);
+      chip('최근 처리 속도',
+        Math.round(recent.reduce(function(a, r){ return a + r.v; }, 0) / recent.length) + ' words/분');
+    } else {
+      var s = document.createElement('span');
+      s.textContent = '아직 푼 기록이 없어요';
+      box.appendChild(s);
+    }
+  }
+
+  /* 이 기기 기록으로 먼저 그려 두고, 웹 저장을 쓰는 중이면 원격 기록이 도착할 때 고쳐 그린다.
+     처음 들어온 기기에서도 다른 기기의 기록이 보여야 하기 때문이다. */
+  paint(localState());
+
+  if(webMode()){
+    try {
+      firebase.initializeApp({
+        apiKey: "AIzaSyBBLliEhUZHFzw4r3Xk6piiYjk9UFauJvE",
+        authDomain: "eng-word-1.firebaseapp.com",
+        projectId: "eng-word-1",
+        storageBucket: "eng-word-1.firebasestorage.app",
+        messagingSenderId: "342379526397",
+        appId: "1:342379526397:web:946215d945f6f3da0ea694"
+      });
+      firebase.firestore().collection('examData').doc('progress').get()
+        .then(function(snap){
+          if(snap.exists) paint(snap.data().data || {});
+        })
+        .catch(function(){ /* 읽기만 하는 화면이라 조용히 둔다. 자세한 상태는 독해 페이지 설정에서 */ });
+    } catch(e){ /* firebase 스크립트가 막힌 경우 — 이 기기 기록만 보여 준다 */ }
   }
 })();
 </script>

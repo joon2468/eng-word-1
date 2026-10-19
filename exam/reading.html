@@ -135,6 +135,14 @@
   .optrow .od{font-size:12.5px;color:var(--muted);margin-left:auto;text-align:right;flex:0 0 auto}
   .optrow.locked{opacity:.55;cursor:default}
   .opthint{font-size:12.5px;color:var(--muted);margin:10px 4px 0;line-height:1.7}
+  .syncrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 4px 2px}
+  .syncstate{font-size:12.5px;color:var(--muted);line-height:1.6;flex:1 1 180px}
+  .syncstate.ok{color:var(--ok)}
+  .syncstate.bad{color:var(--cover)}
+  .syncwarn{font-family:var(--kor);font-weight:600;font-size:12.5px;cursor:pointer;
+    border:1px solid #F0BDC4;background:#FDF0F1;color:var(--cover);border-radius:10px;padding:6px 10px;
+    -webkit-tap-highlight-color:transparent}
+  .syncwarn[hidden]{display:none}
 
   /* 시작 화면 */
   .gate{background:var(--paper);border:1px solid var(--line);border-radius:16px;
@@ -257,6 +265,7 @@
     <div class="barright">
       <span class="timer" id="timer" hidden>0:00</span>
       <span class="count" id="count">0 / 0</span>
+      <button class="syncwarn" id="syncWarn" hidden>⚠︎ 웹 저장 안 됨</button>
       <button class="store" id="optsBtn">설정</button>
       <button class="btn small" id="pickBtn">지문 고르기</button>
       <button class="btn small" id="newBtn">새 지문</button>
@@ -270,6 +279,10 @@
     <p class="opthint">꺼 둔 묶음도 기록은 그대로 남아 있어요. 다시 켜면 이어서 볼 수 있습니다.</p>
     <h4>저장 위치</h4>
     <div id="storeOpts"></div>
+    <div class="syncrow">
+      <span class="syncstate" id="syncState">확인 중…</span>
+      <button class="btn small" id="syncBtn">지금 맞추기</button>
+    </div>
   </div>
 
   <div class="picker" id="picker">
@@ -407,27 +420,86 @@
   function saveLocal(data){
     try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e){}
   }
+  /* 웹 저장 상태. 조용히 실패하면 기기마다 기록이 갈라지므로 화면에 드러낸다. */
+  var sync = { ok:false, at:0, err:'' };
+
   function loadRemote(){
-    if(!db) return Promise.resolve(loadLocal());
+    if(!db) return Promise.reject(new Error('firebase-unavailable'));
     return db.collection('examData').doc('progress').get()
-      .then(function(snap){ return snap.exists ? (snap.data().data || {}) : {}; })
-      .catch(function(){ return loadLocal(); });
+      .then(function(snap){ return snap.exists ? (snap.data().data || {}) : {}; });
   }
   var saveTimer = null;
   function saveRemote(data){
     if(!db) return;
+    /* 원격을 못 읽은 채로 덮어쓰면 다른 기기 기록이 날아간다 */
+    if(!sync.ok) return;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(function(){
-      db.collection('examData').doc('progress').set({ data: data }).catch(function(){});
+      db.collection('examData').doc('progress').set({ data: data })
+        .then(function(){ sync.at = Date.now(); sync.err = ''; paintSync(); })
+        .catch(function(e){ sync.err = errText(e); paintSync(); });
     }, 800);
   }
-  /* 네트워크가 막히면 Firestore 요청이 응답 없이 오래 걸린다. 화면이 빈 채로
-     멈추지 않도록 먼저 끝나는 쪽을 쓴다. */
+  function errText(e){
+    var c = (e && (e.code || e.message)) || '알 수 없는 오류';
+    if(c === 'permission-denied') return '권한 거부 — Firestore 규칙에서 examData를 막고 있어요';
+    if(c === 'unavailable') return '네트워크 연결 안 됨';
+    return c;
+  }
+
+  /* 기록(done)은 두 기기 것을 합친다. 같은 지문이면 더 최근에 푼 쪽을 남긴다.
+     풀던 자리(current/answers/타이머)는 기기마다 다른 게 자연스러우니 이 기기 것을 쓴다. */
+  function mergeState(remote, local){
+    remote = remote || {}; local = local || {};
+    var out = {}, keys = {};
+    Object.keys(remote).forEach(function(k){ keys[k] = 1; });
+    Object.keys(local).forEach(function(k){ keys[k] = 1; });
+    Object.keys(keys).forEach(function(k){
+      if(k === TABS_KEY){ out[k] = remote[k] || local[k] || {}; return; }
+      var r = remote[k] || {}, l = local[k] || {}, done = {};
+      Object.keys(r.done || {}).forEach(function(id){ done[id] = r.done[id]; });
+      Object.keys(l.done || {}).forEach(function(id){
+        var a = done[id], b = l.done[id];
+        if(!a || (b.at || 0) >= (a.at || 0)) done[id] = b;
+      });
+      out[k] = {
+        current: l.current || r.current || null,
+        answers: l.answers || {},
+        submitted: !!l.submitted,
+        started: !!l.started,
+        elapsed: l.elapsed || 0,
+        done: done
+      };
+    });
+    return out;
+  }
+
+  /* 네트워크가 막히면 Firestore 요청이 응답 없이 오래 걸린다. 화면이 빈 채로 멈추지
+     않도록 먼저 끝나는 쪽을 쓰되, 늦게 도착한 원격 기록도 버리지 않고 합쳐 준다. */
   function load(){
-    if(getMode() !== 'web') return Promise.resolve(loadLocal());
+    var local = loadLocal();
+    if(getMode() !== 'web'){ sync.ok = false; sync.err = ''; return Promise.resolve(local); }
+    var settled = false;
+    var remoteP = loadRemote().then(function(remote){
+      sync.ok = true; sync.err = ''; sync.at = Date.now();
+      if(settled){
+        state = mergeState(remote, state);
+        render(); paintSync(); save();
+      }
+      return mergeState(remote, local);
+    }).catch(function(e){
+      sync.ok = false; sync.err = errText(e);
+      return local;
+    });
     return Promise.race([
-      loadRemote(),
-      new Promise(function(resolve){ setTimeout(function(){ resolve(loadLocal()); }, 3500); })
+      remoteP,
+      new Promise(function(resolve){
+        setTimeout(function(){
+          settled = true;
+          if(!sync.ok) sync.err = sync.err || '응답이 없어요 — 오프라인일 수 있습니다';
+          resolve(local);
+        }, 3500);
+      })
     ]);
   }
   function save(){
@@ -941,6 +1013,7 @@
         r.addEventListener('change', function(){ changeMode(m[0]); });
         sb.appendChild(optRow(on, m[1], m[2], r));
       });
+    paintSync();
   }
 
   function toggleTab(key, on){
@@ -960,13 +1033,52 @@
   function changeMode(m){
     if(getMode() === m) return;
     setMode(m);
-    load().then(function(data){ state = data || {}; render(); renderOpts(); });
+    load().then(function(data){ state = data || {}; render(); renderOpts(); paintSync(); save(); });
+  }
+
+  function paintSync(){
+    var box = document.getElementById('syncState');
+    var warn = document.getElementById('syncWarn');
+    var web = getMode() === 'web';
+    var txt, cls = '';
+    if(!web) txt = '이 기기에만 저장하고 있어요. 다른 기기에서는 보이지 않습니다.';
+    else if(sync.err) txt = '웹에 저장되지 않았어요 — ' + sync.err + '. 기록은 이 기기에 남아 있습니다.';
+    else if(sync.ok){
+      cls = 'ok';
+      txt = '웹에 저장됨' + (sync.at ? (' · ' + new Date(sync.at)
+        .toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit' })) : '');
+    } else txt = '웹에 연결하는 중…';
+    if(web && sync.err) cls = 'bad';
+    if(box){ box.textContent = txt; box.className = 'syncstate' + (cls ? ' ' + cls : ''); }
+    if(warn) warn.hidden = !(web && sync.err);
+  }
+
+  function syncNow(){
+    var box = document.getElementById('syncState');
+    if(box){ box.textContent = '맞추는 중…'; box.className = 'syncstate'; }
+    load().then(function(data){
+      state = data || {};
+      save();
+      render(); renderOpts(); paintSync();
+    });
   }
 
   document.getElementById('optsBtn').addEventListener('click', function(){
     var open = document.getElementById('opts').classList.toggle('open');
     picker.classList.remove('open');
     if(open){ renderOpts(); document.getElementById('opts').scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+  });
+
+  document.getElementById('syncBtn').addEventListener('click', syncNow);
+  document.getElementById('syncWarn').addEventListener('click', function(){
+    var opts = document.getElementById('opts');
+    if(!opts.classList.contains('open')){
+      opts.classList.add('open');
+      picker.classList.remove('open');
+      renderOpts();
+    }
+    paintSync();
+    opts.scrollIntoView({ behavior:'smooth', block:'nearest' });
   });
 
   document.getElementById('resetBtn').addEventListener('click', resetLevel);
@@ -984,6 +1096,7 @@
   load().then(function(data){
     state = data || {};
     render();
+    paintSync();
     save();                                   /* 처음 고른 세트를 기록해 둔다 */
   });
 })();
