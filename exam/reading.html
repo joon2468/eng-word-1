@@ -228,6 +228,24 @@
   .transtitle{font-size:19px;font-weight:700;color:var(--ink);letter-spacing:-.01em;
     margin:0 0 12px;padding:0 0 12px;border-bottom:1px solid var(--line)}
 
+  /* words — 제출 뒤 결과 화면에만 나온다 */
+  .words{margin:14px 0 0;background:var(--paper);border:1px solid var(--line);
+    border-radius:16px;box-shadow:var(--shadow);padding:20px}
+  .words h3{margin:0 0 4px;font-size:13px;font-family:var(--eng);letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);font-weight:600}
+  .words .whint{margin:0 0 16px;font-size:12.5px;color:var(--muted);line-height:1.7}
+  .words ul{list-style:none;margin:0;padding:0}
+  .words li{padding:0 0 15px;margin:0 0 15px;border-bottom:1px solid var(--line)}
+  .words li:last-child{padding:0;margin:0;border-bottom:none}
+  .wtop{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+  .wen{font-family:var(--eng);font-weight:700;font-size:17.5px;letter-spacing:-.01em}
+  .wpos{font-size:11.5px;font-weight:600;color:var(--teal);background:var(--teal-soft);
+    border-radius:7px;padding:3px 8px}
+  .wmean{font-size:15px;color:#3A372F;line-height:1.55}
+  .wex{margin:9px 0 0;padding:0 0 0 12px;border-left:2px solid var(--teal-line);
+    font-family:var(--eng);font-size:14.5px;line-height:1.7;color:#3A372F}
+  .wexko{margin:3px 0 0;padding:0 0 0 14px;font-size:13.5px;line-height:1.7;color:var(--muted)}
+
   .empty{background:var(--paper);border:1px dashed var(--teal-line);border-radius:16px;
     padding:46px 24px;text-align:center;color:var(--muted);font-size:15px;line-height:1.8}
   .empty b{color:var(--ink);display:block;font-size:17px;margin-bottom:6px}
@@ -236,7 +254,7 @@
 
   @media (max-width:600px){
     body{padding:22px 12px 70px}
-    .card,.q,.foot,.trans{padding:16px}
+    .card,.q,.foot,.trans,.words{padding:16px}
     .gate{padding:32px 18px}
     .passage{font-size:16px;line-height:1.8}
     .barright{width:100%;margin-left:0;justify-content:space-between}
@@ -698,6 +716,30 @@
     return box;
   }
 
+  /* 어려운 낱말 — 교과서 Read 꼭지처럼 뜻과 예문을 함께 보여 준다.
+     제출 전에는 아예 만들지 않는다. 숨겨만 두면 뜻이 페이지 안에 그대로 들어 있어서
+     어휘 문항의 답이 소스에 노출된다. */
+  function renderWords(set){
+    if(!set.words || !set.words.length) return null;
+    var box = el('div','words');
+    box.appendChild(el('h3', null, '어려운 낱말'));
+    box.appendChild(el('p','whint', '이 지문에서 챙겨 둘 낱말 ' + set.words.length + '개입니다.'));
+    var ul = document.createElement('ul');
+    set.words.forEach(function(w){
+      var li = document.createElement('li');
+      var top = el('div','wtop');
+      top.appendChild(el('span','wen', w.w));
+      if(w.pos) top.appendChild(el('span','wpos', w.pos));
+      top.appendChild(el('span','wmean', w.mean));
+      li.appendChild(top);
+      if(w.ex) li.appendChild(el('div','wex', w.ex));
+      if(w.ko) li.appendChild(el('div','wexko', w.ko));
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+    return box;
+  }
+
   /* 시작 전 화면 — 여기서 타이머가 시작된다.
      제목(set.title)은 주제·제목 문항의 답을 거의 그대로 알려 주므로 여기 띄우지 않는다.
      제출한 뒤 해석에서만 보여 준다. */
@@ -883,8 +925,11 @@
     set.questions.forEach(function(q, qi){ main.appendChild(renderQuestion(set, q, qi)); });
     main.appendChild(renderFoot(set));
 
-    /* 해석은 제출한 뒤에만 만든다. 숨겨만 두면 화면엔 안 보여도 글은 페이지 안에 들어 있다 */
+    /* 낱말과 해석은 제출한 뒤에만 만든다. 숨겨만 두면 화면엔 안 보여도 글은 페이지 안에 들어 있다 */
     if(s.submitted){
+      var wordBox = renderWords(set);
+      if(wordBox) main.appendChild(wordBox);
+
       var trans = el('div','trans');
       trans.id = 'trans';
       trans.appendChild(el('h3', null, '지문 해석'));
