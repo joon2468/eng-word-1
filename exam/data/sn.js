@@ -1,5 +1,5 @@
 /* 수능 독해 세트 — 모두 창작 지문입니다. 실제 기출·EBS 지문이 아닙니다.
-   한 세트 = 지문 1개 + 문항 6개(주제 / 빈칸추론 / 함축의미 / 어휘 / 요약문 / 내용일치) + 해설 + 해석 + 낱말 5개.
+   한 세트 = 지문 1개 + 문항 6개(주제 / 빈칸추론 / 함축의미 / 어휘 / 요약문 / 내용일치) + 해설 + 해석 + 낱말 5개·숙어 2개.
    형식은 exam/data/h1.js와 같습니다. implicit(함축의미)과 vocab(어휘)의 target은
    지문에서 그대로 찾아 표시하므로 지문에 있는 그대로 적어야 합니다. */
 
@@ -109,6 +109,14 @@ const EXAM_SETS_SN = [
     { w: "restate", pos: "동사", mean: "다시 말하다, 되풀이해 서술하다",
       ex: "To deny a rumour you must first restate it.",
       ko: "소문을 부정하려면 먼저 그것을 다시 말해야 한다." }
+  ],
+  idioms: [
+    { w: "come to mind", mean: "머리에 떠오르다, 생각나다",
+      ex: "Whatever comes to mind first is not always true.",
+      ko: "가장 먼저 떠오르는 것이 언제나 참인 것은 아니다." },
+    { w: "in advance", mean: "미리, 사전에",
+      ex: "They were warned in advance, and it changed nothing.",
+      ko: "그들은 미리 경고를 받았지만 달라진 것은 없었다." }
   ]
 },
 {
@@ -216,6 +224,14 @@ const EXAM_SETS_SN = [
     { w: "drought", pos: "명사", mean: "가뭄",
       ex: "The drought lasted three summers in a row.",
       ko: "그 가뭄은 세 번의 여름을 내리 이어졌다." }
+  ],
+  idioms: [
+    { w: "at once", mean: "동시에; 당장",
+      ex: "Several causes were at work at once.",
+      ko: "여러 원인이 동시에 작용하고 있었다." },
+    { w: "take out", mean: "빼내다, 제거하다",
+      ex: "We are better at taking a species out than at putting it back.",
+      ko: "우리는 어떤 종을 되돌려 놓기보다 빼내는 일에 더 능하다." }
   ]
 },
 {
@@ -323,6 +339,14 @@ const EXAM_SETS_SN = [
     { w: "correspond", pos: "동사", mean: "일치하다, 들어맞다",
       ex: "His account no longer corresponds to the recording.",
       ko: "그의 이야기는 더 이상 녹음과 일치하지 않는다." }
+  ],
+  idioms: [
+    { w: "point to", mean: "~을 가리키다, ~을 시사하다",
+      ex: "Every study so far points to the same conclusion.",
+      ko: "지금까지의 모든 연구가 같은 결론을 가리킨다." },
+    { w: "carry weight", mean: "무게를 지니다, 영향력이 있다",
+      ex: "In court, a confident voice carries weight it has not earned.",
+      ko: "법정에서 확신에 찬 목소리는 받을 자격 없는 무게를 지닌다." }
   ]
 },
 {
@@ -430,6 +454,14 @@ const EXAM_SETS_SN = [
     { w: "arbitrary", pos: "형용사", mean: "임의적인, 자의적인",
       ex: "The deadline was arbitrary, but everyone obeyed it.",
       ko: "그 기한은 임의로 정한 것이었지만 모두가 따랐다." }
+  ],
+  idioms: [
+    { w: "a matter of", mean: "~의 문제; 겨우 ~ 정도",
+      ex: "The gap was a matter of minutes, and nobody cared.",
+      ko: "그 차이는 겨우 몇 분이었고 아무도 신경 쓰지 않았다." },
+    { w: "treat A as B", mean: "A를 B로 여기다, A를 B처럼 다루다",
+      ex: "We treat the hour as a fact of nature.",
+      ko: "우리는 시각을 자연의 사실처럼 여긴다." }
   ]
 },
 {
@@ -537,6 +569,14 @@ const EXAM_SETS_SN = [
     { w: "property", pos: "명사", mean: "속성, 특성",
       ex: "Hardness is a property of the material, not of the shape.",
       ko: "단단함은 모양의 속성이 아니라 재료의 속성이다." }
+  ],
+  idioms: [
+    { w: "answer back", mean: "되받아 대답하다, 반응을 돌려주다",
+      ex: "Skill grows only where the world answers back quickly.",
+      ko: "실력은 세상이 빠르게 반응을 돌려주는 곳에서만 자란다." },
+    { w: "little better than", mean: "~보다 나을 것이 거의 없는",
+      ex: "Their forecasts were little better than guesses.",
+      ko: "그들의 예측은 짐작보다 나을 것이 거의 없었다." }
   ]
 }
 ];

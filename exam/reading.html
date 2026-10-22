@@ -233,7 +233,11 @@
     border-radius:16px;box-shadow:var(--shadow);padding:20px}
   .words h3{margin:0 0 4px;font-size:13px;font-family:var(--eng);letter-spacing:.14em;
     text-transform:uppercase;color:var(--muted);font-weight:600}
-  .words .whint{margin:0 0 16px;font-size:12.5px;color:var(--muted);line-height:1.7}
+  .words .whint{margin:0 0 18px;font-size:12.5px;color:var(--muted);line-height:1.7}
+  .wgroup + .wgroup{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+  .wlabel{font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--teal);
+    background:var(--teal-soft);border-radius:7px;padding:4px 10px;display:inline-block;
+    margin:0 0 14px}
   .words ul{list-style:none;margin:0;padding:0}
   .words li{padding:0 0 15px;margin:0 0 15px;border-bottom:1px solid var(--line)}
   .words li:last-child{padding:0;margin:0;border-bottom:none}
@@ -716,27 +720,41 @@
     return box;
   }
 
-  /* 어려운 낱말 — 교과서 Read 꼭지처럼 뜻과 예문을 함께 보여 준다.
+  /* 어려운 낱말·숙어 — 교과서 Read 꼭지처럼 뜻과 예문을 함께 보여 준다.
      제출 전에는 아예 만들지 않는다. 숨겨만 두면 뜻이 페이지 안에 그대로 들어 있어서
      어휘 문항의 답이 소스에 노출된다. */
-  function renderWords(set){
-    if(!set.words || !set.words.length) return null;
-    var box = el('div','words');
-    box.appendChild(el('h3', null, '어려운 낱말'));
-    box.appendChild(el('p','whint', '이 지문에서 챙겨 둘 낱말 ' + set.words.length + '개입니다.'));
+  function wordGroup(label, items){
+    var g = el('div','wgroup');
+    g.appendChild(el('div','wlabel', label));
     var ul = document.createElement('ul');
-    set.words.forEach(function(w){
+    items.forEach(function(w){
       var li = document.createElement('li');
       var top = el('div','wtop');
       top.appendChild(el('span','wen', w.w));
-      if(w.pos) top.appendChild(el('span','wpos', w.pos));
+      if(w.pos) top.appendChild(el('span','wpos', w.pos));   /* 숙어는 품사 딱지를 달지 않는다 */
       top.appendChild(el('span','wmean', w.mean));
       li.appendChild(top);
       if(w.ex) li.appendChild(el('div','wex', w.ex));
       if(w.ko) li.appendChild(el('div','wexko', w.ko));
       ul.appendChild(li);
     });
-    box.appendChild(ul);
+    g.appendChild(ul);
+    return g;
+  }
+
+  function renderWords(set){
+    var ws = set.words || [], ids = set.idioms || [];
+    if(!ws.length && !ids.length) return null;
+    var box = el('div','words');
+    box.appendChild(el('h3', null, '어려운 낱말·숙어'));
+
+    var parts = [];
+    if(ws.length) parts.push('낱말 ' + ws.length + '개');
+    if(ids.length) parts.push('숙어 ' + ids.length + '개');
+    box.appendChild(el('p','whint', '이 지문에서 챙겨 둘 ' + parts.join(', ') + '입니다.'));
+
+    if(ws.length) box.appendChild(wordGroup('낱말', ws));
+    if(ids.length) box.appendChild(wordGroup('숙어', ids));
     return box;
   }
 
@@ -925,7 +943,7 @@
     set.questions.forEach(function(q, qi){ main.appendChild(renderQuestion(set, q, qi)); });
     main.appendChild(renderFoot(set));
 
-    /* 낱말과 해석은 제출한 뒤에만 만든다. 숨겨만 두면 화면엔 안 보여도 글은 페이지 안에 들어 있다 */
+    /* 낱말·숙어와 해석은 제출한 뒤에만 만든다. 숨겨만 두면 화면엔 안 보여도 글은 페이지 안에 들어 있다 */
     if(s.submitted){
       var wordBox = renderWords(set);
       if(wordBox) main.appendChild(wordBox);

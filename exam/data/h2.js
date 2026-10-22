@@ -1,5 +1,5 @@
 /* 고2 독해 세트 — 모두 창작 지문입니다. 실제 기출·EBS 지문이 아닙니다.
-   한 세트 = 지문 1개 + 문항 5개(제목 / 빈칸추론 / 어휘 / 요약문 / 내용일치) + 해설 + 해석 + 낱말 5개.
+   한 세트 = 지문 1개 + 문항 5개(제목 / 빈칸추론 / 어휘 / 요약문 / 내용일치) + 해설 + 해석 + 낱말 5개·숙어 2개.
    형식은 exam/data/h1.js와 같습니다. */
 
 const EXAM_SETS_H2 = [
@@ -82,9 +82,9 @@ const EXAM_SETS_H2 = [
     { w: "predictable", pos: "형용사", mean: "예상할 수 있는, 뻔한",
       ex: "The result was predictable from the first week.",
       ko: "그 결과는 첫 주부터 예상할 수 있는 것이었다." },
-    { w: "turn away", pos: "숙어", mean: "돌려보내다, 받아 주지 않다",
-      ex: "The clinic turned away patients it could not treat.",
-      ko: "그 병원은 치료할 수 없는 환자들을 돌려보냈다." },
+    { w: "narrow", pos: "동사", mean: "좁히다, 범위를 줄이다",
+      ex: "The school narrowed its teaching to whatever the test asked.",
+      ko: "그 학교는 시험이 묻는 것에만 수업의 범위를 좁혔다." },
     { w: "sensibly", pos: "부사", mean: "분별 있게, 합리적으로",
       ex: "They acted sensibly given the rules they were under.",
       ko: "그들은 자기들에게 주어진 규칙을 생각하면 합리적으로 행동한 것이었다." },
@@ -94,6 +94,14 @@ const EXAM_SETS_H2 = [
     { w: "settle", pos: "동사", mean: "(논쟁을) 끝맺다, 해결하다",
       ex: "The data should start the argument, not settle it.",
       ko: "자료는 논쟁을 끝맺는 것이 아니라 시작하게 해야 한다." }
+  ],
+  idioms: [
+    { w: "turn away", mean: "돌려보내다, 받아 주지 않다",
+      ex: "The clinic turned away patients it could not treat.",
+      ko: "그 병원은 치료할 수 없는 환자들을 돌려보냈다." },
+    { w: "hang up on", mean: "(~와 통화 중에) 전화를 끊어 버리다",
+      ex: "Rushed agents hang up on the callers who need most help.",
+      ko: "쫓기는 상담원은 도움이 가장 필요한 사람의 전화를 끊어 버린다." }
   ]
 },
 {
@@ -187,6 +195,14 @@ const EXAM_SETS_H2 = [
     { w: "persistence", pos: "명사", mean: "끈기, 집요함",
       ex: "Persistence, not talent, decided the outcome.",
       ko: "결과를 결정한 것은 재능이 아니라 끈기였다." }
+  ],
+  idioms: [
+    { w: "arrive at", mean: "(결론·답에) 이르다, 도달하다",
+      ex: "Three teams arrived at the same answer that year.",
+      ko: "그해에 세 연구진이 같은 답에 이르렀다." },
+    { w: "in a sense", mean: "어떤 의미에서는",
+      ex: "The idea was, in a sense, already finished.",
+      ko: "그 발상은 어떤 의미에서는 이미 완성되어 있었다." }
   ]
 },
 {
@@ -280,6 +296,14 @@ const EXAM_SETS_H2 = [
     { w: "overlook", pos: "동사", mean: "간과하다, 못 보고 넘기다",
       ex: "A purely physical view overlooks fear entirely.",
       ko: "순전히 신체적인 관점은 두려움을 완전히 간과한다." }
+  ],
+  idioms: [
+    { w: "walk off", mean: "(부상·통증을) 떨치고 걸어 나가다",
+      ex: "He walked off a broken rib and finished the match.",
+      ko: "그는 갈비뼈가 부러진 채로 떨치고 걸어 나가 경기를 마쳤다." },
+    { w: "work on", mean: "~에 공들이다, ~을 손보다",
+      ex: "Treatment now works on expectation as well as tissue.",
+      ko: "치료는 이제 조직뿐 아니라 기대까지 손본다." }
   ]
 },
 {
@@ -364,15 +388,23 @@ const EXAM_SETS_H2 = [
     { w: "shade", pos: "명사", mean: "(색의) 색조, 농담",
       ex: "The two walls are painted in different shades of green.",
       ko: "두 벽은 서로 다른 녹색 색조로 칠해져 있다." },
-    { w: "tell apart", pos: "숙어", mean: "구별하다, 가려내다",
-      ex: "I still cannot tell the twins apart.",
-      ko: "나는 아직도 그 쌍둥이를 구별하지 못한다." },
+    { w: "measurably", pos: "부사", mean: "측정할 수 있을 만큼, 눈에 띄게",
+      ex: "The two groups differed measurably in speed.",
+      ko: "두 집단은 속도에서 측정할 수 있을 만큼 차이가 났다." },
     { w: "boundary", pos: "명사", mean: "경계, 경계선",
       ex: "The boundary between the two colours is not fixed.",
       ko: "두 색 사이의 경계는 고정되어 있지 않다." },
     { w: "perceive", pos: "동사", mean: "지각하다, 알아차리다",
       ex: "We perceive far less than we think we do.",
       ko: "우리는 스스로 생각하는 것보다 훨씬 적게 지각한다." }
+  ],
+  idioms: [
+    { w: "carve up", mean: "나누다, 쪼개어 가르다",
+      ex: "Every language carves up the world a little differently.",
+      ko: "모든 언어는 세계를 조금씩 다르게 갈라놓는다." },
+    { w: "tell apart", mean: "구별하다, 가려내다",
+      ex: "I still cannot tell the twins apart.",
+      ko: "나는 아직도 그 쌍둥이를 구별하지 못한다." }
   ]
 },
 {
@@ -463,7 +495,15 @@ const EXAM_SETS_H2 = [
     { w: "complication", pos: "명사", mean: "복잡하게 만드는 문제, 골칫거리",
       ex: "The plan was simple until one complication appeared.",
       ko: "그 계획은 한 가지 문제가 나타나기 전까지는 단순했다." },
-    { w: "set apart", pos: "숙어", mean: "구별 짓다, 다르게 만들다",
+    { w: "relative", pos: "명사", mean: "친척; 같은 계통의 것",
+      ex: "City foxes are bolder than their country relatives.",
+      ko: "도시 여우는 시골에 사는 같은 무리보다 더 대담하다." }
+  ],
+  idioms: [
+    { w: "make room for", mean: "~을 위한 자리를 내주다",
+      ex: "The city has made room for a few stubborn species.",
+      ko: "그 도시는 끈질긴 몇몇 종에게 자리를 내주었다." },
+    { w: "set apart", mean: "구별 짓다, 남다르게 만들다",
       ex: "One small habit set her apart from the rest.",
       ko: "작은 습관 하나가 그녀를 나머지 사람들과 구별 지었다." }
   ]
