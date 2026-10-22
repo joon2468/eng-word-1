@@ -108,7 +108,8 @@
 <script>
 (function(){
   'use strict';
-  /* 지문 묶음 목록과 기본 노출 여부는 reading.html과 같은 값을 쓴다 */
+  /* 수준 목록과 기본 노출 여부는 reading.html과 같은 값을 쓴다.
+     데이터 파일을 더하면 위 <script src="data/…"> 줄에도 넣어야 지문 수가 맞는다. */
   var ALL = [
     { key:'h1', bank: typeof EXAM_SETS_H1 !== 'undefined' ? EXAM_SETS_H1 : [] },
     { key:'h2', bank: typeof EXAM_SETS_H2 !== 'undefined' ? EXAM_SETS_H2 : [] },
@@ -136,7 +137,7 @@
 
   function paint(state){
     box.innerHTML = '';
-    /* 설정에서 꺼 둔 묶음은 세지 않는다 — 화면에 보이는 것과 숫자가 맞아야 하니까 */
+    /* 설정에서 꺼 둔 수준은 세지 않는다 — 화면에 보이는 것과 숫자가 맞아야 하니까 */
     var pref = state.__tabs || {};
     var levels = ALL.filter(function(lv){
       return (lv.key in pref) ? !!pref[lv.key] : !!TAB_ON_DEFAULT[lv.key];
