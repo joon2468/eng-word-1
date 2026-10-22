@@ -1,17 +1,20 @@
 /* 고1 독해 세트 — 모두 창작 지문입니다. 실제 기출·EBS 지문이 아닙니다.
-   한 세트 = 지문 1개 + 문항 4개(주제 / 빈칸추론 / 어휘 / 내용일치) + 해설 + 해석 + 낱말.
+   한 세트 = 지문 1개 + 문항 4개(주제 / 빈칸추론 / 어휘 / 내용일치) + 해설 + 해석 + 낱말·숙어.
 
    question.type : 'theme' | 'blank' | 'vocab' | 'detail'
    question.target : vocab 문항에서 지문 안에 표시할 낱말 (지문에 그대로 등장해야 함)
    question.sentence : blank 문항에서 보여 줄 빈칸 문장
    question.answer : choices 배열의 0부터 시작하는 번호
 
-   words : 제출한 뒤 결과 화면에서 보여 줄 어려운 낱말.
+   words  : 제출한 뒤 결과 화면에서 보여 줄 어려운 낱말.
      { w 낱말, pos 품사, mean 뜻, ex 예문, ko 예문 해석 }
-   - 교과서 Read 꼭지 분량에 맞춰 세트당 고1은 4개, 고2·수능은 5개만 담는다.
+   idioms : 같은 화면에서 낱말 아래에 따로 묶어 보여 줄 숙어·구문. 모양은 words와 같되
+     pos가 없다 (모두 숙어라 품사 딱지가 의미가 없다). 세트당 2개.
+   - 낱말과 숙어를 한 배열에 섞지 않는다. 화면에서 두 덩어리로 갈라 보여 주기 때문이다.
+   - 교과서 Read 꼭지 분량에 맞춰 낱말은 세트당 고1 4개, 고2·수능 5개만 담는다.
    - 예문은 지문에서 베끼지 않고 새로 쓴다. 지문 문장을 그대로 두면 해석을 미리 주는 셈이다.
    - 어휘(vocab)·함축의미(implicit) 문항의 target은 넣지 않는다. 그 낱말의 뜻이 곧 답이다.
-   - 낱말은 제출 전에는 화면에 그리지도 않는다 (reading.html의 renderWords 참고). */
+   - 둘 다 제출 전에는 화면에 그리지도 않는다 (reading.html의 renderWords 참고). */
 
 const EXAM_SETS_H1 = [
 {
@@ -88,6 +91,14 @@ const EXAM_SETS_H1 = [
     { w: "backfire", pos: "동사", mean: "역효과를 내다",
       ex: "The strict rule backfired and made the students noisier.",
       ko: "그 엄격한 규칙은 역효과를 내서 학생들을 더 떠들게 만들었다." }
+  ],
+  idioms: [
+    { w: "file away", mean: "(자료를) 정리해 넣다, 보관해 두다",
+      ex: "The brain files away the day's events while we sleep.",
+      ko: "뇌는 우리가 자는 동안 그날의 일들을 정리해 넣는다." },
+    { w: "in other words", mean: "다시 말해, 바꿔 말하면",
+      ex: "He never replied — in other words, he refused.",
+      ko: "그는 답하지 않았다. 다시 말해 거절한 것이다." }
   ]
 },
 {
@@ -164,6 +175,14 @@ const EXAM_SETS_H1 = [
     { w: "consumption", pos: "명사", mean: "소비, 소비량",
       ex: "Water consumption rises sharply every July.",
       ko: "물 소비량은 해마다 7월에 급격히 늘어난다." }
+  ],
+  idioms: [
+    { w: "end up in", mean: "결국 ~에 이르다, 결국 ~에 가게 되다",
+      ex: "Most of the bottles end up in a landfill anyway.",
+      ko: "그 병들의 대부분은 어차피 결국 매립지로 간다." },
+    { w: "in the first place", mean: "애초에, 처음부터",
+      ex: "The cheapest bag is the one you never buy in the first place.",
+      ko: "가장 싼 봉지는 애초에 사지 않는 봉지다." }
   ]
 },
 {
@@ -240,6 +259,14 @@ const EXAM_SETS_H1 = [
     { w: "infrastructure", pos: "명사", mean: "기반시설",
       ex: "Roads, pipes, and power lines are basic infrastructure.",
       ko: "도로, 배관, 전선은 기본적인 기반시설이다." }
+  ],
+  idioms: [
+    { w: "rush into", mean: "~ 안으로 쏟아져 들어가다",
+      ex: "Rainwater rushed into the drains and overflowed.",
+      ko: "빗물이 배수구로 쏟아져 들어가 넘쳐 흘렀다." },
+    { w: "none of", mean: "~ 가운데 어느 것도 …않다",
+      ex: "None of these measures works on its own.",
+      ko: "이 대책들 가운데 어느 것도 그것만으로는 효과가 없다." }
   ]
 },
 {
@@ -316,6 +343,14 @@ const EXAM_SETS_H1 = [
     { w: "instinctively", pos: "부사", mean: "본능적으로",
       ex: "We instinctively avoid whatever feels difficult.",
       ko: "우리는 어렵게 느껴지는 것이면 본능적으로 피한다." }
+  ],
+  idioms: [
+    { w: "wrestle with", mean: "~와 씨름하다, ~을 두고 고심하다",
+      ex: "She wrestled with the question for a week.",
+      ko: "그녀는 일주일 동안 그 물음과 씨름했다." },
+    { w: "break down", mean: "무너지다, 제대로 작동하지 않게 되다",
+      ex: "Working backwards shows you where your reasoning breaks down.",
+      ko: "거꾸로 짚어 보면 네 추론이 어디서 무너지는지가 보인다." }
   ]
 },
 {
@@ -392,6 +427,14 @@ const EXAM_SETS_H1 = [
     { w: "deliberately", pos: "부사", mean: "의도적으로, 일부러",
       ex: "She deliberately chose a book she would disagree with.",
       ko: "그녀는 자기가 동의하지 않을 책을 일부러 골랐다." }
+  ],
+  idioms: [
+    { w: "seek out", mean: "애써 찾아 나서다",
+      ex: "Once a month he seeks out a writer he disagrees with.",
+      ko: "그는 한 달에 한 번 자신과 생각이 다른 작가를 애써 찾아 읽는다." },
+    { w: "out of reach", mean: "손이 닿지 않는 곳에",
+      ex: "The older posts sank out of reach within a day.",
+      ko: "오래된 글들은 하루 만에 손이 닿지 않는 곳으로 가라앉았다." }
   ]
 },
 {
@@ -468,6 +511,14 @@ const EXAM_SETS_H1 = [
     { w: "novelty", pos: "명사", mean: "새로움, 신기함",
       ex: "The novelty of the new app wore off in a week.",
       ko: "그 새 앱의 신기함은 일주일 만에 사라졌다." }
+  ],
+  idioms: [
+    { w: "attend to", mean: "~에 주의를 기울이다, ~을 처리하다",
+      ex: "You cannot attend to two conversations at once.",
+      ko: "두 가지 대화에 동시에 주의를 기울일 수는 없다." },
+    { w: "be mistaken for", mean: "~로 오인되다, ~로 잘못 여겨지다",
+      ex: "Busyness is often mistaken for progress.",
+      ko: "바쁨은 흔히 진전으로 오인된다." }
   ]
 },
 {
@@ -544,6 +595,14 @@ const EXAM_SETS_H1 = [
     { w: "shrink", pos: "동사", mean: "줄어들다, 작아지다",
       ex: "The lake has shrunk to half its former size.",
       ko: "그 호수는 예전 크기의 절반으로 줄어들었다." }
+  ],
+  idioms: [
+    { w: "after all", mean: "따지고 보면, 어쨌든",
+      ex: "The honeybee is, after all, a farm animal.",
+      ko: "꿀벌은 따지고 보면 가축이다." },
+    { w: "rise and fall", mean: "오르내리다, 흥하고 쇠하다",
+      ex: "Their numbers rise and fall with the weather.",
+      ko: "그들의 개체 수는 날씨에 따라 오르내린다." }
   ]
 },
 {
@@ -620,6 +679,14 @@ const EXAM_SETS_H1 = [
     { w: "distortion", pos: "명사", mean: "왜곡, 뒤틀림",
       ex: "The distortion is largest near the poles.",
       ko: "그 왜곡은 극지방 근처에서 가장 크다." }
+  ],
+  idioms: [
+    { w: "pay for", mean: "~의 대가를 치르다",
+      ex: "The map pays for its accuracy with distorted sizes.",
+      ko: "그 지도는 크기를 왜곡하는 것으로 정확성의 대가를 치른다." },
+    { w: "be willing to", mean: "기꺼이 ~하다, ~할 각오가 되어 있다",
+      ex: "Ask which errors a method is willing to accept.",
+      ko: "그 방법이 어떤 오차를 감수할 각오인지를 물어라." }
   ]
 },
 {
@@ -696,6 +763,14 @@ const EXAM_SETS_H1 = [
     { w: "obstacle", pos: "명사", mean: "장애물, 걸림돌",
       ex: "The main obstacle was not money but habit.",
       ko: "가장 큰 걸림돌은 돈이 아니라 습관이었다." }
+  ],
+  idioms: [
+    { w: "be limited to", mean: "~에 국한되다, ~에만 해당되다",
+      ex: "The benefit is not limited to young people.",
+      ko: "그 이득은 젊은 사람들에게만 해당되는 것이 아니다." },
+    { w: "be aimed at", mean: "~을 목표로 하다, ~을 겨냥하다",
+      ex: "The program was aimed at fitness, not memory.",
+      ko: "그 프로그램은 기억력이 아니라 체력을 겨냥한 것이었다." }
   ]
 },
 {
@@ -772,6 +847,14 @@ const EXAM_SETS_H1 = [
     { w: "institution", pos: "명사", mean: "기관, 제도",
       ex: "Libraries are among the oldest public institutions.",
       ko: "도서관은 가장 오래된 공공 기관 가운데 하나다." }
+  ],
+  idioms: [
+    { w: "a series of", mean: "일련의, 잇따른",
+      ex: "A series of small cuts did what no fire could.",
+      ko: "잇따른 작은 삭감이 어떤 화재도 하지 못한 일을 해냈다." },
+    { w: "be likely to", mean: "~할 가능성이 크다",
+      ex: "Such places are more likely to fade than to burn.",
+      ko: "그런 곳들은 불타기보다 서서히 사라질 가능성이 더 크다." }
   ]
 }
 ];
