@@ -225,6 +225,8 @@
   .trans.open{display:block}
   .trans h3{margin:0 0 10px;font-size:13px;font-family:var(--eng);letter-spacing:.14em;
     text-transform:uppercase;color:var(--muted);font-weight:600}
+  .transtitle{font-size:19px;font-weight:700;color:var(--ink);letter-spacing:-.01em;
+    margin:0 0 12px;padding:0 0 12px;border-bottom:1px solid var(--line)}
 
   .empty{background:var(--paper);border:1px dashed var(--teal-line);border-radius:16px;
     padding:46px 24px;text-align:center;color:var(--muted);font-size:15px;line-height:1.8}
@@ -672,23 +674,28 @@
     });
     box.appendChild(list);
 
-    var exBtn = el('button','exbtn','해설 보기');
-    var ex = el('div','explain', q.explain);
-    if(graded && chosen !== q.answer){ ex.className += ' open'; exBtn.textContent = '해설 접기'; }
-    exBtn.addEventListener('click', function(){
-      var open = ex.classList.toggle('open');
-      exBtn.textContent = open ? '해설 접기' : '해설 보기';
-    });
-    box.appendChild(exBtn);
-    box.appendChild(ex);
+    /* 해설도 채점한 뒤에만 만든다. 해설에는 정답 근거가 그대로 적혀 있다 */
+    if(graded){
+      var exBtn = el('button','exbtn','해설 보기');
+      var ex = el('div','explain', q.explain);
+      if(chosen !== q.answer){ ex.className += ' open'; exBtn.textContent = '해설 접기'; }
+      exBtn.addEventListener('click', function(){
+        var open = ex.classList.toggle('open');
+        exBtn.textContent = open ? '해설 접기' : '해설 보기';
+      });
+      box.appendChild(exBtn);
+      box.appendChild(ex);
+    }
     return box;
   }
 
-  /* 시작 전 화면 — 여기서 타이머가 시작된다 */
+  /* 시작 전 화면 — 여기서 타이머가 시작된다.
+     제목(set.title)은 주제·제목 문항의 답을 거의 그대로 알려 주므로 여기 띄우지 않는다.
+     제출한 뒤 해석에서만 보여 준다. */
   function renderGate(set, no){
     var g = el('div','gate');
-    g.appendChild(el('div','gn','지문 ' + no));
-    g.appendChild(el('h2', null, set.title));
+    g.appendChild(el('div','gn', labelOf(level)));
+    g.appendChild(el('h2', null, '지문 ' + no));
     var meta = el('div','meta');
     var c1 = el('span','chip');
     c1.appendChild(document.createTextNode('문항 '));
@@ -783,7 +790,8 @@
       var rec = s.done[set.id];
       var b = el('button','pick' + (set.id === s.current ? ' cur' : ''));
       b.appendChild(el('span','pn', String(i + 1)));
-      b.appendChild(el('span','pt', set.title));
+      /* 이미 푼 지문만 제목을 보여 준다. 안 푼 지문은 제목이 곧 힌트라서 숨긴다 */
+      b.appendChild(el('span','pt', rec ? set.title : ('지문 ' + (i + 1))));
       b.appendChild(el('span','ps' + (rec ? ' done' : ''),
         rec ? (rec.score + '/' + rec.total + ' · ' + fmt(rec.sec || 0)) : '—'));
       b.addEventListener('click', function(){
@@ -852,7 +860,7 @@
     if(!set) return;
     var no = bank.indexOf(set) + 1;
     setTag.textContent = '지문 ' + no + '/' + bank.length;
-    setName.textContent = set.title;
+    setName.textContent = labelOf(level);
     countEl.textContent = Object.keys(s.done).length + ' / ' + bank.length + ' 완료';
     renderPicker();
     paintTimer();
@@ -866,11 +874,15 @@
     set.questions.forEach(function(q, qi){ main.appendChild(renderQuestion(set, q, qi)); });
     main.appendChild(renderFoot(set));
 
-    var trans = el('div','trans');
-    trans.id = 'trans';
-    trans.appendChild(el('h3', null, '지문 해석'));
-    trans.appendChild(el('div', null, set.translation));
-    main.appendChild(trans);
+    /* 해석은 제출한 뒤에만 만든다. 숨겨만 두면 화면엔 안 보여도 글은 페이지 안에 들어 있다 */
+    if(s.submitted){
+      var trans = el('div','trans');
+      trans.id = 'trans';
+      trans.appendChild(el('h3', null, '지문 해석'));
+      trans.appendChild(el('div','transtitle', set.title));   /* 제목은 다 풀고 난 여기서만 */
+      trans.appendChild(el('div', null, set.translation));
+      main.appendChild(trans);
+    }
 
     if(running()) startTimer();
   }
