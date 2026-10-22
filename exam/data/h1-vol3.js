@@ -178,7 +178,7 @@ EXAM_SETS_H1.push(
 {
   id: "h1-023",
   title: "얼룩말의 줄무늬",
-  passage: "Why a zebra wears stripes has been argued over for a century. Camouflage was the old favourite, though lions hunt well at dusk and a striped animal in open grass is not hard to see. Others proposed that the pattern confuses a chasing predator, or that it cools the body. Then biologists tried something plainer: they put striped coats on plain horses and counted the flies. Horseflies approached the striped horses as often as the bare ones but failed to land, sweeping past or bumping into them as if they could not judge the final distance. The same animals, in bare coats, were landed on freely. Stripes, it seems, are a defence against insects that carry disease, which also explains why the boldest patterns appear where biting flies are worst. A century of elegant guesses lost to an experiment anyone could have run with a horse and a blanket.",
+  passage: "Why a zebra wears stripes has been argued over for a century. Camouflage was the old favourite, though lions hunt well at dusk and a striped animal in open grass is not hard to see. Others proposed that the pattern confuses a chasing predator, or that it cools the body. Then biologists tried something plainer: they put striped coats on ordinary horses and counted the flies. Horseflies approached the striped horses as often as the bare ones but failed to land, sweeping past or bumping into them as if they could not judge the final distance. The same animals, in bare coats, were landed on freely. Stripes, it seems, are a defence against insects that carry disease, which also explains why the boldest patterns appear where biting flies are worst. A century of elegant guesses lost to an experiment anyone could have run with a horse and a blanket.",
   questions: [
     {
       type: "theme",
@@ -235,7 +235,7 @@ EXAM_SETS_H1.push(
       explain: "지문은 등에가 줄무늬 말에게도 \"똑같이 자주(as often as)\" 다가왔다고 했다. 달랐던 것은 다가온 횟수가 아니라 내려앉지 못했다는 점이므로 ①이 일치하지 않는다."
     }
   ],
-  translation: "얼룩말이 왜 줄무늬를 두르고 있는지는 백 년 동안 논쟁거리였다. 위장설이 오래된 인기 설명이었지만, 사자는 땅거미 속에서도 잘 사냥하고 탁 트인 풀밭의 줄무늬 짐승은 알아보기 어렵지 않다. 다른 이들은 그 무늬가 쫓아오는 포식자를 혼란스럽게 한다거나 몸을 식혀 준다고 주장했다. 그러다 생물학자들이 더 단순한 것을 해 보았다. 무늬 없는 말에게 줄무늬 덮개를 씌우고 파리를 센 것이다. 등에는 줄무늬를 두른 말에게도 맨몸의 말만큼 자주 다가왔지만 내려앉지는 못했고, 마지막 거리를 가늠하지 못하는 듯 옆으로 휙 지나가거나 몸에 부딪혔다. 같은 말들이 맨몸일 때는 마음껏 내려앉혔다. 줄무늬는 병을 옮기는 곤충에 대한 방어로 보이며, 이는 무는 파리가 가장 심한 곳에서 가장 뚜렷한 무늬가 나타나는 이유도 설명해 준다. 백 년에 걸친 우아한 추측들이, 말 한 마리와 담요 한 장이면 누구나 해 볼 수 있었던 실험에 졌다.",
+  translation: "얼룩말이 왜 줄무늬를 두르고 있는지는 백 년 동안 논쟁거리였다. 위장설이 오래된 인기 설명이었지만, 사자는 땅거미 속에서도 잘 사냥하고 탁 트인 풀밭의 줄무늬 짐승은 알아보기 어렵지 않다. 다른 이들은 그 무늬가 쫓아오는 포식자를 혼란스럽게 한다거나 몸을 식혀 준다고 주장했다. 그러다 생물학자들이 더 단순한 것을 해 보았다. 보통 말에게 줄무늬 덮개를 씌우고 파리를 센 것이다. 등에는 줄무늬를 두른 말에게도 맨몸의 말만큼 자주 다가왔지만 내려앉지는 못했고, 마지막 거리를 가늠하지 못하는 듯 옆으로 휙 지나가거나 몸에 부딪혔다. 같은 말들이 맨몸일 때는 마음껏 내려앉혔다. 줄무늬는 병을 옮기는 곤충에 대한 방어로 보이며, 이는 무는 파리가 가장 심한 곳에서 가장 뚜렷한 무늬가 나타나는 이유도 설명해 준다. 백 년에 걸친 우아한 추측들이, 말 한 마리와 담요 한 장이면 누구나 해 볼 수 있었던 실험에 졌다.",
   words: [
     { w: "camouflage", pos: "명사", mean: "위장, 보호색",
       ex: "The moth's camouflage fails on a painted wall.",
@@ -262,7 +262,7 @@ EXAM_SETS_H1.push(
 {
   id: "h1-024",
   title: "소금이 그린 지도",
-  passage: "Before refrigeration, salt was the only reliable way to keep food from rotting, and that single fact shaped maps. Fishing fleets could sail further because the catch could be salted on board. Armies could march because meat travelled with them. Towns rose beside salt springs and mines, and roads were cut to reach them long before anyone needed roads for anything else. Governments noticed. A substance that everyone must buy and nobody can make at home is almost perfectly designed to be taxed, and salt taxes funded states for centuries, from medieval France to British India. They also provoked them: Gandhi chose a march to the sea and a handful of salt as the clearest way to refuse a government. It is hard now to look at a shaker on a table and see any of this. The cheapest thing in the kitchen was once the reason the kitchen could be stocked at all.",
+  passage: "Before refrigeration, salt was the surest way to keep food from rotting, and that single fact shaped maps. Fishing fleets could sail further because the catch could be salted on board. Armies could march because meat travelled with them. Towns rose beside salt springs and mines, and roads were cut to reach them long before anyone needed roads for anything else. Governments noticed. A substance that everyone must buy and nobody can make at home is almost perfectly designed to be taxed, and salt taxes funded states for centuries, from medieval France to British India. They also provoked them: Gandhi chose a march to the sea and a handful of salt as the clearest way to refuse a government. It is hard now to look at a shaker on a table and see any of this. The cheapest thing in the kitchen was once the reason the kitchen could be stocked at all.",
   questions: [
     {
       type: "theme",
@@ -319,7 +319,7 @@ EXAM_SETS_H1.push(
       explain: "지문은 소금을 얻으려는 길이 \"다른 어떤 일로도 길이 필요해지기 훨씬 전에\" 뚫렸다고 했다. 순서가 뒤집힌 ③이 일치하지 않는다."
     }
   ],
-  translation: "냉장이 있기 전, 소금은 음식이 썩지 않게 하는 유일하게 믿을 만한 방법이었고, 그 하나의 사실이 지도의 모양을 바꾸었다. 잡은 것을 배 위에서 절일 수 있었기에 어선은 더 멀리 나갈 수 있었다. 고기가 함께 움직일 수 있었기에 군대는 행군할 수 있었다. 소금 샘과 광산 옆에 마을이 들어섰고, 다른 어떤 일로도 길이 필요해지기 훨씬 전에 그곳에 닿는 길이 뚫렸다. 정부가 이를 알아차렸다. 모두가 사야 하고 아무도 집에서 만들 수 없는 물질은 세금을 매기기에 거의 완벽하게 설계된 것이어서, 소금세는 중세 프랑스부터 영국령 인도에 이르기까지 수백 년 동안 국가를 지탱했다. 소금세는 국가를 자극하기도 했다. 간디는 바다로 향하는 행진과 소금 한 줌을, 한 정부를 거부하는 가장 분명한 방법으로 골랐다. 지금 식탁 위의 양념통을 보면서 이 가운데 어떤 것도 떠올리기는 어렵다. 부엌에서 가장 싼 그것이 한때는 부엌을 채울 수 있게 해 준 이유였다.",
+  translation: "냉장이 있기 전, 소금은 음식이 썩지 않게 하는 가장 확실한 방법이었고, 그 하나의 사실이 지도의 모양을 바꾸었다. 잡은 것을 배 위에서 절일 수 있었기에 어선은 더 멀리 나갈 수 있었다. 고기가 함께 움직일 수 있었기에 군대는 행군할 수 있었다. 소금 샘과 광산 옆에 마을이 들어섰고, 다른 어떤 일로도 길이 필요해지기 훨씬 전에 그곳에 닿는 길이 뚫렸다. 정부가 이를 알아차렸다. 모두가 사야 하고 아무도 집에서 만들 수 없는 물질은 세금을 매기기에 거의 완벽하게 설계된 것이어서, 소금세는 중세 프랑스부터 영국령 인도에 이르기까지 수백 년 동안 국가를 지탱했다. 소금세는 국가를 자극하기도 했다. 간디는 바다로 향하는 행진과 소금 한 줌을, 한 정부를 거부하는 가장 분명한 방법으로 골랐다. 지금 식탁 위의 양념통을 보면서 이 가운데 어떤 것도 떠올리기는 어렵다. 부엌에서 가장 싼 그것이 한때는 부엌을 채울 수 있게 해 준 이유였다.",
   words: [
     { w: "refrigeration", pos: "명사", mean: "냉장, 냉동 보관",
       ex: "Without refrigeration the milk lasted a single day.",
@@ -430,7 +430,7 @@ EXAM_SETS_H1.push(
 {
   id: "h1-026",
   title: "접는 공학",
-  passage: "Engineers have begun borrowing from origami, and not as decoration. A sheet that folds along a fixed pattern can be flat and wide when open, small and stiff when closed, and it moves between the two states without hinges, motors or loose parts. The most used pattern was worked out by a Japanese astrophysicist who wanted a solar panel that a satellite could carry folded and open with one pull. Versions of it now appear in space telescopes whose mirrors are wider than any rocket, in airbags that must inflate in a set order, and in tubes thin enough to travel inside a blood vessel and then hold an artery open. What makes the method powerful is that the behaviour lives in the crease pattern rather than in the material. Draw the folds correctly and a sheet of almost anything will move the way you intend.",
+  passage: "Engineers have begun borrowing from origami, and not as decoration. A sheet that folds along a fixed pattern can be flat and wide when open, small and stiff when closed, and it moves between the two states without hinges, motors or loose parts. The most used pattern was worked out by a Japanese space engineer who wanted a solar panel that a satellite could carry folded and open with one pull. Folding designs of this kind now appear in space telescopes whose mirrors are wider than any rocket, in airbags that must inflate in a set order, and in tubes thin enough to travel inside a blood vessel and then hold an artery open. What makes the method powerful is that the behaviour lives in the crease pattern rather than in the material. Draw the folds correctly and a sheet of almost anything will move the way you intend.",
   questions: [
     {
       type: "theme",
@@ -478,7 +478,7 @@ EXAM_SETS_H1.push(
       prompt: "윗글의 내용과 일치하지 않는 것은?",
       choices: [
         "접힌 판은 펼치면 넓고 접으면 작고 뻣뻣해진다.",
-        "가장 많이 쓰이는 무늬는 한 일본 천체물리학자가 고안했다.",
+        "가장 많이 쓰이는 무늬는 한 일본 우주 공학자가 고안했다.",
         "에어백은 정해진 순서로 부풀어야 한다.",
         "이 방식이 움직이려면 경첩과 모터가 반드시 있어야 한다.",
         "혈관 속을 지날 만큼 가는 관이 동맥을 열어 두는 데 쓰인다."
@@ -487,7 +487,7 @@ EXAM_SETS_H1.push(
       explain: "지문은 경첩도 모터도 헐거운 부품도 없이 두 상태를 오간다고 분명히 적어 두었다. 따라서 ④가 일치하지 않는다."
     }
   ],
-  translation: "공학자들이 종이접기에서 빌려 오기 시작했는데, 장식으로 쓰려는 것이 아니다. 정해진 무늬를 따라 접히는 판은 펼치면 평평하고 넓으며 접으면 작고 뻣뻣해지고, 경첩도 모터도 헐거운 부품도 없이 두 상태 사이를 오간다. 가장 많이 쓰이는 무늬는, 위성이 접은 채로 싣고 가서 한 번 잡아당기면 펼쳐지는 태양전지판을 원했던 한 일본 천체물리학자가 고안했다. 그 변형들이 이제는 어떤 로켓보다 거울이 넓은 우주망원경에, 정해진 순서로 부풀어야 하는 에어백에, 그리고 혈관 속을 지날 만큼 가늘면서 동맥을 열어 두는 관에 쓰인다. 이 방식을 강력하게 만드는 것은 그 움직임이 재료가 아니라 접힌 자국의 무늬에 들어 있다는 점이다. 접는 선을 제대로 그리기만 하면 거의 어떤 재료의 판이든 당신이 뜻하는 대로 움직인다.",
+  translation: "공학자들이 종이접기에서 빌려 오기 시작했는데, 장식으로 쓰려는 것이 아니다. 정해진 무늬를 따라 접히는 판은 펼치면 평평하고 넓으며 접으면 작고 뻣뻣해지고, 경첩도 모터도 헐거운 부품도 없이 두 상태 사이를 오간다. 가장 많이 쓰이는 무늬는, 위성이 접은 채로 싣고 가서 한 번 잡아당기면 펼쳐지는 태양전지판을 원했던 한 일본 우주 공학자가 고안했다. 이런 식의 접는 설계가 이제는 어떤 로켓보다 거울이 넓은 우주망원경에, 정해진 순서로 부풀어야 하는 에어백에, 그리고 혈관 속을 지날 만큼 가늘면서 동맥을 열어 두는 관에 쓰인다. 이 방식을 강력하게 만드는 것은 그 움직임이 재료가 아니라 접힌 자국의 무늬에 들어 있다는 점이다. 접는 선을 제대로 그리기만 하면 거의 어떤 재료의 판이든 당신이 뜻하는 대로 움직인다.",
   words: [
     { w: "hinge", pos: "명사", mean: "경첩",
       ex: "The gate swung badly because one hinge was loose.",
