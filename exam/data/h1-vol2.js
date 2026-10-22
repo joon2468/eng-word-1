@@ -258,7 +258,7 @@ EXAM_SETS_H1.push(
 {
   id: "h1-014",
   title: "강철 상자 하나",
-  passage: "Before 1956, loading a ship was slow and dangerous work. Cargo arrived in barrels, sacks and crates of every size, and gangs of dockworkers packed it by hand, a process that could keep a vessel in port for a week. Then a trucking owner named Malcolm McLean asked a simple question: why unload the truck at all? His answer was a steel box of a fixed size that could be lifted straight from a chassis onto a deck. The box itself was not clever. What mattered was that everyone agreed on its dimensions, so that a crane in Rotterdam could handle a container packed in Busan. Shipping costs fell by more than ninety percent, and goods that had never travelled began to cross oceans. Whole industries moved. The lesson is easy to miss, because the invention looks like nothing: the value lay not in the object but in the agreement about it.",
+  passage: "Before 1956, loading a ship was slow and dangerous work. Cargo arrived in barrels, sacks and crates of every size, and gangs of dockworkers packed it by hand, a process that could keep a vessel in port for a week. Then a trucking owner named Malcom McLean asked a simple question: why unload the truck at all? His answer was a steel box of a fixed size that could be lifted straight from a chassis onto a deck. The box itself was not clever. What mattered was that everyone agreed on its dimensions, so that a crane in Rotterdam could handle a container packed in Busan. The cost of loading a ship fell by more than ninety percent, and goods that had never travelled began to cross oceans. Whole industries moved. The lesson is easy to miss, because the invention looks like nothing: the value lay not in the object but in the agreement about it.",
   questions: [
     {
       type: "theme",
@@ -307,7 +307,7 @@ EXAM_SETS_H1.push(
       choices: [
         "1956년 이전에는 배 한 척이 일주일씩 항구에 묶여 있기도 했다.",
         "맥린은 트럭의 짐을 내리지 않는 방법을 떠올렸다.",
-        "운송비는 90퍼센트가 넘게 떨어졌다.",
+        "배에 짐을 싣는 비용은 90퍼센트가 넘게 떨어졌다.",
         "부산에서 실은 컨테이너를 로테르담의 크레인이 다룰 수 있었다.",
         "강철 상자 자체가 기술적으로 뛰어났다는 점이 변화의 핵심이었다."
       ],
@@ -315,7 +315,7 @@ EXAM_SETS_H1.push(
       explain: "지문은 \"그 상자 자체는 영리하지 않았다\"라고 분명히 말하고, 가치는 물건이 아니라 합의에 있었다고 끝맺는다. 따라서 ⑤가 일치하지 않는다."
     }
   ],
-  translation: "1956년 이전에 배에 짐을 싣는 일은 느리고 위험했다. 화물은 온갖 크기의 통과 자루와 나무 상자에 담겨 도착했고, 부두 노동자 무리가 그것을 손으로 쌓았는데, 그 과정 때문에 배 한 척이 일주일씩 항구에 묶여 있기도 했다. 그때 맬컴 맥린이라는 트럭 회사 주인이 단순한 질문을 던졌다. 애초에 트럭에서 짐을 왜 내리는가? 그의 답은 섀시에서 갑판으로 곧바로 들어 올릴 수 있는, 정해진 크기의 강철 상자였다. 그 상자 자체는 영리하지 않았다. 중요한 것은 모두가 그 치수에 합의했다는 점, 그래서 부산에서 실은 컨테이너를 로테르담의 크레인이 다룰 수 있었다는 점이다. 운송비는 90퍼센트 넘게 떨어졌고, 한 번도 바다를 건넌 적 없던 물건들이 대양을 오가기 시작했다. 산업 전체가 옮겨 다녔다. 발명이 아무것도 아닌 것처럼 보이기 때문에 이 교훈은 놓치기 쉽다. 가치는 그 물건이 아니라 그것에 대한 합의에 있었다.",
+  translation: "1956년 이전에 배에 짐을 싣는 일은 느리고 위험했다. 화물은 온갖 크기의 통과 자루와 나무 상자에 담겨 도착했고, 부두 노동자 무리가 그것을 손으로 쌓았는데, 그 과정 때문에 배 한 척이 일주일씩 항구에 묶여 있기도 했다. 그때 맬컴 맥린이라는 트럭 회사 주인이 단순한 질문을 던졌다. 애초에 트럭에서 짐을 왜 내리는가? 그의 답은 섀시에서 갑판으로 곧바로 들어 올릴 수 있는, 정해진 크기의 강철 상자였다. 그 상자 자체는 영리하지 않았다. 중요한 것은 모두가 그 치수에 합의했다는 점, 그래서 부산에서 실은 컨테이너를 로테르담의 크레인이 다룰 수 있었다는 점이다. 배에 짐을 싣는 비용은 90퍼센트 넘게 떨어졌고, 한 번도 바다를 건넌 적 없던 물건들이 대양을 오가기 시작했다. 산업 전체가 옮겨 다녔다. 발명이 아무것도 아닌 것처럼 보이기 때문에 이 교훈은 놓치기 쉽다. 가치는 그 물건이 아니라 그것에 대한 합의에 있었다.",
   words: [
     { w: "cargo", pos: "명사", mean: "화물",
       ex: "The cargo was checked twice before loading.",
@@ -342,7 +342,7 @@ EXAM_SETS_H1.push(
 {
   id: "h1-015",
   title: "혀의 지도",
-  passage: "Most of us learned that the tongue is divided into zones: sweet at the tip, bitter at the back, sour and salty along the sides. The diagram appears in textbooks all over the world, and it is wrong. It began as a German study from 1901 that merely noted slight differences in sensitivity across the tongue. An English translation turned those small differences into sharp borders, and a tidy picture is hard to kill. In fact every taste bud responds to every basic taste, and a drop of sugar placed at the back of the tongue tastes perfectly sweet. Anyone can test this in a kitchen in about a minute, which is the strange part. The map survived not because it resisted checking but because nobody bothered. A claim that is simple, useful-looking and printed in a textbook rarely gets the one minute that would overturn it.",
+  passage: "Most of us learned that the tongue is divided into zones: sweet at the tip, bitter at the back, sour and salty along the sides. The diagram appears in textbooks all over the world, and it is wrong. It began as a German study from 1901 that merely noted slight differences in sensitivity across the tongue. An American textbook redrew those small differences as sharp borders, and a tidy picture is hard to kill. In fact every taste bud responds to every basic taste, and a drop of sugar placed at the back of the tongue tastes perfectly sweet. Anyone can test this in a kitchen in about a minute, which is the strange part. The map survived not because it resisted checking but because nobody bothered. A claim that is simple, useful-looking and printed in a textbook rarely gets the one minute that would overturn it.",
   questions: [
     {
       type: "theme",
@@ -350,12 +350,12 @@ EXAM_SETS_H1.push(
       choices: [
         "why a false diagram of the tongue has lasted so long",
         "how the sense of taste changes as people grow older",
-        "the difficulty of translating scientific papers",
+        "how often science textbooks are rewritten",
         "which foods work best for testing sensitivity",
         "how taste buds renew themselves over time"
       ],
       answer: 0,
-      explain: "글은 혀 지도가 틀렸다는 사실보다 \"1분이면 확인할 수 있는데도 아무도 수고하지 않아 살아남았다\"는 쪽에 무게를 둔다. 따라서 주제는 ①. ③은 번역이 계기였다는 한 문장일 뿐이고 ②·④·⑤는 지문에 없다."
+      explain: "글은 혀 지도가 틀렸다는 사실보다 \"1분이면 확인할 수 있는데도 아무도 수고하지 않아 살아남았다\"는 쪽에 무게를 둔다. 따라서 주제는 ①. ③은 교과서가 계기였다는 한 문장일 뿐이고 ②·④·⑤는 지문에 없다."
     },
     {
       type: "blank",
@@ -391,7 +391,7 @@ EXAM_SETS_H1.push(
       choices: [
         "혀 지도는 1901년의 독일 연구에서 비롯되었다.",
         "그 독일 연구는 혀의 부위마다 맛이 뚜렷하게 나뉜다고 밝혔다.",
-        "영어 번역이 작은 차이를 뚜렷한 경계로 바꿔 놓았다.",
+        "미국의 한 교과서가 작은 차이를 뚜렷한 경계로 다시 그렸다.",
         "혀 뒤쪽에 설탕을 떨어뜨려도 단맛이 제대로 느껴진다.",
         "누구나 부엌에서 1분이면 이것을 확인해 볼 수 있다."
       ],
@@ -399,7 +399,7 @@ EXAM_SETS_H1.push(
       explain: "그 독일 연구는 부위별 민감도에 \"약간의 차이\"가 있다고 적었을 뿐이다. 뚜렷한 경계로 바꾼 것은 뒤의 영어 번역이므로 ②가 일치하지 않는다."
     }
   ],
-  translation: "우리 대부분은 혀가 구역으로 나뉘어 있다고 배웠다. 끝에서는 단맛, 안쪽에서는 쓴맛, 양옆을 따라서는 신맛과 짠맛이라고 말이다. 그 그림은 전 세계의 교과서에 실려 있고, 그리고 틀렸다. 그것은 혀의 부위마다 민감도에 약간의 차이가 있다고 적었을 뿐인 1901년의 한 독일 연구에서 시작되었다. 영어 번역이 그 작은 차이들을 뚜렷한 경계로 바꿔 놓았고, 깔끔한 그림은 좀처럼 사라지지 않는다. 실제로는 모든 미뢰가 모든 기본 맛에 반응하며, 혀 안쪽에 떨어뜨린 설탕 한 방울도 완벽하게 달게 느껴진다. 누구나 부엌에서 1분이면 이것을 확인할 수 있다는 점이 이상한 대목이다. 그 지도는 확인을 견뎌 내서 살아남은 것이 아니라, 아무도 수고하지 않아서 살아남았다. 단순하고 쓸모 있어 보이며 교과서에 인쇄된 주장은, 그것을 뒤엎을 그 1분을 좀처럼 얻지 못한다.",
+  translation: "우리 대부분은 혀가 구역으로 나뉘어 있다고 배웠다. 끝에서는 단맛, 안쪽에서는 쓴맛, 양옆을 따라서는 신맛과 짠맛이라고 말이다. 그 그림은 전 세계의 교과서에 실려 있고, 그리고 틀렸다. 그것은 혀의 부위마다 민감도에 약간의 차이가 있다고 적었을 뿐인 1901년의 한 독일 연구에서 시작되었다. 미국의 한 교과서가 그 작은 차이들을 뚜렷한 경계로 다시 그렸고, 깔끔한 그림은 좀처럼 사라지지 않는다. 실제로는 모든 미뢰가 모든 기본 맛에 반응하며, 혀 안쪽에 떨어뜨린 설탕 한 방울도 완벽하게 달게 느껴진다. 누구나 부엌에서 1분이면 이것을 확인할 수 있다는 점이 이상한 대목이다. 그 지도는 확인을 견뎌 내서 살아남은 것이 아니라, 아무도 수고하지 않아서 살아남았다. 단순하고 쓸모 있어 보이며 교과서에 인쇄된 주장은, 그것을 뒤엎을 그 1분을 좀처럼 얻지 못한다.",
   words: [
     { w: "sensitivity", pos: "명사", mean: "민감도, 예민함",
       ex: "Sensitivity to cold varies from person to person.",
@@ -594,7 +594,7 @@ EXAM_SETS_H1.push(
 {
   id: "h1-018",
   title: "다윈의 지렁이",
-  passage: "Charles Darwin spent the last years of his life on earthworms. He weighed the soil they pushed to the surface, played a bassoon at them to test their hearing, and kept pots of them in his study for decades. Friends found the subject beneath him. The book he produced in 1881 argued that worms had, over long stretches of time, passed most of the soil of England through their bodies, burying stones, ruins and whole fields in the process. A Roman villa near his house had sunk under worm castings, not under any flood. Critics thought the claim absurd; later measurements showed he had been too cautious. The work is now read as a companion to his famous theory rather than a hobby, because it makes the same argument in miniature: a force too small to notice, given enough time, rearranges the world. Darwin's worms were his last picture of what patience can build.",
+  passage: "Charles Darwin spent the last years of his life on earthworms. He weighed the soil they pushed to the surface, had a bassoon played at them to test their hearing, and kept pots of them in his study for decades. Friends found the subject beneath him. The book he produced in 1881 argued that worms had, over long stretches of time, passed most of the soil of England through their bodies, burying stones, ruins and whole fields in the process. A Roman villa in southern England had sunk under worm castings, not under any flood. Critics thought the claim absurd; later measurements showed he had been too cautious. The work is now read as a companion to his famous theory rather than a hobby, because it makes the same argument in miniature: a force too small to notice, given enough time, rearranges the world. Darwin's worms were his last picture of what patience can build.",
   questions: [
     {
       type: "theme",
@@ -642,16 +642,16 @@ EXAM_SETS_H1.push(
       prompt: "윗글의 내용과 일치하지 않는 것은?",
       choices: [
         "뒤의 측정은 다윈이 지렁이의 역할을 지나치게 크게 봤다고 밝혔다.",
-        "다윈은 지렁이의 청각을 시험하려고 바순을 불어 보았다.",
+        "다윈은 지렁이의 청각을 시험하려고 바순을 불게 해 보았다.",
         "친구들은 그 주제가 그에게 격이 떨어진다고 여겼다.",
-        "집 근처의 로마 시대 별장은 지렁이 똥 아래로 가라앉았다.",
+        "잉글랜드 남부의 로마 시대 별장이 지렁이 똥 아래로 가라앉았다.",
         "그 책은 1881년에 나왔다."
       ],
       answer: 0,
       explain: "지문은 뒤의 측정이 그가 \"너무 조심스러웠음(too cautious)\"을 보여 주었다고 했다. 즉 지렁이의 역할은 그가 말한 것보다 오히려 컸으므로 ①이 일치하지 않는다."
     }
   ],
-  translation: "찰스 다윈은 생의 마지막 몇 해를 지렁이에 썼다. 그는 지렁이가 땅 위로 밀어 올린 흙의 무게를 재고, 청각을 시험하려고 그들 앞에서 바순을 불었으며, 수십 년 동안 서재에 지렁이 화분을 두었다. 친구들은 그 주제가 그에게 격이 떨어진다고 여겼다. 1881년에 내놓은 그 책은, 지렁이들이 아주 긴 시간에 걸쳐 잉글랜드 흙의 대부분을 제 몸으로 통과시켰고 그 과정에서 돌과 유적과 들판 전체를 묻어 버렸다고 주장했다. 그의 집 근처에 있던 로마 시대 별장은 어떤 홍수가 아니라 지렁이 똥 아래로 가라앉은 것이었다. 비평가들은 그 주장을 터무니없다고 여겼지만, 뒤의 측정들은 그가 오히려 너무 조심스러웠음을 보여 주었다. 이 연구는 이제 취미가 아니라 그의 유명한 이론의 짝으로 읽히는데, 같은 주장을 축소판으로 펴고 있기 때문이다. 알아차리지 못할 만큼 작은 힘도 시간이 충분히 주어지면 세상을 다시 배치한다는 주장이다. 다윈의 지렁이는 인내가 무엇을 쌓을 수 있는지를 보여 준 그의 마지막 그림이었다.",
+  translation: "찰스 다윈은 생의 마지막 몇 해를 지렁이에 썼다. 그는 지렁이가 땅 위로 밀어 올린 흙의 무게를 재고, 청각을 시험하려고 그들 앞에서 바순을 불게 했으며, 수십 년 동안 서재에 지렁이 화분을 두었다. 친구들은 그 주제가 그에게 격이 떨어진다고 여겼다. 1881년에 내놓은 그 책은, 지렁이들이 아주 긴 시간에 걸쳐 잉글랜드 흙의 대부분을 제 몸으로 통과시켰고 그 과정에서 돌과 유적과 들판 전체를 묻어 버렸다고 주장했다. 잉글랜드 남부의 한 로마 시대 별장은 어떤 홍수가 아니라 지렁이 똥 아래로 가라앉은 것이었다. 비평가들은 그 주장을 터무니없다고 여겼지만, 뒤의 측정들은 그가 오히려 너무 조심스러웠음을 보여 주었다. 이 연구는 이제 취미가 아니라 그의 유명한 이론의 짝으로 읽히는데, 같은 주장을 축소판으로 펴고 있기 때문이다. 알아차리지 못할 만큼 작은 힘도 시간이 충분히 주어지면 세상을 다시 배치한다는 주장이다. 다윈의 지렁이는 인내가 무엇을 쌓을 수 있는지를 보여 준 그의 마지막 그림이었다.",
   words: [
     { w: "bury", pos: "동사", mean: "묻다, 덮어 가리다",
       ex: "Sand had buried the lower half of the fence.",
@@ -762,7 +762,7 @@ EXAM_SETS_H1.push(
 {
   id: "h1-020",
   title: "하품이 옮는 이유",
-  passage: "Read the word yawn and there is a fair chance you will yawn. The reflex spreads between people within seconds, passes through a telephone, and works on dogs that watch their owners do it. Why one body should copy another this way is not settled, but the pattern of who catches it is suggestive. Contagious yawning is strongest between family members, weaker between friends, weaker still between strangers, which is the same ladder that other measures of empathy climb. Children do not catch yawns until about the age of four, around the time they begin to understand that other people have minds of their own. The habit, in other words, seems to ride on the machinery we use to feel what someone else feels. That does not make a yawn meaningful. It makes it a small, visible sign of a system that usually works out of sight.",
+  passage: "Read the word yawn and there is a fair chance you will yawn. The reflex spreads between people within seconds, passes through a telephone, and appears to work on dogs that watch their owners do it. Why one body should copy another this way is not settled, but the pattern of who catches it is suggestive. Contagious yawning is strongest between family members, weaker between friends, weaker still between strangers, which is the same ladder that other measures of empathy climb. Children do not catch yawns until about the age of four, around the time they begin to understand that other people have minds of their own. The habit, in other words, seems to ride on the machinery we use to feel what someone else feels. That does not make a yawn meaningful. It makes it a small, visible sign of a system that usually works out of sight.",
   questions: [
     {
       type: "theme",
@@ -819,7 +819,7 @@ EXAM_SETS_H1.push(
       explain: "지문은 아이들이 네 살 무렵까지는 하품이 옮지 않는다고 했다. 태어날 때부터라는 ④가 일치하지 않는다."
     }
   ],
-  translation: "하품이라는 낱말을 읽기만 해도 당신이 하품할 가능성이 꽤 있다. 이 반사 작용은 사람들 사이에 몇 초 만에 퍼지고, 전화를 통해서도 옮으며, 주인이 하품하는 것을 지켜보는 개에게도 통한다. 왜 한 몸이 다른 몸을 이런 식으로 따라 해야 하는지는 아직 결론이 나 있지 않지만, 누구에게서 누구로 옮는가 하는 무늬는 무언가를 짐작하게 한다. 하품의 전염은 가족 사이에서 가장 강하고, 친구 사이에서는 그보다 약하며, 낯선 사람 사이에서는 더 약한데, 이는 공감을 재는 다른 척도들이 오르는 것과 똑같은 사다리다. 아이들은 네 살 무렵까지는 하품이 옮지 않는데, 그 시기는 다른 사람에게도 저마다의 마음이 있다는 것을 이해하기 시작하는 때와 대략 겹친다. 다시 말해 이 버릇은 우리가 남이 느끼는 것을 느끼는 데 쓰는 장치에 얹혀 있는 것으로 보인다. 그렇다고 해서 하품에 의미가 담기는 것은 아니다. 다만 하품은, 평소에는 보이지 않는 곳에서 돌아가는 한 장치의 작고 눈에 보이는 표시가 된다.",
+  translation: "하품이라는 낱말을 읽기만 해도 당신이 하품할 가능성이 꽤 있다. 이 반사 작용은 사람들 사이에 몇 초 만에 퍼지고, 전화를 통해서도 옮으며, 주인이 하품하는 것을 지켜보는 개에게도 통하는 것으로 보인다. 왜 한 몸이 다른 몸을 이런 식으로 따라 해야 하는지는 아직 결론이 나 있지 않지만, 누구에게서 누구로 옮는가 하는 무늬는 무언가를 짐작하게 한다. 하품의 전염은 가족 사이에서 가장 강하고, 친구 사이에서는 그보다 약하며, 낯선 사람 사이에서는 더 약한데, 이는 공감을 재는 다른 척도들이 오르는 것과 똑같은 사다리다. 아이들은 네 살 무렵까지는 하품이 옮지 않는데, 그 시기는 다른 사람에게도 저마다의 마음이 있다는 것을 이해하기 시작하는 때와 대략 겹친다. 다시 말해 이 버릇은 우리가 남이 느끼는 것을 느끼는 데 쓰는 장치에 얹혀 있는 것으로 보인다. 그렇다고 해서 하품에 의미가 담기는 것은 아니다. 다만 하품은, 평소에는 보이지 않는 곳에서 돌아가는 한 장치의 작고 눈에 보이는 표시가 된다.",
   words: [
     { w: "reflex", pos: "명사", mean: "반사 작용, 반사적인 반응",
       ex: "Blinking at a bright light is a reflex.",
