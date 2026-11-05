@@ -461,6 +461,11 @@
   function triesOf(rec){
     return (rec && typeof rec.tries === 'number' && rec.tries > 0) ? rec.tries : 1;
   }
+  /* 세기 전에 쌓인 기록에는 opened가 없다. 제출한 만큼은 시작했을 테니 그 아래로는 보지 않는다 */
+  function startsOf(st, id){
+    var submitted = st.done && st.done[id] ? triesOf(st.done[id]) : 0;
+    return Math.max((st.opened && st.opened[id]) || 0, submitted);
+  }
   /* 기록의 id로 지문의 번호와 제목을 찾는다 */
   function setInBank(key, id){
     var bank = bankOf(key);
@@ -669,6 +674,7 @@
     var s = state[lv];
     if(!s.answers) s.answers = {};
     if(!s.done) s.done = {};
+    if(!s.opened) s.opened = {};   /* 지문마다 시작을 누른 횟수. 제출과 따로 센다 */
     if(typeof s.elapsed !== 'number') s.elapsed = 0;
     if(typeof s.started !== 'boolean') s.started = false;
     if(typeof s.submitted !== 'boolean') s.submitted = false;
@@ -1195,8 +1201,11 @@
 
   /* ---------- 동작 ---------- */
   function startSet(){
-    var s = levelState(level);
+    var s = levelState(level), set = currentSet();
     peek = false;
+    /* 제출하지 않고 나가면 기록이 남지 않는다. 그래서 시작은 따로 센다 —
+       다 읽고 제출만 안 한 채 나중에 다시 푸는 경우가 제출 횟수에는 안 잡힌다 */
+    if(set) s.opened[set.id] = (s.opened[set.id] || 0) + 1;
     s.started = true;
     s.elapsed = 0;
     save();
@@ -1386,48 +1395,57 @@
      기록을 하나 지웠을 때 어긋나고, 어느 지문을 다시 푼 것인지도 알 수 없다 */
   function adminStat(){
     var box = el('div','adminstat');
-    var total = 0, again = [];
+    var sumStart = 0, sumSub = 0, notable = [];
     TABS.forEach(function(t){
-      var done = (state[t.key] || {}).done || {};
-      var ids = Object.keys(done), n = 0;
+      var st = state[t.key] || {}, done = st.done || {};
+      /* 제출한 적 없이 시작만 한 지문도 있으므로 두 쪽의 id를 합쳐 훑는다 */
+      var ids = Object.keys(done);
+      Object.keys(st.opened || {}).forEach(function(id){ if(ids.indexOf(id) < 0) ids.push(id); });
+
+      var starts = 0, subs = 0;
       ids.forEach(function(id){
-        var k = triesOf(done[id]);
-        n += k;
-        if(k > 1){
+        var a = startsOf(st, id), b = done[id] ? triesOf(done[id]) : 0;
+        starts += a; subs += b;
+        if(a > 1 || b > 1){
           var at = setInBank(t.key, id);
-          again.push({ lv:t.label, no:at ? at.no : 0, title:at ? at.title : id, tries:k });
+          notable.push({ lv:t.label, no:at ? at.no : 0, title:at ? at.title : id,
+                         starts:a, subs:b, gap:a - b });
         }
       });
-      total += n;
+      sumStart += starts; sumSub += subs;
+
       var r = el('div','ar');
       r.appendChild(el('span','ak', t.label));
-      r.appendChild(el('span','av', n + '회'));
-      r.appendChild(el('span','ad', ids.length
-        ? ('지문 ' + ids.length + '개 완료 · 다시 푼 ' + (n - ids.length) + '회')
-        : '아직 푼 지문 없음'));
+      r.appendChild(el('span','av', subs + '회'));
+      r.appendChild(el('span','ad', Object.keys(done).length
+        ? ('지문 ' + Object.keys(done).length + '개 완료 · 시작 ' + starts + '회')
+        : (starts ? ('시작만 ' + starts + '회') : '아직 푼 지문 없음')));
       box.appendChild(r);
     });
     var sum = el('div','ar');
     sum.appendChild(el('span','ak', '합계'));
-    sum.appendChild(el('span','av', total + '회'));
+    sum.appendChild(el('span','av', sumSub + '회'));
+    sum.appendChild(el('span','ad', '시작 ' + sumStart + '회 · 제출 없이 나간 '
+      + Math.max(0, sumStart - sumSub) + '회'));
     box.appendChild(sum);
 
-    if(again.length){
-      again.sort(function(a, b){ return (b.tries - a.tries) || (a.no - b.no); });
+    if(notable.length){
+      /* 제출 없이 나간 것이 많은 순, 그다음 많이 푼 순 */
+      notable.sort(function(a, b){ return (b.gap - a.gap) || (b.starts - a.starts) || (a.no - b.no); });
       var list = el('div','adminagain');
-      list.appendChild(el('p','at', '두 번 이상 푼 지문'));
-      again.forEach(function(g){
+      list.appendChild(el('p','at', '여러 번 연 지문'));
+      notable.forEach(function(g){
         var r = el('div','ar');
         r.appendChild(el('span','an', String(g.no)));
         r.appendChild(el('span','atitle', g.title));
-        r.appendChild(el('span','ad', g.lv + ' · ' + g.tries + '번'));
+        r.appendChild(el('span','ad', '시작 ' + g.starts + ' · 제출 ' + g.subs));
         list.appendChild(r);
       });
       box.appendChild(list);
     }
-    box.appendChild(el('p','adminmsg', again.length
-      ? '지문마다 제출한 횟수를 셉니다. 세기 전에 쌓인 기록은 한 번씩 푼 것으로 잡았어요.'
-      : '아직 두 번 이상 푼 지문은 없어요. 세기 전에 쌓인 기록은 한 번씩 푼 것으로 잡았습니다.'));
+    box.appendChild(el('p','adminmsg',
+      '시작과 제출을 지문마다 따로 셉니다. 시작만 하고 제출하지 않으면 기록이 남지 않아서예요. '
+      + '세기 전에 쌓인 기록은 한 번씩 시작해 한 번씩 제출한 것으로 잡았습니다.'));
     return box;
   }
 
@@ -1511,11 +1529,14 @@
       for(var k in state){
         if(k === TABS_KEY || !state[k]) continue;
         var mine = state[k].done || {};
+        var opened = state[k].opened || {};
         var theirs = (remote[k] && remote[k].done) || {};
         Object.keys(mine).forEach(function(id){
           if(theirs[id]) return;                 /* 웹에 이미 있으면 건너뛴다 */
-          if(!patch[k]) patch[k] = { done:{} };
+          if(!patch[k]) patch[k] = { done:{}, opened:{} };
           patch[k].done[id] = mine[id];
+          /* 올리는 지문의 시작 횟수도 같이 보낸다. 올리지 않는 지문은 건드리지 않는다 */
+          if(opened[id]) patch[k].opened[id] = opened[id];
           add.push(id);
         });
       }
