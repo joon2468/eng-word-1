@@ -226,7 +226,7 @@ EXAM_SETS_H1.push(
       prompt: "윗글의 내용과 일치하지 않는 것은?",
       choices: [
         "등에는 줄무늬를 두른 말에게는 평소보다 적게 다가왔다.",
-        "생물학자들은 무늬 없는 말에 줄무늬 덮개를 씌워 보았다.",
+        "생물학자들은 보통 말에 줄무늬 덮개를 씌워 보았다.",
         "등에는 줄무늬 말에 내려앉지 못하고 지나치거나 부딪혔다.",
         "무늬가 가장 뚜렷한 곳은 무는 파리가 가장 심한 지역이다.",
         "위장설은 오래전부터 가장 인기 있는 설명이었다."
@@ -262,7 +262,7 @@ EXAM_SETS_H1.push(
 {
   id: "h1-024",
   title: "소금이 그린 지도",
-  passage: "Before refrigeration, salt was the surest way to keep food from rotting, and that single fact shaped maps. Fishing fleets could sail further because the catch could be salted on board. Armies could march because meat travelled with them. Towns rose beside salt springs and mines, and roads were cut to reach them long before anyone needed roads for anything else. Governments noticed. A substance that everyone must buy and nobody can make at home is almost perfectly designed to be taxed, and salt taxes funded states for centuries, from medieval France to British India. They also provoked them: Gandhi chose a march to the sea and a handful of salt as the clearest way to refuse a government. It is hard now to look at a shaker on a table and see any of this. The cheapest thing in the kitchen was once the reason the kitchen could be stocked at all.",
+  passage: "Before refrigeration, salt was the surest way to keep food from rotting, and that single fact shaped maps. Fishing fleets could sail further because the catch could be salted on board. Armies could march because meat travelled with them. Towns rose beside salt springs and mines, and roads were cut to reach them long before anyone needed roads for anything else. Governments noticed. A substance that everyone must buy and nobody can make at home is almost perfectly designed to be taxed, and salt taxes funded states for centuries, from medieval France to British India. They also provoked revolt against them: Gandhi chose a march to the sea and a handful of salt as the clearest way to refuse a government. It is hard now to look at a shaker on a table and see any of this. The cheapest thing in the kitchen was once the reason the kitchen could be stocked at all.",
   questions: [
     {
       type: "theme",
@@ -303,7 +303,7 @@ EXAM_SETS_H1.push(
         "stirred up"
       ],
       answer: 4,
-      explain: "provoke는 \"불러일으키다, 자극하다\"라는 뜻이다. 앞 문장의 funded(지탱했다)와 대비되어 \"국가를 자극하기도 했다\"로 이어지고 간디의 행진이 그 예이므로 stirred up이 가장 가깝다."
+      explain: "provoke는 \"불러일으키다, 자극하다\"라는 뜻이다. 앞 문장의 funded(지탱했다)와 대비되어 \"국가에 맞선 저항을 불러일으켰다\"로 이어지고 간디의 행진이 그 예이므로 stirred up이 가장 가깝다."
     },
     {
       type: "detail",
@@ -319,7 +319,7 @@ EXAM_SETS_H1.push(
       explain: "지문은 소금을 얻으려는 길이 \"다른 어떤 일로도 길이 필요해지기 훨씬 전에\" 뚫렸다고 했다. 순서가 뒤집힌 ③이 일치하지 않는다."
     }
   ],
-  translation: "냉장이 있기 전, 소금은 음식이 썩지 않게 하는 가장 확실한 방법이었고, 그 하나의 사실이 지도의 모양을 바꾸었다. 잡은 것을 배 위에서 절일 수 있었기에 어선은 더 멀리 나갈 수 있었다. 고기가 함께 움직일 수 있었기에 군대는 행군할 수 있었다. 소금 샘과 광산 옆에 마을이 들어섰고, 다른 어떤 일로도 길이 필요해지기 훨씬 전에 그곳에 닿는 길이 뚫렸다. 정부가 이를 알아차렸다. 모두가 사야 하고 아무도 집에서 만들 수 없는 물질은 세금을 매기기에 거의 완벽하게 설계된 것이어서, 소금세는 중세 프랑스부터 영국령 인도에 이르기까지 수백 년 동안 국가를 지탱했다. 소금세는 국가를 자극하기도 했다. 간디는 바다로 향하는 행진과 소금 한 줌을, 한 정부를 거부하는 가장 분명한 방법으로 골랐다. 지금 식탁 위의 양념통을 보면서 이 가운데 어떤 것도 떠올리기는 어렵다. 부엌에서 가장 싼 그것이 한때는 부엌을 채울 수 있게 해 준 이유였다.",
+  translation: "냉장이 있기 전, 소금은 음식이 썩지 않게 하는 가장 확실한 방법이었고, 그 하나의 사실이 지도의 모양을 바꾸었다. 잡은 것을 배 위에서 절일 수 있었기에 어선은 더 멀리 나갈 수 있었다. 고기가 함께 움직일 수 있었기에 군대는 행군할 수 있었다. 소금 샘과 광산 옆에 마을이 들어섰고, 다른 어떤 일로도 길이 필요해지기 훨씬 전에 그곳에 닿는 길이 뚫렸다. 정부가 이를 알아차렸다. 모두가 사야 하고 아무도 집에서 만들 수 없는 물질은 세금을 매기기에 거의 완벽하게 설계된 것이어서, 소금세는 중세 프랑스부터 영국령 인도에 이르기까지 수백 년 동안 국가를 지탱했다. 소금세는 그 국가들에 맞서는 저항을 불러일으키기도 했다. 간디는 바다로 향하는 행진과 소금 한 줌을, 한 정부를 거부하는 가장 분명한 방법으로 골랐다. 지금 식탁 위의 양념통을 보면서 이 가운데 어떤 것도 떠올리기는 어렵다. 부엌에서 가장 싼 그것이 한때는 부엌을 채울 수 있게 해 준 이유였다.",
   words: [
     { w: "refrigeration", pos: "명사", mean: "냉장, 냉동 보관",
       ex: "Without refrigeration the milk lasted a single day.",
@@ -430,7 +430,7 @@ EXAM_SETS_H1.push(
 {
   id: "h1-026",
   title: "접는 공학",
-  passage: "Engineers have begun borrowing from origami, and not as decoration. A sheet that folds along a fixed pattern can be flat and wide when open, small and stiff when closed, and it moves between the two states without hinges, motors or loose parts. The most used pattern was worked out by a Japanese space engineer who wanted a solar panel that a satellite could carry folded and open with one pull. Folding designs of this kind now appear in space telescopes whose mirrors are wider than any rocket, in airbags that must inflate in a set order, and in tubes thin enough to travel inside a blood vessel and then hold an artery open. What makes the method powerful is that the behaviour lives in the crease pattern rather than in the material. Draw the folds correctly and a sheet of almost anything will move the way you intend.",
+  passage: "Engineers have begun borrowing from origami, and not as decoration. A sheet that folds along a fixed pattern can be flat and wide when open, small and stiff when closed, and it moves between the two states without hinges, motors or loose parts. The most used pattern was worked out by a Japanese space engineer who wanted a solar panel that a satellite could carry folded and open with one pull. Folding designs of this kind now appear in space telescopes whose mirrors are wider than any rocket, and in airbags that must inflate in a set order. They even turn up in tubes thin enough to travel inside a blood vessel and then hold an artery open. What makes the method powerful is that the behaviour lives in the crease pattern rather than in the material. Draw the folds correctly and a sheet of almost anything will move the way you intend.",
   questions: [
     {
       type: "theme",
@@ -487,7 +487,7 @@ EXAM_SETS_H1.push(
       explain: "지문은 경첩도 모터도 헐거운 부품도 없이 두 상태를 오간다고 분명히 적어 두었다. 따라서 ④가 일치하지 않는다."
     }
   ],
-  translation: "공학자들이 종이접기에서 빌려 오기 시작했는데, 장식으로 쓰려는 것이 아니다. 정해진 무늬를 따라 접히는 판은 펼치면 평평하고 넓으며 접으면 작고 뻣뻣해지고, 경첩도 모터도 헐거운 부품도 없이 두 상태 사이를 오간다. 가장 많이 쓰이는 무늬는, 위성이 접은 채로 싣고 가서 한 번 잡아당기면 펼쳐지는 태양전지판을 원했던 한 일본 우주 공학자가 고안했다. 이런 식의 접는 설계가 이제는 어떤 로켓보다 거울이 넓은 우주망원경에, 정해진 순서로 부풀어야 하는 에어백에, 그리고 혈관 속을 지날 만큼 가늘면서 동맥을 열어 두는 관에 쓰인다. 이 방식을 강력하게 만드는 것은 그 움직임이 재료가 아니라 접힌 자국의 무늬에 들어 있다는 점이다. 접는 선을 제대로 그리기만 하면 거의 어떤 재료의 판이든 당신이 뜻하는 대로 움직인다.",
+  translation: "공학자들이 종이접기에서 빌려 오기 시작했는데, 장식으로 쓰려는 것이 아니다. 정해진 무늬를 따라 접히는 판은 펼치면 평평하고 넓으며 접으면 작고 뻣뻣해지고, 경첩도 모터도 헐거운 부품도 없이 두 상태 사이를 오간다. 가장 많이 쓰이는 무늬는, 위성이 접은 채로 싣고 가서 한 번 잡아당기면 펼쳐지는 태양전지판을 원했던 한 일본 우주 공학자가 고안했다. 이런 식의 접는 설계가 이제는 어떤 로켓보다 거울이 넓은 우주망원경에, 그리고 정해진 순서로 부풀어야 하는 에어백에 쓰인다. 혈관 속을 지날 만큼 가늘면서 동맥을 열어 두는 관에도 등장한다. 이 방식을 강력하게 만드는 것은 그 움직임이 재료가 아니라 접힌 자국의 무늬에 들어 있다는 점이다. 접는 선을 제대로 그리기만 하면 거의 어떤 재료의 판이든 당신이 뜻하는 대로 움직인다.",
   words: [
     { w: "hinge", pos: "명사", mean: "경첩",
       ex: "The gate swung badly because one hinge was loose.",
@@ -545,17 +545,17 @@ EXAM_SETS_H1.push(
     },
     {
       type: "vocab",
-      prompt: "윗글의 pasture와 의미가 가장 가까운 것은?",
-      target: "pasture",
+      prompt: "윗글의 scale과 의미가 가장 가까운 것은?",
+      target: "scale",
       choices: [
-        "harvest",
-        "market",
-        "machine",
-        "grazing land",
-        "medicine"
+        "weight",
+        "balance",
+        "size",
+        "speed",
+        "price"
       ],
-      answer: 3,
-      explain: "pasture는 \"가축을 풀어 먹이는 풀밭\"이다. 바로 뒤에 우리가 그것을 \"뜯어 먹고 있다\"는 말이 이어지므로 grazing land가 가장 가깝다. 모두가 함께 쓰는 자원이라는 비유다."
+      answer: 2,
+      explain: "scale은 \"저울\"로 외우기 쉽지만 여기서는 \"규모\"라는 뜻이다. 아프지도 않은 가축에게까지, 처방전 없이도, 세계 곳곳에서 쓰인다는 뒤 문장이 바로 그 규모를 보여 주므로 size가 가장 가깝다. ①과 ②는 저울 쪽 뜻에 걸리라고 둔 오답이다."
     },
     {
       type: "detail",
@@ -573,9 +573,9 @@ EXAM_SETS_H1.push(
   ],
   translation: "항생제는 세균을 약하게 만들지 않는다. 죽일 수 있는 것들을 죽이고 나머지는 남겨 두며, 그 나머지가 번식한다. 어떤 세균 집단에도 주어진 약에서 어쩌다 살아남는 개체가 몇은 있기 때문에, 모든 치료 한 차례는 살아남은 것들을 번식시키는 작은 선택 사건이 된다. 이것은 우리가 눈으로 볼 수 있는 속도로 일어나는 평범한 진화다. 자연스러운 과정을 위기로 바꾸는 것은 규모다. 항생제는 아프지도 않은 가축에게 투여되고, 어떤 약도 듣지 않는 감염에 처방되며, 세계의 많은 곳에서 처방전 없이 팔린다. 그 사용 하나하나는 그렇게 하는 사람에게는 합리적으로 보이지만 나머지 모두에게는 비용이 되는데, 내성이 숙주와 숙주 사이로 옮겨 가는 것만큼이나 쉽게 세균의 종과 종 사이로도 옮겨 가기 때문이다. 그 약들은 풀밭처럼 작동하는 공유 자원이고, 우리는 풀밭이 늘 그래 왔던 방식 그대로 그것을 뜯어 먹고 있다.",
   words: [
-    { w: "bacterium", pos: "명사", mean: "세균 (복수형 bacteria)",
-      ex: "A single bacterium can divide every twenty minutes.",
-      ko: "세균 한 마리가 20분마다 분열할 수 있다." },
+    { w: "pasture", pos: "명사", mean: "(가축을 풀어 먹이는) 풀밭, 목초지",
+      ex: "The sheep were moved to a higher pasture in June.",
+      ko: "양들은 6월에 더 높은 목초지로 옮겨졌다." },
     { w: "multiply", pos: "동사", mean: "번식하다, 수가 불어나다",
       ex: "Left warm, the cells multiply overnight.",
       ko: "따뜻하게 두면 그 세포들은 하룻밤 사이에 불어난다." },
@@ -598,7 +598,7 @@ EXAM_SETS_H1.push(
 {
   id: "h1-028",
   title: "소리를 계산하다",
-  passage: "In 1895 a young physicist at Harvard was handed a problem nobody thought was physics. A new lecture hall was unusable: a speaker's words hung in the air so long that each sentence smeared into the next. Wallace Sabine spent nights carrying seat cushions in and out of the room, timing with a stopwatch how long an organ pipe's note took to fade. From hundreds of such nights he drew a single relation between a room's volume, the material on its surfaces and the time a sound lingers. Acoustics stopped being a matter of opinion. Five years later Boston opened a concert hall built from his numbers, the first in history designed to sound a particular way rather than merely hoped to, and it is still ranked among the finest anywhere. The lesson is less about sound than about measurement: a quality everyone could hear became manageable the moment somebody found a way to count it.",
+  passage: "In 1895 a young physicist at Harvard was handed a problem nobody thought was physics. A new lecture hall was unusable: a speaker's words hung in the air so long that each sentence smeared into the next. Wallace Sabine spent nights carrying seat cushions in and out of the room, timing with a stopwatch how long an organ pipe's note took to fade. From hundreds of such nights he drew a single relation between a room's volume, the material on its surfaces and the time a sound lingers. Acoustics stopped being a matter of opinion. Five years later Boston opened a concert hall built from his numbers, the first in history designed to sound a particular way instead of merely hoping it would, and it is still ranked among the finest anywhere. The lesson is less about sound than about measurement: a quality everyone could hear became manageable the moment somebody found a way to count it.",
   questions: [
     {
       type: "theme",
