@@ -172,6 +172,9 @@
   .adminstat .ad{color:var(--muted);font-size:12.5px;margin-left:auto;text-align:right;flex:0 0 auto}
   .adminagain{margin:12px 0 0;padding-top:11px;border-top:1px dashed var(--line)}
   .adminagain .at{margin:0 0 7px;font-size:12.5px;font-weight:600;color:var(--ink)}
+  .adminagain .ag{margin:9px 0 3px;font-family:var(--eng);font-size:11.5px;font-weight:700;
+    letter-spacing:.08em;color:var(--teal)}
+  .adminagain .ag:first-of-type{margin-top:2px}
   .adminagain .ar{padding:4px 0;gap:9px}
   .adminagain .an{font-family:var(--eng);font-weight:700;font-size:12px;color:var(--teal);
     background:var(--teal-soft);border:1px solid var(--teal-line);border-radius:7px;flex:0 0 auto;
@@ -1395,24 +1398,31 @@
      기록을 하나 지웠을 때 어긋나고, 어느 지문을 다시 푼 것인지도 알 수 없다 */
   function adminStat(){
     var box = el('div','adminstat');
-    var sumStart = 0, sumSub = 0, notable = [];
-    TABS.forEach(function(t){
+    var sumStart = 0, sumSub = 0, groups = [];
+    /* 켜 둔 수준만 본다. 쓰지 않는 수준이 0회로 줄만 차지할 이유가 없다 */
+    var levels = TABS.filter(function(t){ return tabOn(t.key); });
+    levels.forEach(function(t){
       var st = state[t.key] || {}, done = st.done || {};
       /* 제출한 적 없이 시작만 한 지문도 있으므로 두 쪽의 id를 합쳐 훑는다 */
       var ids = Object.keys(done);
       Object.keys(st.opened || {}).forEach(function(id){ if(ids.indexOf(id) < 0) ids.push(id); });
 
-      var starts = 0, subs = 0;
+      var starts = 0, subs = 0, rows = [];
       ids.forEach(function(id){
         var a = startsOf(st, id), b = done[id] ? triesOf(done[id]) : 0;
         starts += a; subs += b;
         if(a > 1 || b > 1){
           var at = setInBank(t.key, id);
-          notable.push({ lv:t.label, no:at ? at.no : 0, title:at ? at.title : id,
-                         starts:a, subs:b, gap:a - b });
+          rows.push({ no:at ? at.no : 0, title:at ? at.title : id,
+                      starts:a, subs:b, gap:a - b });
         }
       });
       sumStart += starts; sumSub += subs;
+      /* 제출 없이 나간 것이 많은 순, 그다음 많이 연 순 */
+      if(rows.length){
+        rows.sort(function(a, b){ return (b.gap - a.gap) || (b.starts - a.starts) || (a.no - b.no); });
+        groups.push({ label:t.label, rows:rows });
+      }
 
       var r = el('div','ar');
       r.appendChild(el('span','ak', t.label));
@@ -1422,24 +1432,29 @@
         : (starts ? ('시작만 ' + starts + '회') : '아직 푼 지문 없음')));
       box.appendChild(r);
     });
-    var sum = el('div','ar');
-    sum.appendChild(el('span','ak', '합계'));
-    sum.appendChild(el('span','av', sumSub + '회'));
-    sum.appendChild(el('span','ad', '시작 ' + sumStart + '회 · 제출 없이 나간 '
-      + Math.max(0, sumStart - sumSub) + '회'));
-    box.appendChild(sum);
+    /* 수준이 하나뿐이면 합계가 그 줄을 그대로 되풀이할 뿐이다 */
+    if(levels.length > 1){
+      var sum = el('div','ar');
+      sum.appendChild(el('span','ak', '합계'));
+      sum.appendChild(el('span','av', sumSub + '회'));
+      sum.appendChild(el('span','ad', '시작 ' + sumStart + '회 · 제출 없이 나간 '
+        + Math.max(0, sumStart - sumSub) + '회'));
+      box.appendChild(sum);
+    }
 
-    if(notable.length){
-      /* 제출 없이 나간 것이 많은 순, 그다음 많이 푼 순 */
-      notable.sort(function(a, b){ return (b.gap - a.gap) || (b.starts - a.starts) || (a.no - b.no); });
+    if(groups.length){
       var list = el('div','adminagain');
       list.appendChild(el('p','at', '여러 번 연 지문'));
-      notable.forEach(function(g){
-        var r = el('div','ar');
-        r.appendChild(el('span','an', String(g.no)));
-        r.appendChild(el('span','atitle', g.title));
-        r.appendChild(el('span','ad', '시작 ' + g.starts + ' · 제출 ' + g.subs));
-        list.appendChild(r);
+      groups.forEach(function(g){
+        /* 묶음이 하나뿐이면 수준 이름이 바로 윗줄과 겹쳐 군더더기가 된다 */
+        if(groups.length > 1) list.appendChild(el('div','ag', g.label));
+        g.rows.forEach(function(x){
+          var r = el('div','ar');
+          r.appendChild(el('span','an', String(x.no)));
+          r.appendChild(el('span','atitle', x.title));
+          r.appendChild(el('span','ad', '시작 ' + x.starts + ' · 제출 ' + x.subs));
+          list.appendChild(r);
+        });
       });
       box.appendChild(list);
     }
