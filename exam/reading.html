@@ -1207,6 +1207,16 @@
   function retrySet(){
     var s = levelState(level), set = currentSet();
     if(!set) return;
+    /* 누르자마자 결과 화면이 사라지고 시작 화면으로 넘어가니 한 번 묻는다.
+       정작 알려야 할 것은 화면이 바뀐다는 사실보다 지난 기록이 어떻게 되는가다.
+       숫자 뒤에 조사가 붙지 않도록 기록은 줄 끝에 둔다 */
+    var rec = s.done[set.id];
+    if(rec){
+      var no = bankOf(level).indexOf(set) + 1;
+      if(!confirm(no + '번 지문을 다시 풀까요?\n\n'
+        + '「' + set.title + '」 · 지난 기록 ' + rec.score + '/' + rec.total + ' · ' + fmt(rec.sec || 0) + '\n'
+        + '시작 화면으로 돌아가며, 다시 제출하면 이 기록을 덮어씁니다.')) return;
+    }
     s.answers = {};
     s.submitted = false;
     s.started = false;
