@@ -80,9 +80,12 @@
   .btn.red:hover{background:var(--cover-2)}
   .btn:disabled{opacity:.45;cursor:default}
   .btn.small{padding:8px 13px;font-size:13.5px}
+  .btn.on{background:var(--teal);border-color:var(--teal);color:#fff}   /* 팝업이 열려 있다 */
+  .btn.on:hover{background:#1B544E}
   .store{background:none;border:none;color:var(--muted);font-family:var(--kor);font-size:12.5px;
     cursor:pointer;padding:6px}
   .store:hover{color:var(--ink)}
+  .store.on{color:var(--teal);font-weight:600;background:var(--teal-soft);border-radius:8px}
 
   /* 지문 고르기 */
   .picker{display:none;background:var(--paper);border:1px solid var(--line);border-radius:16px;
@@ -92,8 +95,15 @@
   .picker h3{margin:2px 4px;font-size:12px;font-family:var(--eng);letter-spacing:.14em;
     text-transform:uppercase;color:var(--muted);font-weight:600}
   .picklist{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:8px}
-  .volhead{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:16px 0 2px}
+  .volhead{grid-column:1/-1;display:flex;align-items:center;gap:10px;width:100%;
+    margin:14px 0 0;padding:4px 2px 3px;background:none;border:none;font:inherit;cursor:pointer;
+    -webkit-tap-highlight-color:transparent}
   .volhead:first-child{margin-top:0}
+  .vcaret{flex:0 0 auto;font-size:12px;line-height:1;color:var(--muted);display:inline-block;
+    transition:transform .15s ease,color .15s ease}
+  .volhead.closed .vcaret{transform:rotate(-90deg)}
+  .volhead:hover .vcaret{color:var(--teal)}
+  .volhead:hover .vline{background:var(--teal-line)}
   .vn{font-family:var(--eng);font-weight:700;font-size:12.5px;letter-spacing:.06em;color:var(--teal);
     background:var(--teal-soft);border-radius:7px;padding:4px 10px;flex:0 0 auto}
   .vline{flex:1 1 auto;height:1px;background:var(--line)}
@@ -105,6 +115,7 @@
     -webkit-tap-highlight-color:transparent;transition:color .15s ease,border-color .15s ease,background .15s ease}
   .pickdel:hover{color:var(--cover);border-color:#F0BDC4;background:#FDF0F1}
   .pickdel[hidden]{display:none}
+  .pickrow[hidden]{display:none}   /* display:flex가 hidden 속성을 덮으므로 따로 적는다 */
   .pick{display:flex;align-items:center;gap:10px;text-align:left;width:100%;min-width:0;
     border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 12px;cursor:pointer;
     font-family:var(--kor);font-size:14.5px;color:var(--ink);-webkit-tap-highlight-color:transparent;
@@ -394,6 +405,9 @@
     summary:80, detail:60
   };
   var VOL_SIZE = 10;   /* Vol 하나에 담는 지문 수. 순서대로 열 개씩 끊는다 */
+  /* 사용자가 직접 접거나 편 묶음만 담는다. 손대지 않은 묶음은 완료 여부로 정한다 —
+     다 푼 묶음은 접어 두어야 아직 남은 묶음이 먼저 눈에 들어온다 */
+  var volOpen = {};
   function volNo(i){ return Math.floor(i / VOL_SIZE) + 1; }
   /* vol번째 묶음의 [시작, 끝) 과 푼 개수 */
   function volStat(bank, s, vol){
@@ -658,6 +672,20 @@
   var picker = document.getElementById('picker');
   var picklist = document.getElementById('picklist');
   var resetBtn = document.getElementById('resetBtn');
+  var opts = document.getElementById('opts');
+  var optsBtn = document.getElementById('optsBtn');
+
+  /* 팝업은 여러 곳에서 여닫히므로, 열림 표시는 이 두 함수에서만 손댄다 */
+  function showPicker(on){
+    picker.classList.toggle('open', !!on);
+    pickBtn.classList.toggle('on', !!on);
+    pickBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+  }
+  function showOpts(on){
+    opts.classList.toggle('open', !!on);
+    optsBtn.classList.toggle('on', !!on);
+    optsBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+  }
 
   function el(tag, cls, text){
     var n = document.createElement(tag);
@@ -883,22 +911,41 @@
     return foot;
   }
 
-  /* Vol 머리글 — 묶음 하나를 끝냈다는 매듭이 보이도록 진행 수를 같이 띄운다 */
-  function volHead(bank, s, vol){
+  /* 묶음을 펴 둘지. 손대지 않았으면 다 푼 묶음은 접고 남은 묶음은 편다 */
+  function volIsOpen(vol, st){
+    var k = level + ':' + vol;
+    return (k in volOpen) ? volOpen[k] : st.done < st.total;
+  }
+
+  /* Vol 머리글 — 묶음 하나를 끝냈다는 매듭이 보이도록 진행 수를 같이 띄운다.
+     눌러서 접었다 폈다 할 수 있다 */
+  function volHead(bank, s, vol, open){
     var st = volStat(bank, s, vol), full = st.done === st.total;
-    var h = el('div','volhead');
+    var h = el('button','volhead' + (open ? '' : ' closed'));
+    h.type = 'button';
+    h.setAttribute('aria-expanded', open ? 'true' : 'false');
+    h.title = 'Vol.' + vol + (open ? ' 접기' : ' 펴기');
     h.appendChild(el('span','vn', 'Vol.' + vol));
     h.appendChild(el('span','vline'));
     h.appendChild(el('span','vp' + (full ? ' full' : ''),
       full ? (st.total + '개 모두 완료 ✓') : (st.done + ' / ' + st.total + ' 완료')));
+    h.appendChild(el('span','vcaret', '▾'));
+    h.addEventListener('click', function(){
+      volOpen[level + ':' + vol] = !open;
+      renderPicker();
+    });
     return h;
   }
 
   function renderPicker(){
-    var bank = bankOf(level), s = levelState(level), vol = 0;
+    var bank = bankOf(level), s = levelState(level), vol = 0, open = true;
     picklist.innerHTML = '';
     bank.forEach(function(set, i){
-      if(volNo(i) !== vol){ vol = volNo(i); picklist.appendChild(volHead(bank, s, vol)); }
+      if(volNo(i) !== vol){
+        vol = volNo(i);
+        open = volIsOpen(vol, volStat(bank, s, vol));
+        picklist.appendChild(volHead(bank, s, vol, open));
+      }
       var rec = s.done[set.id];
       var b = el('button','pick' + (set.id === s.current ? ' cur' : ''));
       b.appendChild(el('span','pn', String(i + 1)));
@@ -907,10 +954,11 @@
       b.appendChild(el('span','ps' + (rec ? ' done' : ''),
         rec ? (rec.score + '/' + rec.total + ' · ' + fmt(rec.sec || 0)) : '—'));
       b.addEventListener('click', function(){
-        picker.classList.remove('open');
+        showPicker(false);
         openSet(set.id);
       });
       var row = el('div','pickrow');
+      row.hidden = !open;
       row.appendChild(b);
       var del = el('button','pickdel','×');
       del.title = '이 지문 기록 지우기';
@@ -952,7 +1000,7 @@
       countEl.textContent = '0 / 0';
       newBtn.disabled = true;
       pickBtn.disabled = true;
-      picker.classList.remove('open');
+      showPicker(false);
       document.getElementById('timer').hidden = true;
       var box = el('div','empty');
       box.appendChild(el('b', null, '보여 줄 수준이 없어요'));
@@ -1015,7 +1063,7 @@
     stopTimer();
     save();
     level = key;
-    picker.classList.remove('open');
+    showPicker(false);
     render();
   }
 
@@ -1060,6 +1108,7 @@
     if(!n){ alert('아직 지울 기록이 없어요.'); return; }
     if(!confirm(labelOf(level) + ' 기록 ' + n + '개를 지울까요? 점수와 풀이 시간이 모두 사라집니다.')) return;
     s.done = {};
+    volOpen = {};   /* 완료가 사라졌으니 접어 둔 것도 되돌린다 */
     s.answers = {};
     s.submitted = false;
     s.started = false;
@@ -1256,18 +1305,18 @@
     });
   }
 
-  document.getElementById('optsBtn').addEventListener('click', function(){
-    var open = document.getElementById('opts').classList.toggle('open');
-    picker.classList.remove('open');
-    if(open){ renderOpts(); document.getElementById('opts').scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+  optsBtn.addEventListener('click', function(){
+    var open = !opts.classList.contains('open');
+    showOpts(open);
+    showPicker(false);
+    if(open){ renderOpts(); opts.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
   });
 
   document.getElementById('upBtn').addEventListener('click', uploadLocalToWeb);
   document.getElementById('syncWarn').addEventListener('click', function(){
-    var opts = document.getElementById('opts');
     if(!opts.classList.contains('open')){
-      opts.classList.add('open');
-      picker.classList.remove('open');
+      showOpts(true);
+      showPicker(false);
       renderOpts();
     }
     paintSync();
@@ -1277,8 +1326,9 @@
   resetBtn.addEventListener('click', resetLevel);
 
   pickBtn.addEventListener('click', function(){
-    var open = picker.classList.toggle('open');
-    document.getElementById('opts').classList.remove('open');
+    var open = !picker.classList.contains('open');
+    showPicker(open);
+    showOpts(false);
     if(open){ renderPicker(); picker.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
   });
 
