@@ -554,6 +554,12 @@
     if(!db) return Promise.reject(new Error('firebase-unavailable'));
     return db.collection('examData').doc('progress').set({ data: data });
   }
+  /* 보낸 지문만 끼워 넣는다. 문서를 통째로 덮지 않으므로, 읽은 뒤 쓰기 전에
+     다른 기기가 올린 기록이 있어도 날아가지 않는다 */
+  function mergeRemote(data){
+    if(!db) return Promise.reject(new Error('firebase-unavailable'));
+    return db.collection('examData').doc('progress').set({ data: data }, { merge: true });
+  }
   function errText(e){
     var c = (e && (e.code || e.message)) || '알 수 없는 오류';
     if(c === 'permission-denied') return '권한 거부 — Firestore 규칙에서 examData를 막고 있어요';
@@ -1258,7 +1264,7 @@
     if(isAdmin()){
       row.appendChild(el('span','syncstate ok', '관리자로 로그인되어 있어요. 이 기기에서만입니다.'));
       var out = el('button','btn small','로그아웃');
-      out.addEventListener('click', function(){ setAdmin(false); renderAdmin(); });
+      out.addEventListener('click', function(){ setAdmin(false); renderOpts(); });
       row.appendChild(out);
       box.appendChild(row);
       box.appendChild(adminStat());
@@ -1276,7 +1282,7 @@
       if(!v){ renderAdmin('암호를 입력해 주세요.', 'bad'); return; }
       go.disabled = true;
       sha256Hex(ADMIN_SALT + v).then(function(h){
-        if(h === ADMIN_HASH){ setAdmin(true); renderAdmin(); }
+        if(h === ADMIN_HASH){ setAdmin(true); renderOpts(); }
         else renderAdmin('암호가 맞지 않아요.', 'bad');
       }).catch(function(){
         renderAdmin('이 브라우저에서는 암호를 확인할 수 없어요.', 'bad');
@@ -1353,9 +1359,11 @@
     if(!isWeb()){
       var n = countRecords(state);
       txt = n
-        ? ('이 기기에만 저장된 기록 ' + n + '개. 다른 기기에서는 보이지 않습니다.')
+        ? ('이 기기에만 저장된 기록 ' + n + '개. 다른 기기에서는 보이지 않습니다.'
+            + (isAdmin() ? '' : ' 웹으로 올리려면 아래에서 관리자로 로그인하세요.'))
         : '이 기기에만 저장합니다. 아직 푼 기록이 없어요.';
-      if(btn){ btn.hidden = !n; btn.disabled = false; btn.textContent = '웹으로 올리기'; }
+      /* 웹 기록을 바꾸는 유일한 버튼이므로 관리자에게만 보인다 */
+      if(btn){ btn.hidden = !n || !isAdmin(); btn.disabled = false; btn.textContent = '웹으로 올리기'; }
     } else {
       if(btn) btn.hidden = true;
       if(sync.err){
@@ -1386,15 +1394,16 @@
     if(btn){ btn.disabled = true; btn.textContent = '웹을 확인하는 중…'; }
     loadRemote().then(function(remote){
       remote = remote || {};
-      var add = [], plan = JSON.parse(JSON.stringify(remote));
+      /* 웹에 없는 지문만 모은다. 웹에 있는 것은 건드리지 않고, 다른 필드도 보내지 않는다 */
+      var add = [], patch = {};
       for(var k in state){
         if(k === TABS_KEY || !state[k]) continue;
         var mine = state[k].done || {};
-        if(!plan[k]) plan[k] = { current:null, answers:{}, submitted:false, started:false, elapsed:0, done:{} };
-        if(!plan[k].done) plan[k].done = {};
+        var theirs = (remote[k] && remote[k].done) || {};
         Object.keys(mine).forEach(function(id){
-          if(plan[k].done[id]) return;           /* 웹에 이미 있으면 건너뛴다 */
-          plan[k].done[id] = mine[id];
+          if(theirs[id]) return;                 /* 웹에 이미 있으면 건너뛴다 */
+          if(!patch[k]) patch[k] = { done:{} };
+          patch[k].done[id] = mine[id];
           add.push(id);
         });
       }
@@ -1403,12 +1412,12 @@
         paintSync(); renderOpts();
         return;
       }
-      if(!confirm('웹에 없는 기록 ' + add.length + '개를 올릴까요?\n웹에 이미 있는 지문은 건드리지 않습니다.')){
+      if(!confirm('웹에 없는 기록 ' + add.length + '개를 올릴까요?\n웹에 이미 있는 지문은 건드리지 않습니다.\n확인 창을 열어 둔 사이 다른 기기가 올린 기록도 그대로 남습니다.')){
         paintSync(); renderOpts();
         return;
       }
       if(box){ box.textContent = '올리는 중…'; box.className = 'syncstate'; }
-      return writeRemote(plan).then(function(){
+      return mergeRemote(patch).then(function(){
         alert(add.length + '개를 웹에 올렸어요. 이 기기 기록은 그대로 남아 있습니다.');
         paintSync(); renderOpts();
       });
