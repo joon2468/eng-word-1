@@ -1032,7 +1032,7 @@
       var del = el('button','pickdel','×');
       del.title = '이 지문 기록 지우기';
       del.setAttribute('aria-label', (i + 1) + '번 지문 기록 지우기');
-      del.hidden = !rec;
+      del.hidden = !rec || !isAdmin();   /* 기록을 지우는 버튼은 관리자에게만 */
       del.addEventListener('click', function(){ resetOne(set, i + 1); });
       row.appendChild(del);
       picklist.appendChild(row);
@@ -1094,6 +1094,8 @@
     setName.textContent = labelOf(level);
     countEl.textContent = 'Vol.' + volNo(no - 1) + ' · ' + st.done + '/' + st.total + ' 완료';
     resetBtn.textContent = labelOf(level) + ' 기록 모두 지우기';
+    /* 다시 풀기가 따로 있으므로 지우기는 정리용이다. 관리자에게만 보인다 */
+    resetBtn.hidden = !isAdmin();
     renderPicker();
     paintTimer();
 
@@ -1282,7 +1284,7 @@
     if(isAdmin()){
       row.appendChild(el('span','syncstate ok', '관리자로 로그인되어 있어요. 이 기기에서만입니다.'));
       var out = el('button','btn small','로그아웃');
-      out.addEventListener('click', function(){ setAdmin(false); renderOpts(); });
+      out.addEventListener('click', function(){ setAdmin(false); render(); renderOpts(); });
       row.appendChild(out);
       box.appendChild(row);
       box.appendChild(adminStat());
@@ -1300,7 +1302,7 @@
       if(!v){ renderAdmin('암호를 입력해 주세요.', 'bad'); return; }
       go.disabled = true;
       sha256Hex(ADMIN_SALT + v).then(function(h){
-        if(h === ADMIN_HASH){ setAdmin(true); renderOpts(); }
+        if(h === ADMIN_HASH){ setAdmin(true); render(); renderOpts(); }
         else renderAdmin('암호가 맞지 않아요.', 'bad');
       }).catch(function(){
         renderAdmin('이 브라우저에서는 암호를 확인할 수 없어요.', 'bad');
