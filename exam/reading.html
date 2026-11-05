@@ -194,7 +194,14 @@
   .gate .chip{font-size:13.5px;color:var(--muted);background:#fff;border:1px solid var(--line);
     border-radius:99px;padding:7px 14px}
   .gate .chip b{color:var(--teal);font-family:var(--eng);font-weight:700}
+  .gate .goes{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
   .gate .go{font-size:17px;padding:15px 44px;border-radius:14px}
+  .peekbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 16px;
+    padding:12px 14px;background:var(--teal-soft);border:1px solid var(--teal-line);border-radius:14px}
+  .peekbar .pk{flex:0 0 auto;font-size:11.5px;font-weight:700;letter-spacing:.05em;color:#fff;
+    background:var(--teal);border-radius:7px;padding:4px 10px}
+  .peekbar .pd{flex:1 1 150px;min-width:0;font-size:13px;line-height:1.5;color:var(--teal)}
+  .peekbar .btn{flex:0 0 auto;background:#fff}
   .gate .hint{margin:16px 0 0;font-size:12.5px;color:var(--muted);line-height:1.7}
 
   /* passage */
@@ -433,6 +440,8 @@
   /* 사용자가 직접 접거나 편 묶음만 담는다. 손대지 않은 묶음은 완료 여부로 정한다 —
      다 푼 묶음은 접어 두어야 아직 남은 묶음이 먼저 눈에 들어온다 */
   var volOpen = {};
+  /* 관리자가 그냥 보는 중인지. state에 담지 않으므로 기록에 아무 흔적도 남기지 않는다 */
+  var peek = false;
   function volNo(i){ return Math.floor(i / VOL_SIZE) + 1; }
   /* vol번째 묶음의 [시작, 끝) 과 푼 개수 */
   function volStat(bank, s, vol){
@@ -696,6 +705,7 @@
     opts = opts || {};
     var s = levelState(level);
     var rec = opts.fresh ? null : s.done[id];   /* fresh면 지난 결과를 펴지 않고 처음부터 */
+    peek = false;                              /* 다른 지문으로 옮기면 미리보기는 닫는다 */
     s.current = id;
     s.answers = (rec && rec.answers) ? rec.answers : {};
     s.submitted = !!rec;
@@ -792,16 +802,17 @@
     return card;
   }
 
-  function renderQuestion(set, q, qi){
+  /* peek이면 고른 답 없이 정답만 짚어 보여 준다. 채점이 아니므로 O·X는 달지 않는다 */
+  function renderQuestion(set, q, qi, peeking){
     var s = levelState(level);
-    var graded = !!s.submitted;
-    var chosen = s.answers[qi];
+    var graded = peeking || !!s.submitted;
+    var chosen = peeking ? null : s.answers[qi];
     var box = el('div','q' + (graded ? ' graded' : ''));
 
     var head = el('div','qhead');
     head.appendChild(el('span','qno', String(qi + 1)));
     head.appendChild(el('span','qtype', TYPE_LABEL[q.type] || ''));
-    if(graded){
+    if(graded && !peeking){
       var ok = chosen === q.answer;
       head.appendChild(el('span','qmark ' + (ok ? 'o' : 'x'), ok ? 'O' : 'X'));
     }
@@ -886,6 +897,33 @@
     return box;
   }
 
+  /* 관리자 미리보기. state를 한 글자도 바꾸지 않으므로 기록도 시간도 남지 않는다.
+     정답과 해설과 해석을 모두 펴 둔다 — 보려고 여는 화면이기 때문이다 */
+  function renderPreview(set, no){
+    var box = document.createDocumentFragment();
+    var bar = el('div','peekbar');
+    bar.appendChild(el('span','pk', '그냥 보기'));
+    bar.appendChild(el('span','pd', '지문 ' + no + ' · ' + set.title
+      + ' — 기록도 풀이 시간도 남지 않습니다'));
+    var close = el('button','btn small','닫기');
+    close.addEventListener('click', function(){
+      peek = false; render(); window.scrollTo({ top:0, behavior:'smooth' });
+    });
+    bar.appendChild(close);
+    box.appendChild(bar);
+
+    box.appendChild(renderPassage(set));
+    set.questions.forEach(function(q, qi){ box.appendChild(renderQuestion(set, q, qi, true)); });
+    var words = renderWords(set);
+    if(words) box.appendChild(words);
+    var trans = el('div','trans open');
+    trans.appendChild(el('h3', null, '지문 해석'));
+    trans.appendChild(el('div','transtitle', set.title));
+    trans.appendChild(el('div', null, set.translation));
+    box.appendChild(trans);
+    return box;
+  }
+
   /* 시작 전 화면 — 여기서 타이머가 시작된다.
      제목(set.title)은 주제·제목 문항의 답을 거의 그대로 알려 주므로 여기 띄우지 않는다.
      제출한 뒤 해석에서만 보여 준다. */
@@ -905,10 +943,21 @@
     c3.appendChild(el('b', null, fmtKo(goalSec(set))));
     meta.appendChild(c1); meta.appendChild(c2); meta.appendChild(c3);
     g.appendChild(meta);
+    var goes = el('div','goes');
     var go = el('button','btn solid go','시작하기');
     go.id = 'startBtn';
     go.addEventListener('click', startSet);
-    g.appendChild(go);
+    goes.appendChild(go);
+    if(isAdmin()){
+      var pk = el('button','btn','그냥 보기');
+      pk.id = 'peekBtn';
+      pk.title = '기록과 시간을 남기지 않고 지문·정답·해설을 봅니다';
+      pk.addEventListener('click', function(){
+        peek = true; render(); window.scrollTo({ top:0, behavior:'smooth' });
+      });
+      goes.appendChild(pk);
+    }
+    g.appendChild(goes);
     var avg = recentWpm(level, 5, set.id);
     g.appendChild(el('p','hint', avg
       ? ('최근 평균 ' + avg + ' words/분. 목표 시간은 그보다 조금 빠른 속도로 잡았어요.')
@@ -1099,6 +1148,11 @@
     renderPicker();
     paintTimer();
 
+    /* 미리보기는 시작 화면보다 먼저 본다. 타이머를 켜는 아래 줄에도 닿지 않는다 */
+    if(peek && isAdmin()){
+      main.appendChild(renderPreview(set, no));
+      return;
+    }
     if(!s.started){
       main.appendChild(renderGate(set, no));
       return;
@@ -1134,6 +1188,7 @@
     stopTimer();
     save();
     level = key;
+    peek = false;
     showPicker(false);
     render();
   }
@@ -1141,6 +1196,7 @@
   /* ---------- 동작 ---------- */
   function startSet(){
     var s = levelState(level);
+    peek = false;
     s.started = true;
     s.elapsed = 0;
     save();
@@ -1284,7 +1340,7 @@
     if(isAdmin()){
       row.appendChild(el('span','syncstate ok', '관리자로 로그인되어 있어요. 이 기기에서만입니다.'));
       var out = el('button','btn small','로그아웃');
-      out.addEventListener('click', function(){ setAdmin(false); render(); renderOpts(); });
+      out.addEventListener('click', function(){ setAdmin(false); peek = false; render(); renderOpts(); });
       row.appendChild(out);
       box.appendChild(row);
       box.appendChild(adminStat());
