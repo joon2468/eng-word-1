@@ -157,6 +157,20 @@
   .syncstate{font-size:12.5px;color:var(--muted);line-height:1.6;flex:1 1 180px}
   .syncstate.ok{color:var(--ok)}
   .syncstate.bad{color:var(--cover)}
+  .adminrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 4px}
+  .adminrow input[type="password"]{flex:1 1 150px;min-width:0;font-family:var(--kor);font-size:14px;
+    padding:9px 12px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink)}
+  .adminrow input[type="password"]:focus{outline:none;border-color:var(--teal-line);
+    box-shadow:0 0 0 3px var(--teal-soft)}
+  .adminmsg{font-size:12.5px;margin:9px 4px 0;line-height:1.7;color:var(--muted)}
+  .adminmsg.bad{color:var(--cover)}
+  .adminmsg.ok{color:var(--ok)}
+  .adminstat{margin:13px 4px 0;padding-top:12px;border-top:1px solid var(--line)}
+  .adminstat .ar{display:flex;align-items:baseline;gap:9px;font-size:13.5px;padding:5px 0}
+  .adminstat .ak{font-weight:600;min-width:34px;flex:0 0 auto}
+  .adminstat .av{font-family:var(--eng);font-weight:700;color:var(--teal);flex:0 0 auto}
+  .adminstat .ad{color:var(--muted);font-size:12.5px;margin-left:auto;text-align:right}
+
   .syncwarn{font-family:var(--kor);font-weight:600;font-size:12.5px;cursor:pointer;
     border:1px solid #F0BDC4;background:#FDF0F1;color:var(--cover);border-radius:10px;padding:6px 10px;
     -webkit-tap-highlight-color:transparent}
@@ -328,6 +342,9 @@
       <span class="syncstate" id="syncState">확인 중…</span>
       <button class="btn small" id="upBtn" hidden>웹으로 올리기</button>
     </div>
+
+    <h4>관리자</h4>
+    <div id="adminBox"></div>
   </div>
 
   <div class="picker" id="picker">
@@ -488,6 +505,32 @@
   var KEY = 'exam_progress';                   /* 로컬 모드 기록 */
   var PENDING_KEY = 'exam_pending';            /* 웹에 못 올린 기록. 로컬 기록과 별개다 */
   var MODE_KEY = 'storage_mode';               /* 다른 페이지와 같은 설정을 쓴다 */
+  var ADMIN_KEY = 'exam_admin';                /* 이 기기에서만. 웹 기록과 섞지 않는다 */
+
+  /* 서버가 없어 암호를 브라우저가 읽을 수 있는 곳에 둘 수밖에 없다. 그대로 적어 두면
+     소스에 바로 보이므로 소금을 친 SHA-256 해시만 둔다. 작정하고 깨는 것은 막지 못한다.
+     무심코 소스를 열었을 때 암호가 눈에 띄지 않게 하는 턱이다. */
+  var ADMIN_SALT = 'eng-word-1/exam/';
+  var ADMIN_HASH = 'b06618d8d036b135ae5a360f2df76bdb4cf1803183cdd62521fbf361d3f6fea5';
+
+  function isAdmin(){
+    try { return localStorage.getItem(ADMIN_KEY) === '1'; } catch(e){ return false; }
+  }
+  function setAdmin(on){
+    try {
+      if(on) localStorage.setItem(ADMIN_KEY, '1');
+      else localStorage.removeItem(ADMIN_KEY);
+    } catch(e){}
+  }
+  function sha256Hex(text){
+    if(!(window.crypto && window.crypto.subtle && window.TextEncoder))
+      return Promise.reject(new Error('nocrypto'));
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function(buf){
+      return Array.prototype.map.call(new Uint8Array(buf), function(b){
+        return ('0' + b.toString(16)).slice(-2);
+      }).join('');
+    });
+  }
   function getMode(){ try{ return localStorage.getItem(MODE_KEY) || 'web'; }catch(e){ return 'local'; } }
   function setMode(m){ try{ localStorage.setItem(MODE_KEY, m); }catch(e){} }
   function isWeb(){ return getMode() === 'web'; }
@@ -594,6 +637,9 @@
     if(typeof s.elapsed !== 'number') s.elapsed = 0;
     if(typeof s.started !== 'boolean') s.started = false;
     if(typeof s.submitted !== 'boolean') s.submitted = false;
+    /* 제출 횟수. 세기 전에 이미 푼 지문이 있으므로 그 수에서 시작한다 —
+       0에서 시작하면 17개를 푼 묶음이 0회로 보인다 */
+    if(typeof s.submits !== 'number') s.submits = Object.keys(s.done).length;
     return s;
   }
   function setById(id){
@@ -1138,6 +1184,7 @@
       answers: s.answers                        /* 다시 열었을 때 그대로 보여 주려고 남긴다 */
     };
     s.done[set.id] = rec;
+    s.submits++;            /* 다시 풀어 또 제출하면 그만큼 더 센다 */
     /* 웹 모드에서는 올라갈 때까지 대기열에 둔다. 저장이 성공하면 비워진다 */
     if(isWeb()) pendingAdd(level, set.id, rec);
     save();
@@ -1198,6 +1245,72 @@
         sb.appendChild(optRow(on, m[1], m[2], r));
       });
     paintSync();
+    renderAdmin();
+  }
+
+  /* 관리자 칸. 로그인 상태는 이 기기에만 두므로 아드님 기기에는 켜지지 않는다 */
+  function renderAdmin(msg, cls){
+    var box = document.getElementById('adminBox');
+    if(!box) return;
+    box.innerHTML = '';
+    var row = el('div','adminrow');
+
+    if(isAdmin()){
+      row.appendChild(el('span','syncstate ok', '관리자로 로그인되어 있어요. 이 기기에서만입니다.'));
+      var out = el('button','btn small','로그아웃');
+      out.addEventListener('click', function(){ setAdmin(false); renderAdmin(); });
+      row.appendChild(out);
+      box.appendChild(row);
+      box.appendChild(adminStat());
+      return;
+    }
+
+    var pw = document.createElement('input');
+    pw.type = 'password';
+    pw.id = 'adminPw';
+    pw.placeholder = '관리자 암호';
+    pw.autocomplete = 'current-password';
+    var go = el('button','btn small','로그인');
+    function tryLogin(){
+      var v = pw.value;
+      if(!v){ renderAdmin('암호를 입력해 주세요.', 'bad'); return; }
+      go.disabled = true;
+      sha256Hex(ADMIN_SALT + v).then(function(h){
+        if(h === ADMIN_HASH){ setAdmin(true); renderAdmin(); }
+        else renderAdmin('암호가 맞지 않아요.', 'bad');
+      }).catch(function(){
+        renderAdmin('이 브라우저에서는 암호를 확인할 수 없어요.', 'bad');
+      });
+    }
+    go.addEventListener('click', tryLogin);
+    pw.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); tryLogin(); } });
+    row.appendChild(pw);
+    row.appendChild(go);
+    box.appendChild(row);
+    if(msg) box.appendChild(el('p','adminmsg ' + (cls || ''), msg));
+  }
+
+  /* 수준별 제출 횟수. 꺼 둔 수준도 함께 보여 준다 */
+  function adminStat(){
+    var box = el('div','adminstat');
+    var total = 0;
+    TABS.forEach(function(t){
+      var st = state[t.key] || {}, n = st.submits || 0, done = Object.keys(st.done || {}).length;
+      total += n;
+      var r = el('div','ar');
+      r.appendChild(el('span','ak', t.label));
+      r.appendChild(el('span','av', n + '회'));
+      r.appendChild(el('span','ad', done
+        ? ('지문 ' + done + '개 완료 · 다시 푼 ' + Math.max(0, n - done) + '회')
+        : '아직 푼 지문 없음'));
+      box.appendChild(r);
+    });
+    var sum = el('div','ar');
+    sum.appendChild(el('span','ak', '합계'));
+    sum.appendChild(el('span','av', total + '회'));
+    box.appendChild(sum);
+    box.appendChild(el('p','adminmsg', '횟수를 세기 시작하기 전에 푼 지문은 한 번씩 제출한 것으로 잡았어요.'));
+    return box;
   }
 
   function toggleTab(key, on){
